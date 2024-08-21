@@ -65,18 +65,18 @@
                         {{-- <li><a href="email-compose.html">Email Compose</a></li> --}}
                     </ul>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="javascript:void(0);" class="waves-effect"><i class="fa-solid fa-user-plus"></i><span> Socios <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                     <ul class="submenu">
                         <li><a href="/admin/socios">Ver Todos</a></li>
                     </ul>
-                </li>
-                <li>
+                </li> --}}
+                {{-- <li>
                     <a href="/admin/pistas" class="waves-effect"><i class="fa-solid fa-flag"></i><span> Pistas </span></a>
                 </li>
                 <li>
                     <a href="/admin/torneos" class="waves-effect"><i class="fa-solid fa-trophy"></i> Torneos </span></a>
-                </li>
+                </li> --}}
                
 
                 {{-- <li class="menu-title">Eventos</li> --}}
@@ -142,25 +142,24 @@
                         {{-- <li><a href="email-compose.html">Email Compose</a></li> --}}
                     {{-- </ul>
                 </li> --}}
-                <li>
+                {{-- <li>
                     <a href="javascript:void(0);" class="waves-effect"><i class="fas fa-user-friends"></i><span> Monitores <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                     <ul class="submenu">
                         <li><a href="/admin/monitores">Ver Todos</a></li>
                         <li><a href="/admin/monitores-create">Crear Monitor</a></li>
                         {{-- <li><a href="email-compose.html">Email Compose</a></li> --}}
-                    </ul>
-                </li>
+                    {{-- </ul>
+                </li> --}}
 
-                <li class="menu-title">Departamentos</li>
+                <li class="menu-title">Hermandades</li>
 
-<li>
+                    {{-- <li>
                     <a href="javascript:void(0);" class="waves-effect"><i class="icon-case-2"></i><span> Departamentos <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                     <ul class="submenu">
                         <li><a href="/admin/departamentos">Ver Todos</a></li>
                         <li><a href="/admin/departamento-create">Crear Departamento</a></li>
-                        {{-- <li><a href="email-compose.html">Email Compose</a></li> --}}
                     </ul>
-                </li>
+                </li> --}}
                 <li>
                     <a href="javascript:void(0);" class="waves-effect"><i class="fas fa-user"></i><span> Usuarios <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                     <ul class="submenu">

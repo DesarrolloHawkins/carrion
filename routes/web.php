@@ -51,6 +51,8 @@ use App\Http\Livewire\Facturas\IndexComponent as FacturasIndexComponent;
 use App\Http\Livewire\Productos\IndexComponent;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\TorneosController;
+use App\Http\Controllers\SillasController;
+use App\Http\Controllers\CsvUploadController;
 
 use App\Http\Middleware\IsAdmin;
 use FontLib\Table\Type\name;
@@ -118,6 +120,10 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
     Route::get('calendario', [CalendarioController::class, 'index'])->name('calendario.index');
     Route::get('calendario-create', [CalendarioController::class, 'create'])->name('calendario.create');
     Route::get('calendario-edit/{id}', [CalendarioController::class, 'edit'])->name('calendario.edit');
+
+    //sillas
+    Route::get('sillas', [SillasController::class, 'index'])->name('sillas.index');
+    Route::post('/process-csv', [CsvUploadController::class, 'processCsv'])->name('processCsv');
 
 
     // Articulos
@@ -336,5 +342,10 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
      Route::get('caja-edit/{id}', [CajaController::class, 'edit'])->name('caja.edit');
 
      Route::get('/service/jwt', [MapKitController::class, 'getJwt']);
+
+     //MAPA
+     Route::get('/mapa', [App\Http\Controllers\MapController::class, 'index']);
+     Route::get('/detalles-zona', [App\Http\Controllers\MapController::class, 'zona']);
+
 
 });

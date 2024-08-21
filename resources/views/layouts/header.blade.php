@@ -6,11 +6,11 @@
     <div class="topbar-left" style="margin-bottom: -145px !important;">
         <a href="{{route('home')}}" class="logo">
             <span class="logo-light">
-                <img class="img-fluid p-1" width="100px" src="{{ asset('assets/images/logo.jpg') }}" alt="Logo">
+                <img class="img-fluid p-1" width="100px" src="{{ asset('assets/images/logo.png') }}" alt="Logo">
                 {{-- <i class="mdi mdi-camera-control"></i> La Fabrica --}}
             </span>
             <span class="logo-sm">
-                <img class="img-fluid p-1" src="{{ asset('assets/images/logo.jpg') }}" alt="Logo">
+                <img class="img-fluid p-1" src="{{ asset('assets/images/logo.png') }}" alt="Logo">
             </span>
         </a>
     </div>
