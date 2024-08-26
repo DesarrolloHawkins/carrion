@@ -25,4 +25,9 @@ class Gradas extends Model
         return $this->belongsTo(Zonas::class, 'id_zona');
     }
 
+    public function sillas()
+    {
+        return $this->hasMany(Sillas::class, 'id_grada');
+    }
+
 }

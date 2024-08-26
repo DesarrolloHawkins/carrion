@@ -9,16 +9,19 @@
                 <li class="menu-title">General</li>
                 <li>
                     <a href="/../home" class="waves-effect">
-                        <i class="icon-accelerator"></i> {{-- <span class="badge badge-success badge-pill float-right">9+</span> --}} <span> Dashboard </span>
+                        <i class="icon-accelerator"></i> {{-- <span class="badge badge-success badge-pill float-right">9+</span> --}} <span> Mapa </span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
+                    <a href="/admin/mapa" class="waves-effect"><i class="icon-calendar"></i><span> Mapa </span></a>
+                </li> --}}
+                {{-- <li>
                     <a href="/admin/calendario" class="waves-effect"><i class="icon-calendar"></i><span> Reservas </span></a>
                 </li>
 
                 <li>
                     <a href="/admin/informes-reservas" class="waves-effect"><i class="fa-solid fa-book-bookmark"></i><span> Informes Reservas </span></a>
-                </li>
+                </li> --}}
                 {{-- <li>
                     <a href="/admin/agenda" class="waves-effect"><i class="fas fa-book"></i><span> Agenda </span></a>
                 </li> --}}

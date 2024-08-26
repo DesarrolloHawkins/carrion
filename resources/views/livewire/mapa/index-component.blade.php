@@ -3,8 +3,8 @@
         <script src="https://cdn.jsdelivr.net/npm/ol@v10.0.0/dist/ol.js"></script>
         <style>
             .map {
-                height: 600px;
-                width: 600px;
+                height: 800px;
+                width: 95%;
             }
         </style>
     <div id="map" class="map"></div>
@@ -73,8 +73,22 @@
         map.on('singleclick', function(evt) {
             map.forEachFeatureAtPixel(evt.pixel, function(feature) {
                 var zona = feature.get('zona');
+
+               let id = 0; 
+               switch (zona) {
+                    case '01- Asunción (Protocolo)': id = 8; break;
+                    case '02.- Consistorio': id = 7; break;
+                    case '04.- Lancería-Gallo Azul': id = 2; break;
+                    case '05.- Algarve-Plaza del Banco': id = 6; break;
+                    case '06.- Rotonda de los Casinos-Santo Domingo': id = 4; break;
+                    case '07.- Marqués de Casa Domecq': id = 5; break;
+                    case '08.- Eguiluz': id = 3; break;
+                    case '03. Arenal': id = 1; break;
+                default: break ; 
+                }
+
                 // Redirigir a la página correspondiente (puedes modificar la URL según tus necesidades)
-                window.location.href = '/detalles-zona?nombre=' + encodeURIComponent(zona);
+                window.location.href = '/admin/detalles-zona?id=' + id;
             });
         });
     </script>

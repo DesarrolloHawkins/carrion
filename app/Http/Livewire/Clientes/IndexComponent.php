@@ -12,29 +12,29 @@ class IndexComponent extends Component
     use LivewireAlert;
 
     public $clientes;
-    public $categorias;
-    public $categoria_id;
+    public $apellidos;
     public $nombre;
-    public $apellido;
-    public $tlf1;
-    public $email1;
-    public $cliente_id;
-    public $telefono;
+    public $direccion;
+    public $codigo_postal;
+    public $poblacion;
+    public $provincia;
+    public $fijo;
+    public $movil;
     public $DNI;
-    public $nickName;
-    public $ciudad;
-    public $genero;
+    public $email;
+    public $cliente_id;
 
     protected $rules = [
-        'nombre' => 'required|string|max:255',
-        'apellido' => 'nullable|string|max:255',
-        'telefono' => 'required|string|max:15',
-        'email1' => 'required|email|max:255',
-        'categoria_id' => 'required|exists:categorias_jugadores,id',
-        'DNI' => 'required|string|max:255',
-        'nickName' => 'required|string|max:255',
-        'ciudad' => 'nullable|string|max:255',
-        'genero' => 'nullable|string|max:255',
+        'nombre' => 'required',
+        'apellidos' => 'nullable',
+        'direccion' => 'nullable',
+        'codigo_postal' => 'nullable',
+        'poblacion' => 'nullable',
+        'provincia' => 'nullable',
+        'fijo' => 'nullable',
+        'movil' => 'nullable',
+        'DNI' => 'required',
+        'email' => 'required',
     ];
 
     public function mount()
@@ -50,7 +50,7 @@ class IndexComponent extends Component
 
     public function resetFields()
     {
-        $this->reset(['nombre', 'apellido', 'telefono', 'email1', 'categoria_id', 'cliente_id' , 'DNI', 'nickName', 'ciudad', 'genero']);
+        $this->reset(['cliente_id', 'nombre', 'apellidos', 'direccion', 'codigo_postal', 'poblacion', 'provincia', 'fijo', 'movil', 'DNI', 'email']);
     }
 
     public function submit()
@@ -75,15 +75,19 @@ class IndexComponent extends Component
         $cliente = Cliente::findOrFail($id);
 
         $this->cliente_id = $cliente->id;
+
         $this->nombre = $cliente->nombre;
-        $this->apellido = $cliente->apellido;
-        $this->telefono = $cliente->telefono;
-        $this->email1 = $cliente->email1;
-        $this->categoria_id = $cliente->categoria_id;
+        $this->apellidos = $cliente->apellidos;
+        $this->direccion = $cliente->direccion;
+        $this->codigo_postal = $cliente->codigo_postal;
+        $this->poblacion = $cliente->poblacion;
+        $this->provincia = $cliente->provincia;
+        $this->fijo = $cliente->fijo;
+        $this->movil = $cliente->movil;
         $this->DNI = $cliente->DNI;
-        $this->nickName = $cliente->nickName;
-        $this->ciudad = $cliente->ciudad;
-        $this->genero = $cliente->genero;
+        $this->email = $cliente->email;
+
+
 
         $this->dispatchBrowserEvent('open-modal');
     }

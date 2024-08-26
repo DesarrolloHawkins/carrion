@@ -47,13 +47,12 @@ class HomeController extends Controller
         $pendiente = (float) ($presupuestos->where('estado', '!=', 'Facturado')->whereBetween('fechaEmision', [$inicioMes, $finMes])->sum('precioFinal') - $presupuestos->where('estado', '!=', 'Facturado')->whereBetween('fechaEmision', [$inicioMes, $finMes])->sum('adelanto'));
 
         $user = $request->user();
-        $eventos = Evento::whereBetween('diaEvento', [$inicioSemana, $finSemana])->orderBy('diaEvento', 'ASC')->get();
         $presupuestosMes = Presupuesto::where('estado', 'Facturado')->whereBetween('fechaEmision', [$inicioMes, $finMes])->get();
 
         $gastos_caja = Caja::whereBetween('fecha', [$inicioSemana, $finSemana])->where('tipo_movimiento', 'Gasto')->sum('importe');
         $ingresos_caja = Caja::whereBetween('fecha', [$inicioSemana, $finSemana])->where('tipo_movimiento', 'Ingreso')->sum('importe');
         $resultados_caja = $ingresos_caja - $gastos_caja;
 
-        return view('torneos.index');
+        return view('mapa.index');
     }
 }

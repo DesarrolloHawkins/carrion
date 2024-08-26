@@ -12,7 +12,13 @@ class ZonasComponent extends Component
     public $identificador;
     public $svgFile;
 
-    protected $listeners = ['selectZone'];
+    // Propiedades para almacenar los datos seleccionados
+    public $selectedId;
+    public $selectedZona;
+    public $selectedType;
+    public $selectedSector;
+
+    protected $listeners = ['selectZone', 'zoneConfirmed'];
 
     public function mount($identificador)
     {
@@ -24,28 +30,98 @@ class ZonasComponent extends Component
                 $this->svgFile = 'arenal1.svg';
                 break;
             case 2:
-                $this->svgFile = 'arenal2.svg'; // Otro ejemplo, puedes añadir más casos
+                $this->svgFile = 'lanceria-gallo-1.svg';
+                break;  
+            case 3:
+                $this->svgFile = 'algarve-plaza-1.svg';
+                break;  
+            case 4:
+                $this->svgFile = 'casino-santodomingo.svg';
                 break;
-            // Añade más casos según los identificadores y los archivos SVG correspondientes
+            case 5:
+                $this->svgFile = 'Marques-domecq.svg';
+                break;
+            case 6:
+                $this->svgFile = 'eguiluz1.svg';
+                break;
+            case 7:
+                $this->svgFile = 'ayuntamiento.svg';
+                break;
+            case 8:
+                $this->svgFile = 'asuncion.svg';
+                break;
             default:
-                $this->svgFile = 'default.svg'; // Un SVG por defecto si el identificador no coincide
+                $this->svgFile = 'default.svg';
         }
     }
 
-    public function selectZone($id, $zona)
+    public function selectZone($id, $zona, $type, $sector)
     {
+        // Almacenar los valores en propiedades del componente
+        $this->selectedId = $id;
+        $this->selectedZona = $zona;
+        $this->selectedType = $type;
+        $this->selectedSector = $sector;
+
+        // Definir el mensaje personalizado basado en el tipo de zona
+        switch($type) {
+            case 'palco':
+                $message = "Está usted seleccionando un Palco en la zona $zona (ID: $id) del sector $sector.";
+                break;
+            case 'silla':
+                $message = "Está usted seleccionando una Silla en la zona $zona (ID: $id) del sector $sector.";
+                break;
+            case 'grada':
+                $message = "Está usted seleccionando la Grada en la zona $zona (ID: $id) del sector $sector.";
+                break;
+            default:
+                $message = "Está usted seleccionando una zona $zona (ID: $id) del sector $sector.";
+        }
+
         // Mostrar alerta de confirmación con LivewireAlert
         $this->alert('question', '¿Deseas seleccionar esta zona?', [
-            'text' => "Zona: $zona ($id)",
+            'text' => $message,
             'showConfirmButton' => true,
             'confirmButtonText' => 'Sí, seleccionar',
             'showCancelButton' => true,
             'cancelButtonText' => 'Cancelar',
-            'position' => 'center', // Asegura que la alerta esté centrada
-            'onConfirmed' => 'zoneConfirmed', // Esto dispara un evento cuando se confirma
+            'position' => 'center',
+            'onConfirmed' => 'zoneConfirmed',
         ]);
     }
 
+    public function zoneConfirmed()
+    {
+        // Usar las propiedades almacenadas para la redirección
+        if ($this->selectedType === 'palco') {
+            return redirect()->route('mapa.palcos', [
+                'id' => $this->selectedId,
+                'zona' => $this->selectedZona,
+                'sector' => $this->selectedSector,
+            ]);
+        }
+
+        //dd($this->selectedType);
+
+        if($this->selectedType === 'grada') {
+            return redirect()->route('mapa.gradas', [
+                'id' => $this->selectedId,
+                'zona' => $this->selectedZona,
+            ]);
+        }
+
+        // Lógica adicional si se seleccionan otros tipos (sillas, gradas, etc.)
+        $this->alert('success', 'Zona seleccionada', [
+            'text' => 'Has seleccionado la zona correctamente.',
+        ]);
+    }
+
+    public function render()
+    {
+        return view('livewire.mapa.zonas-component', [
+            'svgFile' => $this->svgFile,
+        ]);
+    }
      // Función para cuando se llama a la alerta
      public function getListeners()
      {
@@ -55,20 +131,7 @@ class ZonasComponent extends Component
          ];
      }
 
-    public function zoneConfirmed()
-    {
-
-
-        // Lógica para manejar la confirmación
-        $this->alert('success', 'Zona seleccionada', [
-            'text' => 'Has seleccionado la zona correctamente.',
-        ]);
-    }
+   
     
-    public function render()
-    {
-        return view('livewire.mapa.zonas-component', [
-            'svgFile' => $this->svgFile,
-        ]);
-    }
+   
 }

@@ -344,8 +344,11 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
      Route::get('/service/jwt', [MapKitController::class, 'getJwt']);
 
      //MAPA
-     Route::get('/mapa', [App\Http\Controllers\MapController::class, 'index']);
+     Route::get('/mapa', [App\Http\Controllers\MapController::class, 'index'])->name('mapa.index');
      Route::get('/detalles-zona', [App\Http\Controllers\MapController::class, 'zona']);
+     Route::get('/palco/{id}/{zona}/{sector}', [App\Http\Controllers\MapController::class, 'palcos'])->name('mapa.palcos');
+     Route::get('/grada/{id}/{zona}', [App\Http\Controllers\MapController::class, 'gradas'])->name('mapa.gradas');
+
 
 
 });

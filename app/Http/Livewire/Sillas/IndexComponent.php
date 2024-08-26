@@ -174,21 +174,22 @@ class IndexComponent extends Component
 
             if($row[1] == 'numero') continue;
 
-            $zona = Zonas::where('nombre', $row[3])->first();
+            $zona = Zonas::where('nombre', $row[4])->first();
 
+            //dd($row[2]);
             if (!$zona) {
                 //crea la zona
                 $zona = Zonas::create([
-                    'nombre' => $row[3],
+                    'nombre' => $row[4],
                 ]);
             }
 
-            $grada = Gradas::where('numero', $row[1])->where('id_zona', $zona->id)->first();
+            $grada = Gradas::where('numero', $row[3])->where('id_zona', $zona->id)->first();
 
             if (!$grada) {
                 //crea la grada
                 $grada = Gradas::create([
-                    'numero' => $row[1],
+                    'numero' => $row[3],
                     'id_zona' => $zona->id,
                 ]);
             }

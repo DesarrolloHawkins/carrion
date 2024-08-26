@@ -33,4 +33,10 @@ class Palcos extends Model
     {
         return $this->belongsTo(Sectores::class, 'id_sector');
     }
+
+    //sillas
+    public function sillas()
+    {
+        return $this->hasMany(Sillas::class, 'id_palco');
+    }
 }

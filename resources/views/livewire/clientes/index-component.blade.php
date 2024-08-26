@@ -31,58 +31,61 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form wire:submit.prevent="">
-                        <div class="form-group">
+                    <form wire:submit.prevent="" class="row ">
+                        <div class="form-group col-6">
                             <label for="nombre">Nombre</label>
                             <input type="text" class="form-control" id="nombre" wire:model="nombre" placeholder="Nombre">
                             @error('nombre') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="form-group">
+                        <div class="form-group col-6">
                             <label for="apellido">Apellidos</label>
-                            <input type="text" class="form-control" id="apellido" wire:model="apellido" placeholder="Apellidos">
-                            @error('apellido') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="apellido" wire:model="apellidos" placeholder="Apellidos">
+                            @error('apellidos') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="form-group">
+                        <div class="form-group col-6">
                             <label for="nombre">DNI</label>
                             <input type="text" class="form-control" id="DNI" wire:model="DNI" placeholder="DNI">
                             @error('DNI') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="nickName">nickName</label>
-                            <input type="text" class="form-control" id="nickName" wire:model="nickName" placeholder="nickName">
-                            @error('nickName') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="tlf1">Teléfono</label>
-                            <input type="text" class="form-control" id="tlf1" wire:model="telefono" placeholder="Teléfono">
-                            @error('tlf1') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="form-group">
+                        <div class="form-group col-6">
                             <label for="email1">Email</label>
-                            <input type="email" class="form-control" id="email1" wire:model="email1" placeholder="Email">
-                            @error('email1') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="email" class="form-control" id="email1" wire:model="email" placeholder="Email">
+                            @error('email') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="ciudad">Ciudad</label>
-                            <input type="text" class="form-control" id="ciudad" wire:model="ciudad" placeholder="Ciudad">
-                            @error('ciudad') <span class="text-danger">{{ $message }}</span> @enderror
+                        <div class="form-group col-6">
+                            <label for="fijo">Teléfono Fijo</label>
+                            <input type="text" class="form-control" id="fijo" wire:model="fijo" placeholder="Teléfono Fijo">
+                            @error('fijo') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="genero">Género</label>
-                            <input type="text" class="form-control" id="genero" wire:model="genero" placeholder="Género">
-                            @error('genero') <span class="text-danger">{{ $message }}</span> @enderror
+                        <div class="form-group col-6">
+                            <label for="movil">Teléfono Movil</label>
+                            <input type="text" class="form-control" id="movil" wire:model="movil" placeholder="Movil">
+                            @error('movil') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="categoria_id">Categoría</label>
-                            <select class="form-control" id="categoria_id" wire:model="categoria_id">
-                                <option value="">-- Seleccione categoria --</option>
-                                @foreach ($categorias as $categoria )
-                                    <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
-                                @endforeach
-                            </select>
-                            @error('categoria_id') <span class="text-danger">{{ $message }}</span> @enderror
+                        
+                        <div class="form-group col-6">
+                            <label for="ciudad">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" wire:model="direccion" placeholder="Direccion">
+                            @error('direccion') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                        <button type="submit" class="btn btn-primary" wire:click="submit" @if($cliente_id) data-dismiss="modal" @endif>{{ $cliente_id ? 'Actualizar' : 'Guardar' }}</button>
+                        <div class="form-group col-6">
+                            <label for="codigo_postal">Codigo Postal</label>
+                            <input type="text" class="form-control" id="codigo_postal" wire:model="codigo_postal" placeholder="Código postal">
+                            @error('codigo_postal') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="codigo_postal">Población</label>
+                            <input type="text" class="form-control" id="poblacion" wire:model="poblacion" placeholder="Población">
+                            @error('poblacion') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="codigo_postal">Provincia</label>
+                            <input type="text" class="form-control" id="provincia" wire:model="provincia" placeholder="Provincia">
+                            @error('provincia') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary col-8 m-auto" wire:click="submit" @if($cliente_id) data-dismiss="modal" @endif>{{ $cliente_id ? 'Actualizar' : 'Guardar' }}</button>
                     </form>
                 </div>
             </div>
@@ -100,13 +103,11 @@
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Apellidos</th>
                                     <th scope="col">DNI</th>
-                                    <th scope="col">NickName</th>
-                                    <th scope="col">Teléfono</th>
+                                    <th scope="col">Fijo</th>
+                                    <th scope="col">Movil</th>
                                     <th scope="col">Email</th>
-                                    <th scope="col">Ciudad</th>
-                                    <th scope="col">Genero</th>
+                                    <th scope="col">Direccion</th>
 
-                                    <th scope="col">Categoría</th>
 
                                     <th scope="col">Acciones</th>
                                 </tr>
@@ -114,20 +115,14 @@
                             <tbody>
                                 @foreach ($clientes as $cliente)
                                     <tr>
-                                        @if($cliente->tipo_cliente != 1)
-                                            <td>{{ $cliente->nombre }}</td>
-                                            <td>{{ $cliente->apellido }}</td>
-                                        @else
-                                            <td>{{ $cliente->nombre }}</td>
-                                            <td></td>
-                                        @endif
+                                        <td>{{ $cliente->nombre }}</td>
+                                        <td>{{ $cliente->apellidos }}</td>
                                         <td>{{ $cliente->DNI }}</td>
-                                        <td>{{ $cliente->nickName}}</td>
-                                        <td>{{ $cliente->telefono }}</td>
-                                        <td>{{ $cliente->email1 }}</td>
-                                        <td>{{ $cliente->ciudad }}</td>
-                                        <td>{{ $cliente->genero }}</td>
-                                        <td>{{ $cliente->categoriaJugadores->nombre ?? 'N/A' }}</td>
+                                        <td>{{ $cliente->fijo }}</td>
+                                        <td>{{ $cliente->movil }}</td>
+                                        <td>{{ $cliente->email }}</td>
+                                        <td>{{ $cliente->direccion }}</td>
+
 
                                         <td>
                                             <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#exampleModal" wire:click="edit({{ $cliente->id }})">Ver/Editar</button>

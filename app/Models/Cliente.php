@@ -9,25 +9,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Cliente extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
 
     protected $table = "clientes";
 
     protected $fillable = [
-        'email1',
+        'apellidos',
         'nombre',
-        'apellido',
-        'tlf1',
-        'calle',
-        'genero',
-        'fecha_nacimiento',
-        'pais',
-        'ciudad',
-        'categoria_id',
-        'nickName',
+        'direccion',
+        'codigo_postal',
+        'poblacion',
+        'provincia',
+        'fijo',
+        'movil',
         'DNI',
-        'telefono'
+        'email',
+        'categoria_id',
     ];
 
 
