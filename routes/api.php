@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ReservasController;
+use App\Http\Controllers\API\AuthClienteController;
+use App\Http\Controllers\API\AuthAdminController;
+use App\Http\Controllers\API\MapApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +20,21 @@ use App\Http\Controllers\API\ReservasController;
 */
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+
+Route::prefix('cliente')->group(function () {
+    Route::post('/register', [AuthClienteController::class, 'register']);
+    Route::post('/login', [AuthClienteController::class, 'login']);
+    Route::middleware('auth:sanctum')->post('/logout', [AuthClienteController::class, 'logout']);
+});
+
+Route::prefix('admin')->group(function () {
+    Route::post('/login', [AuthAdminController::class, 'login']);
+    Route::middleware('auth:sanctum')->post('/logout', [AuthAdminController::class, 'logout']);
+});
+
+Route::get('/sillas', [MapApiController::class, 'getSillas']); // Obtener sillas con filtros
+Route::get('/palcos/{id}/{zona}/{sector}', [MapApiController::class, 'getPalco']); // Obtener un palco específico
+Route::get('/gradas/{id}/{zona}', [MapApiController::class, 'getGrada']); // Obtener una grada específica
 
 Route::middleware('auth:sanctum')->group(function () {
 

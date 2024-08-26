@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
 
 class Cliente extends Model
 {
     use HasFactory, SoftDeletes;
+    use HasApiTokens;
 
 
     protected $table = "clientes";
@@ -26,6 +28,7 @@ class Cliente extends Model
         'DNI',
         'email',
         'categoria_id',
+        'password',
     ];
 
 

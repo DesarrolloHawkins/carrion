@@ -69,6 +69,9 @@ use FontLib\Table\Type\name;
 */
 Auth::routes();
 
+
+
+
 Route::name('inicio')->get('/', function () {
     return view('auth.login');
 });
