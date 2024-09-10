@@ -8,6 +8,7 @@ use GlobalPayments\Api\ServiceConfigs\Gateways\GpEcomConfig;
 use GlobalPayments\Api\ServicesContainer;
 use GlobalPayments\Api\Entities\Exceptions\ApiException;
 use GlobalPayments\Api\PaymentMethods\CreditCardData;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Reservas;
 use App\Models\Cliente;
@@ -121,14 +122,18 @@ class PayController extends Controller
                         $silla = Sillas::find($reserva->id_silla);
                         array_push($sillas, $silla);
                     }
-    
+                    Log::info('Procesando envío de correo para el cliente: ' . $cliente->email);
+
                     Mail::to($cliente->email)->send(new ReservaPagada($reservas, $sillas, $cliente));
-    
+                    Log::info('Correo enviado correctamente a ' . $cliente->email);
+
                 } catch (\Exception $e) {
+                    Log::error('Error al enviar el correo: ' . $e->getMessage());
+
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Payment processed but email not sent',
-                        'error' => $e->getMessage(),
+                        'error' => $e->getMessage() . ' ' . $e->getTraceAsString(),
                     ]);
                 }
     

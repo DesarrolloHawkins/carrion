@@ -3,22 +3,22 @@
 
 ### Estimado **{{ $cliente->nombre }}**,
 
-Gracias por su pago. Aquí están los detalles de su reserva con código {{$detallesReservas[0]['order']}}
+Gracias por su pago. Aquí están los detalles de su reserva con código {{ $detallesReservas[0]['order'] }}
 
 @component('mail::table')
-| Asiento       | Fila       | Sector        | Fecha       | Año       | Precio       |
-| ------------- |:-------------:|:-------------:| -----------:|:---------:|:---------:|
+| Asiento       | Fila       | Sector        | Posición        | Fecha       | Año       | Precio       |
+| ------------- |:-------------:|:-------------:| -----------:| -----------:|:---------:|:---------:|
 @foreach($detallesReservas as $detalle)
-| {{ $detalle['asiento'] }} | {{ $detalle['fila'] }} | {{ $detalle['sector'] }} | {{ $detalle['fecha'] }} | {{ $detalle['año'] }} | {{ $detalle['precio'] }}€ |
+| {{ $detalle['asiento'] }} | {{ $detalle['fila'] }} | {{ $detalle['sector'] }} | {{ $detalle['palco'] ? 'Palco '.$detalle['palco'] : 'Grada '.$detalle['grada'] }} | {{ $detalle['fecha'] }} | {{ $detalle['año'] }} | {{ $detalle['precio'] }}€ |
 @endforeach
 @endcomponent
 
 El total pagado es: **{{ array_sum(array_column($detallesReservas, 'precio')) }}€**
 
-<!-- @component('mail::button', ['url' => 'http://example.com/mis-reservas'])
-Ver mis reservas
-@endcomponent -->
-
+<h3 style="margin-top:20px;">Escanee el siguiente código QR para acceder a sus reservas:</h3>
+<img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
+<h3 style="margin-top: 20px;">Mapa de la Zona:</h3>
+<img style="margin-bottom: 20px;" src="{{ $mapImage }}" alt="Mapa de la Zona">
 Gracias por confiar en nosotros.
 
 Saludos cordiales,<br>
