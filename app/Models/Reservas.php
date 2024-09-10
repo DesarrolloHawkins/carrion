@@ -25,6 +25,7 @@ class Reservas extends Model
         'id_evento',
         'precio',
         'estado',
+        'order',
 
 
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ReservasController;
 use App\Http\Controllers\API\AuthClienteController;
 use App\Http\Controllers\API\AuthAdminController;
 use App\Http\Controllers\API\MapApiController;
+use App\Http\Controllers\API\PayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,9 +33,20 @@ Route::prefix('admin')->group(function () {
     Route::middleware('auth:sanctum')->post('/logout', [AuthAdminController::class, 'logout']);
 });
 
+
 Route::get('/sillas', [MapApiController::class, 'getSillas']); // Obtener sillas con filtros
 Route::get('/palcos/{id}/{zona}/{sector}', [MapApiController::class, 'getPalco']); // Obtener un palco específico
 Route::get('/gradas/{id}/{zona}', [MapApiController::class, 'getGrada']); // Obtener una grada específica
+Route::get('sillas/{id}/check', [MapApiController::class, 'checkSilla']);
+Route::get('sillas/{id}', [MapApiController::class, 'getSilla']);
+Route::post('/reservar-silla', [ReservasController::class, 'reservarSilla'])->middleware('auth:sanctum', 'admin');
+Route::post('/confirmar-pago', [MapApiController::class, 'confirmarPago']);
+Route::post('/reservar-temporal', [MapApiController::class, 'reservarTemporal']);
+Route::post('/cancelar-reserva', [MapApiController::class, 'cancelarReserva']);
+Route::post('/process-payment', [PayController::class, 'processPayment']);
+Route::get('/cliente/sillas-disponibles/{clienteId}', [ReservasController::class, 'getSillasDisponibles']);
+Route::get('/fecha-inicio-reservas', [ReservasController::class, 'getFechaInicioReservas']);
+Route::get('/puedo-reservar/{clienteId}', [MapApiController::class, 'getPuedoReservar']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -63,6 +75,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Clubes
     Route::apiResource('clubes', App\Http\Controllers\API\ClubController::class);
+
+    //Sillas
+    
 
 
 

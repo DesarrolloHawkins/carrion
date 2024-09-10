@@ -53,7 +53,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\TorneosController;
 use App\Http\Controllers\SillasController;
 use App\Http\Controllers\CsvUploadController;
-
+use App\Http\Controllers\ClienteImportController;
 use App\Http\Middleware\IsAdmin;
 use FontLib\Table\Type\name;
 
@@ -85,6 +85,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
 
+    Route::post('/import-clientes', [ClienteImportController::class, 'importClientes']);
+    Route::get('/import-clientes', [ClienteImportController::class, 'getterForm']);
 
     /* --------------------------------------- */
     // Budgets

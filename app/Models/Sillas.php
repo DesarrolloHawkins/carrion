@@ -37,5 +37,9 @@ class Sillas extends Model
     {
         return $this->hasMany(Reservas::class, 'id_silla');
     }
+    public function estaReservada($fecha)
+{
+    return $this->reservas()->where('estado', '!=', 'cancelada')->where('fecha', $fecha)->exists();
+}
 
 }

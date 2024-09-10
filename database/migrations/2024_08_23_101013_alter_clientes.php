@@ -16,26 +16,46 @@ return new class extends Migration
         //add columns to clientes
 
         Schema::table('clientes', function (Blueprint $table) {
-            //apellidos
-            $table->string('apellidos')->nullable();
-            //nombre
-            $table->string('nombre');
-            //direccion
-            $table->string('direccion')->nullable();
-            //codigo postal
-            $table->string('codigo_postal')->nullable();
-            //poblacion
-            $table->string('poblacion')->nullable();
-            //provincia
-            $table->string('provincia')->nullable();
-            //fijo
-            $table->string('fijo')->nullable();
-            //movil
-            $table->string('movil')->nullable();
-            //DNI
-            $table->string('DNI');
-            //email
-            $table->string('email');
+            // Verificar si la columna 'apellidos' no existe
+            if (!Schema::hasColumn('clientes', 'apellidos')) {
+                $table->string('apellidos')->nullable();
+            }
+            // Verificar si la columna 'nombre' no existe
+            if (!Schema::hasColumn('clientes', 'nombre')) {
+                $table->string('nombre');
+            }
+            // Verificar si la columna 'direccion' no existe
+            if (!Schema::hasColumn('clientes', 'direccion')) {
+                $table->string('direccion')->nullable();
+            }
+            // Verificar si la columna 'codigo_postal' no existe
+            if (!Schema::hasColumn('clientes', 'codigo_postal')) {
+                $table->string('codigo_postal')->nullable();
+            }
+            // Verificar si la columna 'poblacion' no existe
+            if (!Schema::hasColumn('clientes', 'poblacion')) {
+                $table->string('poblacion')->nullable();
+            }
+            // Verificar si la columna 'provincia' no existe
+            if (!Schema::hasColumn('clientes', 'provincia')) {
+                $table->string('provincia')->nullable();
+            }
+            // Verificar si la columna 'fijo' no existe
+            if (!Schema::hasColumn('clientes', 'fijo')) {
+                $table->string('fijo')->nullable();
+            }
+            // Verificar si la columna 'movil' no existe
+            if (!Schema::hasColumn('clientes', 'movil')) {
+                $table->string('movil')->nullable();
+            }
+            // Verificar si la columna 'DNI' no existe
+            if (!Schema::hasColumn('clientes', 'DNI')) {
+                $table->string('DNI');
+            }
+            // Verificar si la columna 'email' no existe
+            if (!Schema::hasColumn('clientes', 'email')) {
+                $table->string('email');
+            }
         });
     }
 
