@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:8100' , 'https://unionhermandadesjerez.hawkins.es' , 'https://localhost' , 'http://localhost:8100/perfil'],
+    'allowed_origins' => ['http://localhost:8100' , 'https://unionhermandadesjerez.hawkins.es' , 'https://localhost'],
 
     'allowed_origins_patterns' => [],
 
