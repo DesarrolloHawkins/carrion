@@ -92,6 +92,10 @@
     <div class="qr-code">
         <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
     </div>
+
+    <h3>Mapa de la Zona:</h3>
+
+    <img src="data:image/png;base64,{{ $mapImage }}" alt="Mapa de la Zona">
     
 </body>
 </html>

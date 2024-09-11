@@ -7,8 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\Reservas;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\DB;
-
 use App\Models\Sillas;
+use App\Models\Sectores;
+use App\Models\Gradas;
+use App\Models\Palcos;
+use App\Models\Zonas;
+
+
 
 class ReservasController extends Controller
 {
@@ -36,6 +41,71 @@ class ReservasController extends Controller
             'reservadas' => $sillasReservadas
         ]);
     }
+
+    public function getTotalReservasCliente($clienteId)
+{
+    // Obtener las reservas del cliente
+    $reservas = Reservas::where('id_cliente', $clienteId)
+                        ->where('estado', 'pagada')
+                        ->get();
+
+    // Inicializar arrays y variables
+    $detallesReservas = [];
+    $zonas = [];
+    $palco = null;
+    $grada = null;
+
+    // Recorrer cada reserva para obtener detalles adicionales
+    foreach ($reservas as $reserva) {
+        $silla = Sillas::find($reserva->id_silla); 
+        $zona = null;
+        
+        if ($silla->id_palco != null) {
+            $palco = Palcos::find($silla->id_palco);
+            $zona = Sectores::find($palco->id_sector);
+        } elseif ($silla->id_grada != null) {
+            $grada = Gradas::find($silla->id_grada);
+            $zona = Zonas::find($grada->id_zona);
+        } else {
+            $zona = Zonas::find($silla->id_zona);
+        }
+
+        $detallesReservas[] = [
+            'asiento' => $silla->numero ?? 'N/A',
+            'sector' => $zona->nombre ?? 'N/A',
+            'fecha' => $reserva->fecha,
+            'año' => $reserva->año,
+            'precio' => $reserva->precio,
+            'fila' => $silla->fila ?? 'N/A',
+            'order' => $reserva->order,
+            'palco' => $palco->numero ?? '',
+            'grada' => $grada->numero ?? '',
+        ];
+    }
+
+    // Obtener detalles de la primera reserva para incluir en la respuesta
+    $reserva1 = $reservas->first();
+    $silla = Sillas::find($reserva1->id_silla); 
+    $zona = null;
+    
+    if ($silla->id_palco != null) {
+        $palco = Palcos::find($silla->id_palco);
+        $zona = Zonas::find($palco->id_sector);
+    } elseif ($silla->id_grada != null) {
+        $grada = Gradas::find($silla->id_grada);
+        $zona = Zonas::find($grada->id_zona);
+    } else {
+        $zona = Zonas::find($silla->id_zona);
+    }
+
+    return response()->json([
+        'reservas' => $detallesReservas,
+        'cliente' => Cliente::find($clienteId),
+        'zona' => $zona,
+        'palco' => $palco,
+        'grada' => $grada
+    ]);
+}
     public function getSillasDisponibles($clienteId)
     {
         // Obtener el cliente por su ID

@@ -18,7 +18,8 @@ El total pagado es: **{{ array_sum(array_column($detallesReservas, 'precio')) }}
 <h3 style="margin-top:20px;">Escanee el siguiente código QR para acceder a sus reservas:</h3>
 <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
 <h3 style="margin-top: 20px;">Mapa de la Zona:</h3>
-<img style="margin-bottom: 20px;" src="{{ $mapImage }}" alt="Mapa de la Zona">
+<img style="margin-top: 20px;" src="data:image/png;base64,{{ $mapImage }}" alt="Mapa de la Zona">
+
 Gracias por confiar en nosotros.
 
 Saludos cordiales,<br>

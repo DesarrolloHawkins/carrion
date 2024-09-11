@@ -11,6 +11,8 @@ use App\Models\Zonas;
 use App\Models\Reservas;
 use App\Models\Gradas;
 use App\Models\Palcos;
+use App\Models\Sectores;
+
 use PDF; // Importar la clase PDF
 
 class ReservaPagada extends Mailable
@@ -23,7 +25,7 @@ class ReservaPagada extends Mailable
     public $zonas;
     public $detallesReservas = [];
     public $qrCodeBase64; // Para almacenar el código QR en base64
-
+    public $mapImageBase64;
 
     
 
@@ -77,6 +79,7 @@ class ReservaPagada extends Mailable
         // Obtener la imagen del mapa según la zona
         $this->mapImage = $this->getMapImageByZona($zona->nombre);
 
+        $this->mapImageBase64 = $this->imageToBase64( $this->mapImage);
 
         // Generar el código QR y almacenarlo como base64
         $this->qrCodeBase64 = base64_encode(QrCode::format('png')
@@ -90,12 +93,12 @@ class ReservaPagada extends Mailable
         switch ($zonaNombre) {
             case '01- Asunción (Protocolo)':
             case 'Plaza Asunción (Protocolo)':
-                return asset('images/zonas/asuncion.png');
+                return '/images/zonas/asuncion.png';
             case '02.- Consistorio':
             case 'Consistorio II':
             case 'Consistorio I':
             case '':
-                return asset('images/zonas/consistorio.png');
+                return '/images/zonas/consistorio.png';
             case '03. Arenal':
             case 'Arenal II':
             case 'Arenal I':
@@ -103,31 +106,40 @@ class ReservaPagada extends Mailable
             case 'Arenal IV':
             case 'Arenal V':
             case 'Arenal VI':
-                return asset('images/zonas/arenal.png');
+                return '/images/zonas/arenal.png';
             case '04.- Lancería-Gallo Azul':
             case 'Lancería-Gallo Azul':
-                return asset('images/zonas/lanceria.png');
+                return '/images/zonas/lanceria.png';
             case '05.- Algarve-Plaza del Banco':
             case 'Algarve-Plaza del Banco':
-                return asset('images/zonas/domecq.png');
+                return '/images/zonas/domecq.png';
             case '06.- Rotonda de los Casinos-Santo Domingo':
             case 'Rotonda de los Casinos-Santo Domingo':
             case 'Rotonda de los Casinos-Santo Domingo II':
-                return asset('images/zonas/casinos.png');
+                return '/images/zonas/casinos.png';
             case '07.- Marqués de Casa Domecq':
             case 'Marqués de Casa Domecq II':
             case 'Marqués de Casa Domecq':
             case 'Marqués de Casa Domecq I':
-                return asset('images/zonas/santodomingo.png');
+                return '/images/zonas/santodomingo.png';
             case '08.- Eguiluz':
             case 'Eguiluz II':
             case 'Eguiluz I':
             case 'Eguiluz':
-                return asset('images/zonas/larga.png');
+                return '/images/zonas/larga.png';
             default:
-                return asset('images/zonas/default.png');
+                return '/images/zonas/default.png';
         }
     }
+
+    private function imageToBase64($path)
+{
+    if (file_exists(public_path($path))) {
+        $imageData = file_get_contents(public_path($path));
+        return base64_encode($imageData);
+    }
+    return null;
+}
 
     public function build()
     {
@@ -136,7 +148,8 @@ class ReservaPagada extends Mailable
             'detallesReservas' => $this->detallesReservas,
             'qrCodeBase64' => $this->qrCodeBase64,
             'cliente' => $this->cliente,
-            
+            'mapImage' => $this->mapImageBase64, // Imagen seleccionada según la zona
+
         ]);
 
         return $this->from(config('mail.from.address'), config('mail.from.name'))
@@ -148,7 +161,7 @@ class ReservaPagada extends Mailable
                         'cliente' => $this->cliente,
                         'detallesReservas' => $this->detallesReservas,
                         'zonas' => $this->zonas,
-                        'mapImage' => $this->mapImage, // Imagen seleccionada según la zona
+                        'mapImage' => $this->mapImageBase64, // Imagen seleccionada según la zona
 
                     ])
                     ->attachData($pdf->output(), 'reserva_qr.pdf', [

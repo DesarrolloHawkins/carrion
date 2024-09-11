@@ -8,7 +8,7 @@ use App\Http\Controllers\API\AuthClienteController;
 use App\Http\Controllers\API\AuthAdminController;
 use App\Http\Controllers\API\MapApiController;
 use App\Http\Controllers\API\PayController;
-
+use App\Http\Controllers\API\ClienteController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,6 +26,8 @@ Route::prefix('cliente')->group(function () {
     Route::post('/register', [AuthClienteController::class, 'register']);
     Route::post('/login', [AuthClienteController::class, 'login']);
     Route::middleware('auth:sanctum')->post('/logout', [AuthClienteController::class, 'logout']);
+    Route::middleware('auth:sanctum')->put('/update', [ClienteController::class, 'updateProfile']);
+
 });
 
 Route::prefix('admin')->group(function () {
@@ -33,6 +35,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware('auth:sanctum')->post('/logout', [AuthAdminController::class, 'logout']);
 });
 
+Route::middleware('auth:sanctum')->get('/reservas/cliente/{clienteId}', [ReservasController::class, 'getTotalReservasCliente']);
 
 Route::get('/sillas', [MapApiController::class, 'getSillas']); // Obtener sillas con filtros
 Route::get('/palcos/{id}/{zona}/{sector}', [MapApiController::class, 'getPalco']); // Obtener un palco específico
@@ -78,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Sillas
     
+    //perfil
 
 
 
