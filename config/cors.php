@@ -15,20 +15,13 @@ return [
     |
     */
 
-    'paths' => ['api/*', '*'],
-
-    'allowed_methods' => ['*'],
-
-    'allowed_origins' => ['http://localhost:8100' , 'https://unionhermandadesjerez.hawkins.es' , 'https://localhost'],
-
-    'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
-
-    'exposed_headers' => [],
-
-    'max_age' => 0,
-
-    'supports_credentials' => true,
+        'paths' => ['api/*'],
+        'allowed_methods' => ['*'],
+        'allowed_origins' => ['*'], // Ajusta esto según sea necesario
+        'allowed_origins_patterns' => [],
+        'allowed_headers' => ['*'],
+        'exposed_headers' => [],
+        'max_age' => 0,
+        'supports_credentials' => true,
 
 ];
