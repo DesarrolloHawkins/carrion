@@ -112,9 +112,9 @@ class ReservaPagada extends Mailable
                 return '/images/zonas/lanceria.png';
             case '05.- Algarve-Plaza del Banco':
             case 'Algarve-Plaza del Banco':
-                return '/images/zonas/domecq.png';
+                return '/images/zonas/larga.png';
             case '06.- Rotonda de los Casinos-Santo Domingo':
-            case 'Rotonda de los Casinos-Santo Domingo':
+            case 'Rotonda de los Casinos-Santo Domingo':    
             case 'Rotonda de los Casinos-Santo Domingo II':
                 return '/images/zonas/casinos.png';
             case '07.- Marqués de Casa Domecq':
@@ -126,7 +126,7 @@ class ReservaPagada extends Mailable
             case 'Eguiluz II':
             case 'Eguiluz I':
             case 'Eguiluz':
-                return '/images/zonas/larga.png';
+                return '/images/zonas/domecq.png';
             default:
                 return '/images/zonas/default.png';
         }
