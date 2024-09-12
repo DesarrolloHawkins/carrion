@@ -1155,7 +1155,7 @@
   </g>
   <g fill="none" font-size="34.375" stroke-linejoin="bevel" stroke-width="1" font-family="MS Shell Dlg 2" stroke-opacity="1" stroke-linecap="square" transform="matrix(0.999751,0,0,0.999751,0,0)" font-style="normal" font-weight="400" stroke="#000000"/>
   <g fill="#03bb93" font-size="34.375" font-family="MS Shell Dlg 2" transform="matrix(0.999751,0,0,0.999751,0,0)" fill-opacity="1" font-style="normal" font-weight="400" stroke="none">
-   <path data-id="-" data-zona="Eguiluz II" data-sector="Eguiluz II" data-type="grada" fill-rule="evenodd" d="M3217.22,587.419 L3136.41,476.873 L3124.4,462.248 L3403.74,256.375 L3418.1,250.302 L3498.76,389.538 L3217.22,587.419" vector-effect="none"/>
+   <path data-id="-"  data-zona="Eguiluz II" data-sector="Eguiluz II" data-type="grada" fill-rule="evenodd" d="M3217.22,587.419 L3136.41,476.873 L3124.4,462.248 L3403.74,256.375 L3418.1,250.302 L3498.76,389.538 L3217.22,587.419" vector-effect="none"/>
    <path data-id="01" data-zona="Eguiluz I" data-sector="Eguiluz I" data-type="grada" fill-rule="evenodd" d="M81.611,2251.8 L75.8273,2241.14 L31.5266,2161.34 L207.614,2063.58 L251.945,2143.44 L257.549,2154.14 L81.611,2251.8" vector-effect="none"/>
    <path data-id="02" data-zona="Eguiluz I" data-sector="Eguiluz I" data-type="grada" fill-rule="evenodd" d="M295.045,2133.32 L289.555,2122.56 L245.224,2042.71 L521.603,1889.28 L565.964,1969.19 L571.42,1979.91 L295.045,2133.32" vector-effect="none"/>
    <path data-id="03" data-zona="Eguiluz I" data-sector="Eguiluz I" data-type="grada" fill-rule="evenodd" d="M609.497,1958.77 L604.039,1948.2 L559.617,1868.18 L810.924,1728.67 L855.376,1808.75 L861.575,1818.84 L609.497,1958.77" vector-effect="none"/>

@@ -99,10 +99,10 @@
                     case '01- Asunción (Protocolo)': id = 8; break;
                     case '02.- Consistorio': id = 7; break;
                     case '04.- Lancería-Gallo Azul': id = 2; break;
-                    case '05.- Algarve-Plaza del Banco': id = 6; break;
+                    case '05.- Algarve-Plaza del Banco': id = 3; break;
                     case '06.- Rotonda de los Casinos-Santo Domingo': id = 4; break;
                     case '07.- Marqués de Casa Domecq': id = 5; break;
-                    case '08.- Eguiluz': id = 3; break;
+                    case '08.- Eguiluz': id = 6; break;
                     case '03. Arenal': id = 1; break;
                 default: break ; 
                 }
