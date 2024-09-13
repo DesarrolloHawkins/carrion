@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <div class="page-title-box">
+<div class="page-title-box">
         <div class="row align-items-center">
             <div class="col-sm-6">
                 <h4 class="page-title">Reservas</h4>
@@ -7,94 +7,105 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-right">
                     <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0);">Reservas</a></li>
-                    <li class="breadcrumb-item active">Todos las reservas</li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0);">Clientes</a></li>
+                    <li class="breadcrumb-item active">Todas las reservas </li>
                 </ol>
             </div>
         </div> <!-- end row -->
     </div>
-    <!-- end page-title -->
+    <div class="col-md-12 mt-4" x-data="{}" x-init="$nextTick(() => {
+                        $('#datatable-reservas').DataTable({
+                            responsive: true,
+                            layout: {
+                               topStart: {
+                                        buttons: [
+                                            {
+                                                extend: 'copyHtml5',
+                                                exportOptions: { orthogonal: 'export' }
+                                            },
+                                            
+                                            {
+                                                extend: 'pdfHtml5',
+                                                exportOptions: { orthogonal: 'export' }
+                                            },
+                                            {
+                                                extend: 'colvis',
+                                                columns: ':not(.noVis)'
+                                            }
+                                        ]
+                                    }
+                            },
+                            lengthChange: false,
+                            pageLength: 30,
+                            buttons: ['copy', 'excel', 'pdf', 'colvis'],
+                            language: {
+                                'lengthMenu': 'Mostrar _MENU_ registros por página',
+                                'zeroRecords': 'No se encontraron registros',
+                                'info': 'Mostrando página _PAGE_ de _PAGES_',
+                                'infoEmpty': 'No hay registros disponibles',
+                                'infoFiltered': '(filtrado de _MAX_ total registros)',
+                                'search': 'Buscar:',
+                            }
+                        });
+                    })"
+                    wire:key='{{ rand() }}'>
+    <table id="datatable-reservas" class="table-auto w-full text-left border-collapse border border-gray-200" wire:key='{{ rand() }}'>
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="border px-4 py-2">Cliente</th>
+                <th class="border px-4 py-2">DNI</th>
+                <th class="border px-4 py-2">Telefono</th>
+                <th class="border px-4 py-2">Asiento</th>
+                <th class="border px-4 py-2">Fila</th>
+                <th class="border px-4 py-2">Sector</th>
+                <th class="border px-4 py-2">Posición</th>
+                <th class="border px-4 py-2">Fecha</th>
+                <th class="border px-4 py-2">Año</th>
+                <th class="border px-4 py-2">Precio</th>
+                <th class="border px-4 py-2">Estado</th>
+                <th class="border px-4 py-2">Actions</th>
 
-    <div class="row mb-3">
-        <div class="col-12">
-            <form wire:submit.prevent="filterByMonth">
-                <div class="form-group row">
-                    <label for="monthFilter" class="col-sm-2 col-form-label">Filtrar por mes</label>
-                    <div class="col-sm-4">
-                        <select id="monthFilter" wire:model="selectedMonth" class="form-control">
-                            <option value="">Seleccione un mes</option>
-                            @for ($month = 1; $month <= 12; $month++)
-                                <option value="{{ $month }}">{{ \DateTime::createFromFormat('!m', $month)->format('F') }}</option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="submit" class="btn btn-primary">Filtrar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($detallesReservas as $detalle)
+            <tr>
+                <td class="border px-4 py-2">{{ $detalle['cliente'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['DNI'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['movil'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['asiento'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['fila'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['sector'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['palco'] ? 'Palco '.$detalle['palco'] : 'Grada '.$detalle['grada'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['fecha'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['año'] }}</td>
+                <td class="border px-4 py-2">{{ $detalle['precio'] }}€</td>
+                <td class="border px-4 py-2 @if($detalle['estado'] == 'pagada') text-success @elseif($detalle['estado'] == 'reservada') text-warning @else 'text-danger' @endif  " style="font-weight:bold;"> {{ $detalle['estado'] }}</td>
+                <td class="border px-4 py-2">
+                    <!-- Botón para cancelar la reserva -->
+                    <button wire:click="confirmarCancelacion({{$detalle['id']}})" class="btn-warning bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+                        Cancelar
+                    </button>
+
+                    <!-- Botón para eliminar la reserva -->
+                    <button wire:click="confirmarEliminacion({{$detalle['id']}})" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                        Eliminar
+                    </button>
+                </td>
+
+
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
     </div>
-
-    <!-- Informe de Totales -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="card m-b-30">
-                <div class="card-body">
-                    <h5>Informe</h5>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <strong>Total:</strong> ${{ number_format($totalAmount, 2) }}
-                        </div>
-                        <div class="col-sm-4">
-                            <strong>Pagado:</strong> ${{ number_format($totalPaid, 2) }}
-                        </div>
-                        <div class="col-sm-4">
-                            <strong>Pendiente:</strong> ${{ number_format($totalPending, 2) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabla de Reservas -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card m-b-30">
-                <div class="card-body">
-                    @if (count($reservas) > 0)
-                        <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Fecha</th>
-                                    <th scope="col">Hora inicio</th>
-                                    <th scope="col">Hora fin</th>
-                                    <th scope="col">Pista</th>
-                                    <th scope="col">Propietario</th>
-                                    <th scope="col">Pagado</th>
-                                    <th scope="col">Pendiente</th>
-                                    <th scope="col">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($reservas as $reserva)
-                                    <tr>
-                                        <td>{{ $reserva->dia }}</td>
-                                        <td>{{ $reserva->hora_inicio }}</td>
-                                        <td>{{ $reserva->hora_fin }}</td>
-                                        <td>{{ $reserva->pista->nombre }}</td>
-                                        <td>{{ $reserva->nombre_jugador }}</td>
-                                        <td>{{ $this->existPago($reserva->id) ? $reserva->precio : '0.00' }}</td>
-                                        <td>{{ $this->existPago($reserva->id) ? '0.00' : $reserva->precio }}</td>
-                                        <td>{{ $reserva->precio }}</td> 
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
-                </div>
-            </div>
-        </div> <!-- end col -->
-    </div> <!-- end row -->
 </div>
+@section('scripts')
+<script src="../assets/js/jquery.slimscroll.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/b-print-3.0.1/r-3.0.1/datatables.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
+
+<script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/b-print-3.0.1/r-3.0.1/datatables.min.js"></script>
+@endsection

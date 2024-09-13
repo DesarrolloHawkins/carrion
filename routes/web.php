@@ -355,6 +355,7 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
      Route::get('/palco/{id}/{zona}/{sector}', [App\Http\Controllers\MapController::class, 'palcos'])->name('mapa.palcos');
      Route::get('/grada/{id}/{zona}', [App\Http\Controllers\MapController::class, 'gradas'])->name('mapa.gradas');
 
-
+    //Reservas
+    Route::get('reservas', [ReservasController::class, 'index'])->name('reservas.index');
 
 });

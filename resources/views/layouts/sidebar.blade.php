@@ -68,6 +68,9 @@
                         {{-- <li><a href="email-compose.html">Email Compose</a></li> --}}
                     </ul>
                 </li>
+                <li>
+                    <a href="/admin/reservas" class="waves-effect"><i class="icon-calendar"></i><span> Reservas </span></a>
+                </li>
                 {{-- <li>
                     <a href="javascript:void(0);" class="waves-effect"><i class="fa-solid fa-user-plus"></i><span> Socios <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                     <ul class="submenu">
