@@ -99,21 +99,11 @@ class PayController extends Controller
                                 ->withCurrency("EUR")
                                 ->execute();
             } catch (ApiException $e) {
-                // Extrae solo el mensaje de la excepción
-                $errorMessage = $e->getMessage();
-            
-                // Envía una respuesta de error
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Payment failed',
-                    'error' => $errorMessage,
+                    'error' => $e->getMessage(),
                 ]);
-            
-                // Guarda el mensaje de error en cada reserva
-                foreach ($reservas as $reserva) {
-                    $reserva->transaction = $errorMessage; // Guarda solo el mensaje de error como string
-                    $reserva->save();
-                }
             }
 
             // Si el pago es exitoso
@@ -122,10 +112,9 @@ class PayController extends Controller
                 foreach ($reservas as $reserva) {
                     $reserva->estado = 'pagada';
                     $reserva->order = $orderId;
-                    $reserva->transaction = $response;
                     $reserva->save();
                 }
-
+                
 
     
                 // Enviar correo de confirmación
