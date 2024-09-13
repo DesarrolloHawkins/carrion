@@ -28,6 +28,7 @@ class IndexComponent extends Component
     public $cliente;
     public $zonas;
     public $detallesReservas = [];
+    public $estado = ''; // Nuevo para almacenar el filtro del estado
 
 
     public function getListeners()
@@ -40,36 +41,38 @@ class IndexComponent extends Component
         ];
     }
 
-    public function mount() {
-        // Obtener todas las reservas
-        $this->reservas = Reservas::all();
+    public function loadReservas()
+    {
+        // Obtener todas las reservas, aplicar el filtro por estado si está seleccionado
+        $query = Reservas::query();
+
+        if ($this->estado) {
+            $query->where('estado', $this->estado);
+        }
+
+        $this->reservas = $query->get();
         
         $this->detallesReservas = [];
         $palco = null;
         $grada = null;
-    
+
         // Iterar sobre todas las reservas
         foreach ($this->reservas as $reserva) {
-            // Obtener la silla asociada a la reserva
             $silla = Sillas::find($reserva->id_silla); 
             
             if (!$silla) {
-                continue; // Si no se encuentra la silla, saltar a la siguiente iteración
+                continue;
             }
-    
-            // Obtener la zona asociada a la silla o palco o grada
+
             $zona = Zonas::find($silla->id_zona);
             if ($silla->id_palco != null) {
-                // Si la silla está en un palco, obtener el palco y el sector correspondiente
                 $palco = Palcos::find($silla->id_palco);
                 $zona = Sectores::find($palco->id_sector);
             } elseif ($silla->id_grada != null) {
-                // Si la silla está en una grada, obtener la grada y su zona
                 $grada = Gradas::find($silla->id_grada);
                 $zona = Zonas::find($grada->id_zona);
             }
-    
-            // Agregar los detalles de la reserva al array $detallesReservas
+
             $this->detallesReservas[] = [
                 'cliente' => $reserva->clientes->nombre  ? $reserva->clientes->nombre . ' '.$reserva->clientes->apellidos  : 'N/A',
                 'DNI' => $reserva->clientes->DNI ?? 'N/A',
@@ -85,9 +88,21 @@ class IndexComponent extends Component
                 'grada' => $grada->numero ?? '',
                 'estado' => $reserva->estado,
                 'id' => $reserva->id,
-
             ];
         }
+    }
+
+    public function mount() {
+        $this->loadReservas(); // Cargar reservas en lugar de hacerlo directamente en el mount
+
+    }
+
+
+    // Método para cambiar el filtro de estado
+    public function filtrarPorEstado($estado)
+    {
+        $this->estado = $estado;
+        $this->loadReservas(); // Recargar las reservas con el filtro aplicado
     }
     public function confirmarCancelacion($reservaId) {
         $this->confirm('¿Estás seguro de que deseas cancelar esta reserva?', [
