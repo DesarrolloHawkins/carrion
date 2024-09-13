@@ -104,16 +104,24 @@ class PayController extends Controller
                     'message' => 'Payment failed',
                     'error' => $e->getMessage(),
                 ]);
+
+                foreach ($reservas as $reserva) {
+                    $reserva->transaction = $e->getMessage();
+                    $reserva->save();
+                }
             }
-    
+
             // Si el pago es exitoso
             if ($response->responseCode === '00') {
                 $orderId = $response->orderId;
                 foreach ($reservas as $reserva) {
                     $reserva->estado = 'pagada';
                     $reserva->order = $orderId;
+                    $reserva->transaction = $response;
                     $reserva->save();
                 }
+
+
     
                 // Enviar correo de confirmación
                 try {
