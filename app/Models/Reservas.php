@@ -26,6 +26,7 @@ class Reservas extends Model
         'precio',
         'estado',
         'order',
+        'transaction',
 
 
 
