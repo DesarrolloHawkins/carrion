@@ -382,7 +382,9 @@ public function reservarTemporal(Request $request)
             }
         }
 
-        
+        if(!$precio){
+            $precio = 12;
+        }
 
 
 
