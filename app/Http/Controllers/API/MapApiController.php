@@ -383,7 +383,8 @@ public function reservarTemporal(Request $request)
         }
 
         if(!$precio){
-            $precio = 12;
+           //tengo que pasar precio->precio = 12
+            $precio = (object) ['precio' => 12];
         }
 
 
