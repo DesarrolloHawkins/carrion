@@ -121,10 +121,10 @@
                         <!-- item-->
                         {{-- <a class="dropdown-item" href="#"><i class="mdi mdi-account-circle"></i> Profile</a>
                         <a class="dropdown-item" href="#"><i class="mdi mdi-wallet"></i> Wallet</a> --}}
-                        <a class="dropdown-item d-block" href="/admin/configuracion/">
+                        <!-- <a class="dropdown-item d-block" href="/admin/configuracion/">
                             {{-- <span class="badge badge-success float-right">11</span> --}}
                             <i class="mdi mdi-settings"></i>
-                            Configuración</a>
+                            Configuración</a> -->
                         {{-- <a class="dropdown-item" href="#"><i class="mdi mdi-lock-open-outline"></i> Bloquear
                             pantalla</a> --}}
                         <div class="dropdown-divider"></div>

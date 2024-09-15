@@ -174,9 +174,9 @@
                         {{-- <li><a href="email-compose.html">Email Compose</a></li> --}}
                     </ul>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="/admin/configuracion" class="waves-effect"><i class="fas fa-gear"></i><span> Opciones </span></a>
-                </li>
+                </li> -->
 
 
 
