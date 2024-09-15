@@ -111,7 +111,7 @@ class PayController extends Controller
             if($precioTotal != $amount){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'The total price of the seats is not equal to the total price',
+                    'message' => 'The total price of the seats is not equal to the total price' . $precioTotal . ' ' . $amount,
                 ]);
             }
     
