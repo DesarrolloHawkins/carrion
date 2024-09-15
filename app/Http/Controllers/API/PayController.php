@@ -74,46 +74,47 @@ class PayController extends Controller
                     'message' => 'No reservations found for this order',
                 ]);
             }
-    
-            $clienteId = $reservas[0]->id_cliente;
-            $cliente = Cliente::find($clienteId);
 
-            //Comprobar si el precio de las sillas es igual al precio total
             $precioTotal = 0;
-            $silla = Sillas::find($reservas[0]->id_silla);
-            //si la silla es de grada tiene id_grada, si es de palco tiene id_palco
-            if ($silla->id_grada != null) {
+           
+            foreach ($reservas as $reserva) {
+               $clienteId = $reserva->id_cliente;
+               $cliente = Cliente::find($clienteId);
+
+               $silla = Sillas::find($reserva->id_silla);
+
+               if ($silla->id_grada != null) {
                 //si es de grada debo ver en que fila esta, pero la fila viene dada por F1 o F2 asi que debo sacar el numero de la fila
                 $fila = $silla->fila;
                 //numero de la fila
                 $numeroFila = substr($fila, 1);
                 //si la fila es 1 o 2 el precio es 20, si es 3, 4 , 5 es 18, 6, 7, 8, 9 es 15, de la 9 en adelante es 12
-                if ($numeroFila == 1 || $numeroFila == 2) {
-                    //precioTotal + 20
-                    $precioTotal += 20;
-                } elseif ($numeroFila == 3 || $numeroFila == 4 || $numeroFila == 5) {
+                    if ($numeroFila == 1 || $numeroFila == 2) {
+                        //precioTotal + 20
+                        $precioTotal += 20;
+                    } elseif ($numeroFila == 3 || $numeroFila == 4 || $numeroFila == 5) {
+                        $precioTotal += 18;
+                    } elseif ($numeroFila == 6 || $numeroFila == 7 || $numeroFila == 8 || $numeroFila == 9) {
+                        $precioTotal += 15;
+                    } else {
+                        $precioTotal += 12;
+                    }
+
+                } elseif ($silla->id_palco != null) {
+                    //si es de palco el precio es 50
                     $precioTotal += 18;
-                } elseif ($numeroFila == 6 || $numeroFila == 7 || $numeroFila == 8 || $numeroFila == 9) {
-                    $precioTotal += 15;
-                } else {
-                    $precioTotal += 12;
                 }
 
-
-                
-
-
-            } elseif ($silla->id_palco != null) {
-                //si es de palco el precio es 50
-                $precioTotal += 18;
             }
-
+    
             if($precioTotal != $amount){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'The total price of the seats is not equal to the total price' . $precioTotal . ' ' . $amount,
                 ]);
             }
+
+            
     
             // Comprobar si las sillas ya están reservadas por otros
             foreach ($reservas as $reserva) {
