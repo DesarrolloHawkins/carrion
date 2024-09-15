@@ -161,6 +161,10 @@ public function reservarTemporal(Request $request)
                 throw new \Exception("La silla {$sillaId} ya está reservada.");
             }
 
+            if(!$precio){
+
+            }
+
             // Crear la reserva en estado 'reservada' con el orderId pasado
             Reservas::create([
                 'id_cliente' => $clienteId,
@@ -168,7 +172,7 @@ public function reservarTemporal(Request $request)
                 'fecha' => $fecha,
                 'año' => date('Y', strtotime($fecha)),
                 'id_evento' => 1,
-                'precio' => $precio->precio,
+                'precio' => $precio ? $precio->precio : 12,
                 'estado' => 'reservada',
                 'order' => $orderId  // Usar el orderId recibido en lugar de generar uno nuevo
             ]);
