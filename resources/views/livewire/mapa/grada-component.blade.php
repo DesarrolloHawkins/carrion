@@ -75,7 +75,7 @@
                             <select id="cliente-select" class="form-control" wire:model="clienteSeleccionado" style="width: 100%">
                                 <option value="">-- Selecciona un cliente --</option>
                                 @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }} ({{ $cliente->email }})</option>
+                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }} {{ $cliente->apellidos }} - {{ $cliente->DNI }}  ({{ $cliente->email }})</option>
                                 @endforeach
                             </select>
                         </div>
