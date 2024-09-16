@@ -72,7 +72,7 @@ class PayController extends Controller
             $orderId = $request->input('orderId');
     
             // Obtener las reservas asociadas al pedido
-            $reservas = Reservas::where('order', $orderId)->get();
+            //$reservas = Reservas::where('order', $orderId)->get();
     
             // if (count($reservas) === 0) {
             //     return response()->json([
