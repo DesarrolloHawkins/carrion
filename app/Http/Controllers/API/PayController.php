@@ -49,15 +49,15 @@ class PayController extends Controller
     public function processPayment(Request $request)
     {
             // Validar los datos del request
-            $request->validate([
-                'card_number'   => 'required|min:16|max:16',
-                'expiry_month'  => 'required|numeric|min:1|max:12',
-                'expiry_year'   => 'required|numeric|min:' . date('Y') . '|max:' . (date('Y') + 10),
-                'cvv'           => 'required|min:3|max:4',
-                'card_name'     => 'required',
-                'amount'        => 'required',
-                'orderId'       => 'required',
-            ]);
+            // $request->validate([
+            //     'card_number'   => 'required|min:16|max:16',
+            //     'expiry_month'  => 'required|numeric|min:1|max:12',
+            //     'expiry_year'   => 'required|numeric|min:' . date('Y') . '|max:' . (date('Y') + 10),
+            //     'cvv'           => 'required|min:3|max:4',
+            //     'card_name'     => 'required',
+            //     'amount'        => 'required',
+            //     'orderId'       => 'required',
+            // ]);
 
             // return $request->all();
             // Crear el objeto de tarjeta
