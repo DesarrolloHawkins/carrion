@@ -161,7 +161,12 @@ class PayController extends Controller
                         ->execute();
 
                 
-
+                return response()->json([
+                    'status' => '3ds_required',
+                    'redirectUrl' => $response->redirectUrl,
+                    'transactionId' => $response->transactionId
+                ]);
+                
             
 
             }catch (ApiException $e){
