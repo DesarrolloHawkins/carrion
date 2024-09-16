@@ -164,9 +164,11 @@ class PayController extends Controller
                 return response()->json([
                     'status' => '3ds_required',
                     'redirectUrl' => $response->redirectUrl,
-                    'transactionId' => $response->transactionId
+                    'transactionId' => $response->transactionId,
+                    'message' => $response->transactionId,
+
                 ]);
-                
+
             
 
             }catch (ApiException $e){
@@ -184,7 +186,9 @@ class PayController extends Controller
             return response()->json([
                 'status' => '3ds_required',
                 'redirectUrl' => $threeDSecureData->redirectUrl,
-                'transactionId' => $threeDSecureData->transactionId
+                'transactionId' => $threeDSecureData->transactionId,
+                'message' => $response->transactionId,
+
             ]);
 
             $enrolled = $threeDSecureData->enrolled; // TRUE
