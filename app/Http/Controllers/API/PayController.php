@@ -55,7 +55,7 @@ class PayController extends Controller
                 'expiry_year'   => 'required|numeric|min:' . date('Y') . '|max:' . (date('Y') + 10),
                 'cvv'           => 'required|min:3|max:4',
                 'card_name'     => 'required',
-                'amount'        => 'required|numeric|min:1',
+                'amount'        => 'required',
                 'orderId'       => 'required',
             ]);
 
