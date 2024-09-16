@@ -171,7 +171,7 @@
             $('#datatable-button').DataTable({
                                         stateSave: true,
 
-                responsive: true,
+                responsive: false,
                                     layout: {
                                         topStart: {
                                             buttons: [
