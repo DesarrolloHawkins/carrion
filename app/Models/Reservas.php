@@ -27,8 +27,7 @@ class Reservas extends Model
         'estado',
         'order',
         'transaction',
-
-
+        'metodo_pago',
 
     ];
 

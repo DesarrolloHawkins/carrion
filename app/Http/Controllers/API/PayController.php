@@ -137,6 +137,9 @@ class PayController extends Controller
                                 ->withCurrency("EUR")
                                 ->execute();
             } catch (ApiException $e) {
+
+                Log::error('Error al procesar el pago: ' . $e->getMessage());
+
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Payment failed',
