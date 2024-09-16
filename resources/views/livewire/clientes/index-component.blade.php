@@ -170,6 +170,7 @@
                     <div class="col-md-12 mt-4" x-data="{}" x-init="$nextTick(() => {
             $('#datatable-button').DataTable({
                                         stateSave: true,
+        scrollX: true,  // Agrega scroll horizontal
 
                 responsive: false,
                                     layout: {
