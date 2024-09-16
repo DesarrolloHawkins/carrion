@@ -155,7 +155,12 @@ class PayController extends Controller
             
             
             try{
-                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::TWO);
+                $response = Secure3dService::checkEnrollment($card)
+                        ->withAmount($amount)
+                        ->withCurrency('EUR')
+                        ->execute();
+
+                
 
             
 
