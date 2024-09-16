@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "114004b19450fe85a11b31a65c75a1f4",
+    "content-hash": "4c985d02f840ace75054e61d896933d5",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1303,26 +1303,28 @@
         },
         {
             "name": "globalpayments/php-sdk",
-            "version": "2.0.0",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/globalpayments/php-sdk.git",
-                "reference": "a73f8039b213ce6888df1f12e93fc3264d920f2e"
+                "reference": "bf778a70431cfe7e8cab6eaa6d8a8dc1b59c04c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/globalpayments/php-sdk/zipball/a73f8039b213ce6888df1f12e93fc3264d920f2e",
-                "reference": "a73f8039b213ce6888df1f12e93fc3264d920f2e",
+                "url": "https://api.github.com/repos/globalpayments/php-sdk/zipball/bf778a70431cfe7e8cab6eaa6d8a8dc1b59c04c3",
+                "reference": "bf778a70431cfe7e8cab6eaa6d8a8dc1b59c04c3",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-dom": "*",
+                "ext-json": "*",
                 "ext-openssl": "*",
+                "ext-zlib": "*",
                 "php": ">= 5.5.9"
             },
             "require-dev": {
-                "brianium/paratest": "dev-master",
+                "brianium/paratest": "0.15.0",
                 "phpstan/phpstan-shim": "^0.8.4",
                 "phpunit/phpunit": "~5.0",
                 "squizlabs/php_codesniffer": "2.*"
@@ -1346,9 +1348,9 @@
             "homepage": "https://developer.heartlandpaymentsystems.com/documentation",
             "support": {
                 "issues": "https://github.com/globalpayments/php-sdk/issues",
-                "source": "https://github.com/globalpayments/php-sdk/tree/master"
+                "source": "https://github.com/globalpayments/php-sdk/tree/3.1.0"
             },
-            "time": "2019-12-10T15:53:35+00:00"
+            "time": "2022-05-05T13:10:51+00:00"
         },
         {
             "name": "graham-campbell/result-type",
