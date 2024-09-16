@@ -25,11 +25,9 @@ use GlobalPayments\Api\Services\Secure3dService;
 
 use GlobalPayments\Api\Entities\Address;
 use GlobalPayments\Api\Entities\Enums\AddressType;
-use GlobalPayments\Api\ServiceConfigs\Gateways\GpEcomConfig;
 use GlobalPayments\Api\HostedPaymentConfig;
 use GlobalPayments\Api\Entities\HostedPaymentData;
 use GlobalPayments\Api\Entities\Enums\HppVersion;
-use GlobalPayments\Api\Entities\Exceptions\ApiException;
 use GlobalPayments\Api\Services\HostedService;
 
 class PayController extends Controller
@@ -122,7 +120,9 @@ class PayController extends Controller
 
 
 
-
+return response()->json([
+    'hppJson' => $hppJson,
+]);
 
 
 
