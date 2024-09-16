@@ -393,10 +393,10 @@ public function reservarTemporal(Request $request)
                 
              if (in_array($palco->numero, $palcoIds)) {
                 $precio = (object) ['precio' => 20];
-                return response()->json([
+                // return response()->json([
                   
-                    'precio' => $palco->numero
-                ]);
+                //     'precio' => $palco->numero
+                // ]);
                 
              }
 
