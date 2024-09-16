@@ -147,9 +147,43 @@ class PayController extends Controller
                     ]);
                 }
             }
-    
+            
+            
+            try{
+                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::TWO);
+
+            }catch (ApiException $e){
+                Log::error('Error al procesar el pago: ' . $e->getMessage());
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Payment failed',
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            $status = $threeDSecureData->status;
+
+            return response()->json([
+                'status' => '3ds_required',
+                'redirectUrl' => $threeDSecureData->redirectUrl,
+                'transactionId' => $threeDSecureData->transactionId
+            ]);
+
+            $enrolled = $threeDSecureData->enrolled; // TRUE
+            // if enrolled, the available response data
+            $serverTransactionId = $threeDSecureData->serverTransactionId; // af65c369-59b9-4f8d-b2f6-7d7d5f5c69d5
+            $dsStartProtocolVersion = $threeDSecureData->directoryServerStartVersion; // 2.1.0
+            $dsEndProtocolVersion = $threeDSecureData->directoryServerEndVersion; // 2.1.0
+            $acsStartProtocolVersion = $threeDSecureData->acsStartVersion; // 2.1.0
+            $acsEndProtocolVersion = $threeDSecureData->acsEndVersion; // 2.1.0
+            $methodUrl = $threeDSecureData->issuerAcsUrl; // https://www.acsurl.com/method
+            $encodedMethodData = $threeDSecureData->payerAuthenticationRequest; // Base64 encoded string
+
+
             // Procesar el pago
             try {
+
                 $authResponse = $card->verify()
                     ->withCurrency("EUR")
                     ->withAmount($amount)
