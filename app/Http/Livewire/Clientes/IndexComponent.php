@@ -24,6 +24,15 @@ class IndexComponent extends Component
     public $email;
     public $cliente_id;
 
+    public function getListeners()
+    {
+        return [
+            'confirmed',
+            'deleteConfirmed'
+        ];
+        
+    }
+
     protected $rules = [
         'nombre' => 'required',
         'apellidos' => 'nullable',
@@ -70,27 +79,31 @@ class IndexComponent extends Component
         $this->alert('success', 'Cliente guardado correctamente.');
     }
 
-    public function edit($id)
-    {
-        $cliente = Cliente::findOrFail($id);
+    public function create()
+{
+    $this->resetFields();
+    $this->dispatchBrowserEvent('open-create-modal');
+}
 
-        $this->cliente_id = $cliente->id;
+public function edit($id)
+{
+   // dd("hola");
+    $cliente = Cliente::findOrFail($id);
+    $this->cliente_id = $cliente->id;
+    $this->nombre = $cliente->nombre;
+    $this->apellidos = $cliente->apellidos;
+    $this->direccion = $cliente->direccion;
+    $this->codigo_postal = $cliente->codigo_postal;
+    $this->poblacion = $cliente->poblacion;
+    $this->provincia = $cliente->provincia;
+    $this->fijo = $cliente->fijo;
+    $this->movil = $cliente->movil;
+    $this->DNI = $cliente->DNI;
+    $this->email = $cliente->email;
 
-        $this->nombre = $cliente->nombre;
-        $this->apellidos = $cliente->apellidos;
-        $this->direccion = $cliente->direccion;
-        $this->codigo_postal = $cliente->codigo_postal;
-        $this->poblacion = $cliente->poblacion;
-        $this->provincia = $cliente->provincia;
-        $this->fijo = $cliente->fijo;
-        $this->movil = $cliente->movil;
-        $this->DNI = $cliente->DNI;
-        $this->email = $cliente->email;
+    $this->dispatchBrowserEvent('open-edit-modal');
+}
 
-
-
-        $this->dispatchBrowserEvent('open-modal');
-    }
 
     public function confirmDelete($id)
     {
