@@ -54,28 +54,11 @@
                                 <option value="cancelada">Cancelada</option>
                             </select>
                         </div>
-                        <div class="form-group" x-data x-init="
-                            () => {
-                                // Inicializar select2 cuando se monta el componente
-                                $('#cliente-select').select2();
-
-                                // Sincronizar select2 con Livewire
-                                $('#cliente-select').on('change', function (e) {
-                                    let data = $('#cliente-select').select2('val');
-                                    @this.set('clienteSeleccionado', data);
-                                });
-
-                                // Cuando Livewire reciba una actualización, reinicializar select2
-                                Livewire.hook('message.processed', (message, component) => {
-                                    $('#cliente-select').select2();
-                                });
-                            }
-                        ">
+                        <div class="form-group" wire:ignore>
                             <label for="cliente-select">Seleccionar Cliente</label>
-                            <select id="cliente-select" class="form-control" wire:model="clienteSeleccionado" style="width: 100%">
-                                <option value="">-- Selecciona un cliente --</option>
+                            <select data-pharaonic="select2" data-component-id="{{ $this->id }}" id="cliente-select" class="form-control" wire:model="clienteSeleccionado" style="width: 100%">                                <option value="">-- Selecciona un cliente --</option>
                                 @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }} ({{ $cliente->email }})</option>
+                                    <option value="{{ $cliente->id }}">{{ $cliente->DNI }} - {{ $cliente->nombre }} {{ $cliente->apellidos }} / ({{ $cliente->email }})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -198,13 +181,23 @@
 </div>
 
 @section('scripts')
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<x:pharaonic-select2::scripts />
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener('show-modal', () => {
             var myModal = document.getElementById('reservaModal');
             if (myModal) {
                 $(myModal).modal('show');
+
+                // Inicializar Select2 en el modal
+                $('#cliente-select').select2({
+                    placeholder: "-- Selecciona un cliente --",
+                    width: '100%',
+                    allowClear: true,
+                    dropdownParent: $('#reservaModal') // Asegurarse de que el dropdown esté dentro del modal
+                });
             }
         });
 
@@ -219,6 +212,14 @@
             var myModal = document.getElementById('editarReservaModal');
             if (myModal) {
                 $(myModal).modal('show');
+
+                // Inicializar Select2 en el modal
+                $('#cliente-select').select2({
+                    placeholder: "-- Selecciona un cliente --",
+                    width: '100%',
+                    allowClear: true,
+                    dropdownParent: $('#editarReservaModal') // Asegurarse de que el dropdown esté dentro del modal
+                });
             }
         });
 
@@ -227,6 +228,12 @@
             if (myModalEl) {
                 $(myModalEl).modal('hide');
             }
+        });
+
+        // Sincronizar Select2 con Livewire
+        $('#cliente-select').on('change', function (e) {
+            var selectedCliente = $(this).val();
+            @this.set('clienteSeleccionado', selectedCliente);
         });
     });
 </script>

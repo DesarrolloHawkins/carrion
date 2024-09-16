@@ -22,6 +22,7 @@
         "livewire/livewire": "^2.10",
         "maatwebsite/excel": "*",
         "mediconesystems/livewire-datatables": "*",
+        "pharaonic/livewire-select2": "^1.2",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
