@@ -15,7 +15,7 @@ class PalcoComponent extends Component
 
     public $palco;
     public $sillas;
-    public $selectedSilla;
+    public $selectedSillas = []; // Para selección múltiple de sillas
     public $clienteSeleccionado;
     public $nuevoClienteNombre;
     public $nuevoClienteEmail;
@@ -24,18 +24,20 @@ class PalcoComponent extends Component
     public $clientes;
     public $mostrarFormularioNuevoCliente = false;
     public $estadoSeleccionado;
+    public $selectedSilla;
+    public $metodoPago;
 
     public function mount($palco)
     {
         $this->palco = $palco;
 
-        // Verificar si el palco ya tiene sillas generadas, si no, generarlas.
+        // Generar las sillas si no existen
         if ($this->palco->sillas()->count() === 0) {
             for ($i = 1; $i <= 8; $i++) {
                 Sillas::create([
                     'numero' => $i,
                     'id_palco' => $this->palco->id,
-                    'fila' => $i <= 4 ? 1 : 2, // Las primeras 4 sillas están en la fila 1, las siguientes 4 en la fila 2.
+                    'fila' => $i <= 4 ? 1 : 2,
                 ]);
             }
         }
@@ -49,205 +51,109 @@ class PalcoComponent extends Component
         $this->clientes = Cliente::all();
     }
 
-    public function selectSilla($sillaId)
-    {
-        $this->clienteSeleccionado = null;
-        $this->estadoSeleccionado = null;
-        $this->selectedSilla = Sillas::findOrFail($sillaId);
-        $this->reservaPrecio = $this->calcularPrecio($this->selectedSilla);
-
-        // Comprobar si la silla está reservada
-        $reservaSilla = Reservas::where('id_silla', $this->selectedSilla->id)
-            ->where('id_evento', 1)
-            ->where(function ($query) {
-                $query->where('estado', 'reservada')
-                      ->orWhere('estado', 'pagada');
-            })
-            ->first();
-
-        if ($reservaSilla) {
-            // Configurar datos iniciales para el modal de edición
-            $this->clienteSeleccionado = $reservaSilla->id_cliente;
-            $this->estadoSeleccionado = $reservaSilla->estado;
-            $this->dispatchBrowserEvent('show-modal-editar-reserva');
-            return;
-        }
-
-        $this->dispatchBrowserEvent('show-modal'); // Emitir evento para mostrar el modal
-    }
-
-    public function editarReserva()
-    {
-        // Obtener la reserva existente
-        $reserva = Reservas::where('id_silla', $this->selectedSilla->id)
-        ->where('id_evento', 1)
-        ->where(function ($query) {
-            $query->where('estado', 'reservada')
-                  ->orWhere('estado', 'pagada');
-        })
-        ->first();
-
-        if (!$reserva) {
-            $this->alert('error', 'Reserva no encontrada', [
-                'text' => 'No se ha encontrado la reserva de la silla seleccionada.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        if (!$this->clienteSeleccionado) {
-            $this->alert('error', 'Cliente requerido', [
-                'text' => 'Debes seleccionar un cliente.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        $cliente = Cliente::findOrFail($this->clienteSeleccionado);
-
-        if (!$cliente) {
-            $this->alert('error', 'Cliente no encontrado', [
-                'text' => 'No se ha encontrado el cliente seleccionado.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        // Actualizar los detalles de la reserva
-        $reserva->update([
-            'id_cliente' => $this->clienteSeleccionado,
-            'estado' => $this->estadoSeleccionado,
-            'precio' => $this->reservaPrecio,
-        ]);
-
-        $this->dispatchBrowserEvent('hide-modal-editar-reserva');
-        $this->reset(['clienteSeleccionado', 'selectedSilla', 'estadoSeleccionado']);
-        
-        $this->alert('success', 'Reserva actualizada', [
-            'text' => 'La reserva ha sido actualizada con éxito.',
-            'position' => 'center',
-        ]);
-
-        // Actualizar la lista de sillas
-        $this->sillas = Sillas::where('id_palco', $this->palco->id)->with('reservas')
-            ->get()
-            ->sortBy('numero');
-    }
-
-    public function calcularPrecio($silla)
-    {
-        // Asumiendo que el precio de las sillas en el palco es fijo, si no, puedes modificar esta lógica
-        return 100; // Precio fijo como ejemplo
-    }
-
-    public function crearCliente()
-    {
-        if (!$this->nuevoClienteNombre) {
-            $this->alert('error', 'Nombre requerido', [
-                'text' => 'Debes ingresar el nombre del cliente.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        if (!$this->nuevoClienteEmail) {
-            $this->alert('error', 'Email requerido', [
-                'text' => 'Debes ingresar el email del cliente.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        if (!$this->DNI) {
-            $this->alert('error', 'DNI requerido', [
-                'text' => 'Debes ingresar el DNI del cliente.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        // Crear un nuevo cliente
-        $cliente = Cliente::create([
-            'nombre' => $this->nuevoClienteNombre,
-            'email' => $this->nuevoClienteEmail,
-            'DNI' => $this->DNI,
-        ]);
-
-        // Actualizar la lista de clientes y seleccionar el nuevo cliente
-        $this->clientes = Cliente::all();
-        $this->clienteSeleccionado = $cliente->id;
-
-        // Limpiar los campos de creación
-        $this->reset(['nuevoClienteNombre', 'nuevoClienteEmail', 'DNI']);
-
-        $this->dispatchBrowserEvent('update-dropdown');
-    }
-
     public function IsReservado($reservas)
     {
         foreach ($reservas as $reserva) {
-            if ($reserva->estado == 'reservada' || $reserva->estado == 'pagada') {
+            if ($reserva->estado === 'reservada' || $reserva->estado === 'pagada') {
                 return true;
             }
         }
         return false;
     }
 
-    public function reservarSilla()
+    public function abrirModalReserva()
     {
-        $reservaSilla = Reservas::where('id_silla', $this->selectedSilla->id)
-        ->where('id_evento', 1) // Cambia '1' al id_evento relevante
-        ->where('estado', '!=', 'cancelada')
-        ->first();
+        if (count($this->selectedSillas) > 0) {
+            $this->dispatchBrowserEvent('show-modal');
+        } else {
+            $this->alert('error', 'Selecciona al menos una silla', ['position' => 'center']);
+        }
+    }
 
-        if ($reservaSilla) {
-            $this->alert('error', 'Silla no disponible', [
-                'text' => 'La silla seleccionada ya ha sido reservada.',
-                'position' => 'center',
-            ]);
-            return;
+    public function selectSilla($sillaId)
+    {
+        $this->selectedSilla = Sillas::findOrFail($sillaId);
+        $reserva = Reservas::where('id_silla', $this->selectedSilla->id)
+            ->where('id_evento', 1)
+            ->where(function ($query) {
+                $query->where('estado', 'reservada')->orWhere('estado', 'pagada');
+            })
+            ->first();
+
+        if ($reserva) {
+            $this->clienteSeleccionado = $reserva->id_cliente;
+            $this->estadoSeleccionado = $reserva->estado;
+            $this->reservaPrecio = $reserva->precio;
+            $this->dispatchBrowserEvent('show-modal-editar-reserva');
+        } else {
+            if (!in_array($sillaId, $this->selectedSillas)) {
+                $this->selectedSillas[] = $sillaId;
+            } else {
+                $this->selectedSillas = array_diff($this->selectedSillas, [$sillaId]);
+            }
+        }
+    }
+
+    public function editarReserva()
+    {
+        foreach ($this->selectedSillas as $sillaId) {
+            $silla = Sillas::findOrFail($sillaId);
+            $reservaSilla = Reservas::where('id_silla', $silla->id)
+                ->where('id_evento', 1)
+                ->where('estado', '!=', 'cancelada')
+                ->first();
+
+            if (!$reservaSilla) {
+                Reservas::create([
+                    'id_silla' => $silla->id,
+                    'id_cliente' => $this->clienteSeleccionado,
+                    'id_evento' => 1,
+                    'fecha' => now(),
+                    'año' => date('Y'),
+                    'precio' => $this->calcularPrecio($silla),
+                    'estado' => $this->estadoSeleccionado,
+                    'metodo_pago' => $this->metodoPago,
+                ]);
+            } else {
+                $reservaSilla->update([
+                    'id_cliente' => $this->clienteSeleccionado,
+                    'estado' => $this->estadoSeleccionado,
+                    'precio' => $this->reservaPrecio,
+                    'metodo_pago' => $this->metodoPago,
+                ]);
+
+                $this->alert('success', 'Reserva actualizada', [
+                    'text' => 'La reserva ha sido actualizada con éxito.',
+                    'position' => 'center',
+                ]);
+            }
         }
 
-        if (!$this->clienteSeleccionado) {
-           //livewire alert
-            $this->alert('error', 'Cliente requerido', [
-                'text' => 'Debes seleccionar un cliente.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        $cliente = Cliente::findOrFail($this->clienteSeleccionado);
-        if (!$this->estadoSeleccionado) {
-            //livewire alert
-            $this->alert('error', 'Estado requerido', [
-                'text' => 'Debes seleccionar un estado para la reserva.',
-                'position' => 'center',
-            ]);
-            return;
-        }
-
-        Reservas::create([
-            'id_silla' => $this->selectedSilla->id,
-            'id_cliente' => $cliente->id,
-            'id_evento' => 1, // Cambia esto según sea necesario
-            'fecha' => now(),
-            'año' => date('Y'),
-            'precio' => $this->reservaPrecio,
-            'estado' => $this->estadoSeleccionado,
-        ]);
-
+        $this->dispatchBrowserEvent('hide-modal-editar-reserva');
         $this->dispatchBrowserEvent('hide-modal');
-        $this->reset(['clienteSeleccionado', 'selectedSilla']);
+        $this->reset(['clienteSeleccionado', 'selectedSilla', 'estadoSeleccionado', 'selectedSillas']);
+        $this->sillas = Sillas::where('id_palco', $this->palco->id)->with('reservas')->get()->sortBy('numero');
+    }
 
-        $this->alert('success', 'Reserva creada', [
-            'text' => 'La reserva ha sido creada con éxito.',
-            'position' => 'center',
-        ]);
+    public function calcularPrecio($silla)
+    {
+        $palcoIds = [
+            16, 17, 18, 19, 20,21,22,23,24,25,26,27,28,122,121,120,119,118,117,116,115,114,113,112,111,110,109,108,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+            534, 533, 532, 531, 530, 529, 528, 527, 526, 525, 524, 523, 522, 521, 520, 519, 518, 517, 516, 515, 514, 513, 512, 511, 510, 509, 508, 507, 506, 505, 504, 503, 502, 501, 500, 499, 498, 497, 496, 495, 494, 493,
+            
+        ];
 
-        $this->sillas = Sillas::where('id_palco', $this->palco->id)->with('reservas')
-            ->get()
-            ->sortBy('numero');
+        $palco = Palcos::find($silla->id_palco);
+
+        if ($palco) {
+            if (in_array($palco->numero, $palcoIds)) {
+                return 18;
+            } else {
+                return 20;
+            }
+        }
+
+
     }
 
     public function render()
