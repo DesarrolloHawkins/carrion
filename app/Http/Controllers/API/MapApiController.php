@@ -161,9 +161,15 @@ public function reservarTemporal(Request $request)
                     ->where('tipo_asiento', 'palco')
                     ->first();
 
-                if (in_array($silla->id_palco, $palcoIds)) {
-                    $precio = (object) ['precio' => 20];
+                $palco = Palcos::find($silla->id_palco);
+
+
+                if($palco){
+                    if (in_array( $palco->numero, $palcoIds)) {
+                        $precio = (object) ['precio' => 20];
+                    }
                 }
+                
             }
 
             if ($reservaExistente) {
@@ -355,7 +361,7 @@ public function reservarTemporal(Request $request)
         $zona = Zonas::find($silla->id_zona);
         //palco
         $palco = Palcos::find($silla->id_palco);
-
+        
         if($palco){
             $sector = Sectores::find($palco->id_sector);
         }else{
@@ -378,13 +384,20 @@ public function reservarTemporal(Request $request)
             
             ];
 
+           
+
 
             $precio = DB::table('precios_sillas')
                 ->where('tipo_asiento', 'palco')
                 ->first();
-
-             if (in_array($palco->id, $palcoIds)) {
+                
+             if (in_array($palco->numero, $palcoIds)) {
                 $precio = (object) ['precio' => 20];
+                return response()->json([
+                  
+                    'precio' => $palco->numero
+                ]);
+                
              }
 
         } else {

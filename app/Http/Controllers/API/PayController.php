@@ -14,6 +14,7 @@ use App\Models\Reservas;
 use App\Models\Cliente;
 use App\Mail\ReservaPagada;
 use App\Models\Sillas;
+use App\Models\Palcos;
 
 use Illuminate\Support\Facades\Mail;
 
@@ -108,12 +109,17 @@ class PayController extends Controller
                 467, 468, 469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492
                 
                 ];
-                    if (in_array($silla->id_palco, $palcoIds)) {
-                        $precioTotal += 20;
-                    }else{
-                        $precioTotal += 18;
 
+                $palco = Palcos::find($silla->id_palco);
+                    if($palco){
+                        if (in_array($palco->numero, $palcoIds)) {
+                            $precioTotal += 20;
+                        }else{
+                            $precioTotal += 18;
+
+                        }
                     }
+                   
                 }
 
             }
