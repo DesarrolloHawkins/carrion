@@ -158,7 +158,7 @@ class PayController extends Controller
                 $response = Secure3dService::checkEnrollment($card)
                         ->withAmount(0.01)
                         ->withCurrency('EUR')
-                        ->execute(Secure3dVersion::TWO);
+                        ->execute(Secure3dVersion::ONE);
 
                 
                 return $response;
