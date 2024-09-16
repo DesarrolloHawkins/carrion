@@ -48,7 +48,6 @@ class PayController extends Controller
      */
     public function processPayment(Request $request)
     {
-        try {
             // Validar los datos del request
             $request->validate([
                 'card_number'   => 'required|min:16|max:16',
@@ -276,13 +275,6 @@ class PayController extends Controller
                 ]);
             }
     
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Payment failed general abajo',
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
     
 }
