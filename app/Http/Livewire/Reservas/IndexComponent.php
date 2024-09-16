@@ -28,7 +28,7 @@ class IndexComponent extends Component
     public $cliente;
     public $zonas;
     public $detallesReservas = [];
-    public $estado = ''; // Nuevo para almacenar el filtro del estado
+    public $estado = 'pagada'; // Nuevo para almacenar el filtro del estado
 
 
     public function getListeners()
@@ -88,6 +88,7 @@ class IndexComponent extends Component
                 'grada' => $grada->numero ?? '',
                 'estado' => $reserva->estado,
                 'id' => $reserva->id,
+                'metodo_pago' => $reserva->metodo_pago,
             ];
         }
     }

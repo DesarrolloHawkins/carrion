@@ -25,8 +25,36 @@
         </select>
     </div>
 
-    <div class="col-md-12 mt-4">
-        <table id="datatable-reservas" class="table-auto w-full text-left border-collapse border border-gray-200">
+    <div class="col-md-12 mt-4" x-data="{}" x-init="$nextTick(() => {
+            $('#datatable-reservas').DataTable({
+                                        stateSave: true,
+                                                 scrollX: true,  // Agrega scroll horizontal
+
+                                         responsive: false,
+                                    layout: {
+                                        topStart: {
+                                            buttons: [
+                                                'copy', 'excel', 'pdf'
+                                            ]
+                                        }
+                                    },
+                                    lengthChange: false,
+                                    pageLength: 30,
+                                    buttons: ['copy', 'excelHtml5', 'pdf', 'colvis'],
+                                    language: {
+                                        lengthMenu: 'Mostrar _MENU_ registros por página',
+                                        zeroRecords: 'No se encontraron registros',
+                                        info: 'Mostrando página _PAGE_ de _PAGES_',
+                                        infoEmpty: 'No hay registros disponibles',
+                                        emptyTable: 'No hay registros disponibles',
+
+                                        infoFiltered: '(filtrado de _MAX_ total registros)',
+                                        search: 'Buscar:'
+                                    },
+                                
+                                })
+                            })" wire:key="{{ rand() }}">
+        <table id="datatable-reservas" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;" wire:key="{{ rand() }}">
             <thead class="bg-gray-100">
                 <tr>
                     <th class="border px-4 py-2">Cliente</th>
@@ -39,6 +67,8 @@
                     <th class="border px-4 py-2">Fecha</th>
                     <th class="border px-4 py-2">Año</th>
                     <th class="border px-4 py-2">Precio</th>
+                    <th class="border px-4 py-2">Metodo Pago</th>
+
                     <th class="border px-4 py-2">Estado</th>
                     <th class="border px-4 py-2">Actions</th>
                 </tr>
@@ -56,6 +86,7 @@
                     <td class="border px-4 py-2">{{ $detalle['fecha'] }}</td>
                     <td class="border px-4 py-2">{{ $detalle['año'] }}</td>
                     <td class="border px-4 py-2">{{ $detalle['precio'] }}€</td>
+                    <td class="border px-4 py-2">{{ $detalle['metodo_pago']  ?? 'Tarjeta'}}</td>
                     <td class="border px-4 py-2 @if($detalle['estado'] == 'pagada') text-success @elseif($detalle['estado'] == 'reservada') text-warning @else text-danger @endif">
                         {{ $detalle['estado'] }}
                     </td>
