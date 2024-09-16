@@ -22,14 +22,6 @@ use GlobalPayments\Api\Entities\Enums\Secure3dVersion;
 
 use GlobalPayments\Api\Services\Secure3dService;
 
-use Monolog\Logger;
-
-use App\Logging\SampleRequestLogger;
-
-
-
-
-
 
 class PayController extends Controller
 {
@@ -43,7 +35,6 @@ class PayController extends Controller
         $config->accountId = env('ACCOUNT');
         $config->sharedSecret = env('SHARED_SECRET');
         $config->serviceUrl = env('ENVIRONMENT');
-        $config->requestLogger = new SampleRequestLogger(new Logger("logs"));
         $config->version = 2;
 
         ServicesContainer::configureService($config);
