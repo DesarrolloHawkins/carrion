@@ -37,17 +37,7 @@ class PayController extends Controller
 
     public function __construct()
     {
-        $config = new GpEcomConfig();
-        $config->merchantId = env('MERCHANT_ID');
-        $config->accountId = env('ACCOUNT');
-        $config->sharedSecret = env('SHARED_SECRET');
-        $config->serviceUrl = env('ENVIRONMENT');
-
-        // configure client, request and HPP settings
-
-        $config->hostedPaymentConfig = new HostedPaymentConfig();
-        $config->hostedPaymentConfig->version = HppVersion::VERSION_2;
-        $service = new HostedService($config);
+        
 
         // $config->version = 2;
 
@@ -78,6 +68,17 @@ class PayController extends Controller
         // ]);
 
 // Add 3D Secure 2 Mandatory and Recommended Fields
+        $config = new GpEcomConfig();
+        $config->merchantId = env('MERCHANT_ID');
+        $config->accountId = env('ACCOUNT');
+        $config->sharedSecret = env('SHARED_SECRET');
+        $config->serviceUrl = env('ENVIRONMENT');
+
+        // configure client, request and HPP settings
+
+        $config->hostedPaymentConfig = new HostedPaymentConfig();
+        $config->hostedPaymentConfig->version = HppVersion::VERSION_2;
+        $service = new HostedService($config);
         $hostedPaymentData = new HostedPaymentData();
         $hostedPaymentData->customerEmail = "james.mason@example.com";
         $hostedPaymentData->customerPhoneMobile = "44|07123456789";
