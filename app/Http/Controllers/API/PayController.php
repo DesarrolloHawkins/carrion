@@ -31,11 +31,11 @@ class PayController extends Controller
 
     public function __construct()
     {
-        $config = new Gp3DSProvider();
-        $config->merchantId = env('MERCHANT_ID');
-        $config->accountId = env('ACCOUNT');
-        $config->sharedSecret = env('SHARED_SECRET');
-        $config->serviceUrl = env('ENVIRONMENT');
+        $config = new Gp3DSProvider;
+        $config->setMerchantId(env('MERCHANT_ID')) ;
+        $config->setAccountId(env('ACCOUNT')) ;
+        $config->setSharedSecret(env('SHARED_SECRET')) ;
+        $config->setServiceUrl(env('ENVIRONMENT')) ;
         // $config->version = 2;
 
         ServicesContainer::configureService($config);
