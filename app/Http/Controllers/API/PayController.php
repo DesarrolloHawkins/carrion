@@ -60,7 +60,7 @@ class PayController extends Controller
                 'orderId'       => 'required',
             ]);
 
-            dd($request->all());
+            // return $request->all();
             // Crear el objeto de tarjeta
             $card = new CreditCardData();
             $card->number = $request->input('card_number');
