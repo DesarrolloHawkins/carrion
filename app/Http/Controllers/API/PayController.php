@@ -226,7 +226,7 @@ class PayController extends Controller
 
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Payment failed',
+                    'message' => 'Payment failed in try metodo continuado',
                     'error' => $e->getMessage(),
                 ]);
             }
@@ -279,7 +279,7 @@ class PayController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Payment failed',
+                'message' => 'Payment failed general abajo',
                 'error' => $e->getMessage(),
             ]);
         }
