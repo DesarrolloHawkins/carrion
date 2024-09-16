@@ -18,6 +18,12 @@ use App\Models\Palcos;
 
 use Illuminate\Support\Facades\Mail;
 
+use GlobalPayments\Api\Entities\Enums\Secure3dVersion;
+
+use GlobalPayments\Api\Services\Secure3dService;
+
+
+
 
 class PayController extends Controller
 {
