@@ -4,7 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use GlobalPayments\Api\ServiceConfigs\Gateways\GpEcomConfig;
+use GlobalPayments\Api\Gateways\Gp3DSProvider;
+use GlobalPayments\Api\Entities\Transaction;
 use GlobalPayments\Api\ServicesContainer;
 use GlobalPayments\Api\Entities\Exceptions\ApiException;
 use GlobalPayments\Api\PaymentMethods\CreditCardData;
@@ -30,7 +31,7 @@ class PayController extends Controller
 
     public function __construct()
     {
-        $config = new GpEcomConfig();
+        $config = new Gp3DSProvider();
         $config->merchantId = env('MERCHANT_ID');
         $config->accountId = env('ACCOUNT');
         $config->sharedSecret = env('SHARED_SECRET');
