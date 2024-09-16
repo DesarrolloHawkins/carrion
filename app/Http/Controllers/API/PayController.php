@@ -175,7 +175,7 @@ class PayController extends Controller
                     'error' => $e,
                 ]);
             }
-
+            return $response;
             $status = $threeDSecureData->status;
 
             return response()->json([
