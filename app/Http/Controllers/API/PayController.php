@@ -23,6 +23,15 @@ use GlobalPayments\Api\Entities\ThreeDSecure;
 use GlobalPayments\Api\Services\Secure3dService;
 
 
+use GlobalPayments\Api\Entities\Address;
+use GlobalPayments\Api\Entities\Enums\AddressType;
+use GlobalPayments\Api\ServiceConfigs\Gateways\GpEcomConfig;
+use GlobalPayments\Api\HostedPaymentConfig;
+use GlobalPayments\Api\Entities\HostedPaymentData;
+use GlobalPayments\Api\Entities\Enums\HppVersion;
+use GlobalPayments\Api\Entities\Exceptions\ApiException;
+use GlobalPayments\Api\Services\HostedService;
+
 class PayController extends Controller
 {
     protected $globalPayService;
@@ -35,11 +44,17 @@ class PayController extends Controller
         $config->accountId = env('ACCOUNT');
         $config->sharedSecret = env('SHARED_SECRET');
         $config->serviceUrl = env('ENVIRONMENT');
+
+        // configure client, request and HPP settings
+
+        $config->hostedPaymentConfig = new HostedPaymentConfig();
+        $config->hostedPaymentConfig->version = HppVersion::VERSION_2;
+        $service = new HostedService($config);
+
         // $config->version = 2;
 
         // https://api.globalpay-ecommerce.com
 
-        ServicesContainer::configureService($config);
     }
 
     /** 
@@ -51,18 +66,73 @@ class PayController extends Controller
     public function processPayment(Request $request)
     {
         // Validar los datos de la solicitud
-        $validatedData = $request->validate([
-            'authenticationValue' => 'required|string',
-            'directoryServerTransactionId' => 'required|string',
-            'eci' => 'required|string',
-            'card_number' => 'required|string',
-            'expiry_month' => 'required|numeric',
-            'expiry_year' => 'required|numeric',
-            'cvv' => 'required|string',
-            'card_name' => 'required|string',
-            'amount' => 'required|numeric',
-            'orderId' => 'required|string',
-        ]);
+        // $validatedData = $request->validate([
+        //     'authenticationValue' => 'required|string',
+        //     'directoryServerTransactionId' => 'required|string',
+        //     'eci' => 'required|string',
+        //     'card_number' => 'required|string',
+        //     'expiry_month' => 'required|numeric',
+        //     'expiry_year' => 'required|numeric',
+        //     'cvv' => 'required|string',
+        //     'card_name' => 'required|string',
+        //     'amount' => 'required|numeric',
+        //     'orderId' => 'required|string',
+        // ]);
+
+// Add 3D Secure 2 Mandatory and Recommended Fields
+        $hostedPaymentData = new HostedPaymentData();
+        $hostedPaymentData->customerEmail = "james.mason@example.com";
+        $hostedPaymentData->customerPhoneMobile = "44|07123456789";
+        $hostedPaymentData->addressesMatch = false;
+
+        $billingAddress = new Address();
+        $billingAddress->streetAddress1 = "Flat 123";
+        $billingAddress->streetAddress2 = "House 456";
+        $billingAddress->streetAddress3 = "Unit 4";
+        $billingAddress->city = "Halifax";
+        $billingAddress->postalCode = "W5 9HR";
+        $billingAddress->country = "826";
+
+        $shippingAddress = new Address();
+        $shippingAddress->streetAddress1 = "Apartment 825";
+        $shippingAddress->streetAddress2 = "Complex 741";
+        $shippingAddress->streetAddress3 = "House 963";
+        $shippingAddress->city = "Chicago";
+        $shippingAddress->state = "IL";
+        $shippingAddress->postalCode = "50001";
+        $shippingAddress->country = "840";
+
+        try {
+            $hppJson = $service->charge(19.99)
+               ->withCurrency("EUR")
+               ->withHostedPaymentData($hostedPaymentData)
+               ->withAddress($billingAddress, AddressType::BILLING)
+               ->withAddress($shippingAddress, AddressType::SHIPPING)
+               ->serialize();      
+            // TODO: pass the HPP JSON to the client-side    
+         } catch (ApiException $e) {
+            
+            // Handle the exception
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'message' => 'Error en el procesamiento: ' . $e->getMessage(),
+            ], 500);
+         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Crear el objeto de tarjeta
         $card = new CreditCardData();
