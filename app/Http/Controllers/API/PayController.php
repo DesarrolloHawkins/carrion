@@ -161,7 +161,7 @@ class PayController extends Controller
                         ->execute(Secure3dVersion::TWO);
 
                 
-                //return $response;
+                return $response;
 
             
 
