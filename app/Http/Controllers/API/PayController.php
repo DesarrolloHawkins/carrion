@@ -171,7 +171,7 @@ class PayController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Payment failed in try Secure3dService',
-                    'error' => $e,
+                    'error' => $e->getMessage(),
                 ]);
             }
             return 'Respuesto de Response: ' .$response;
