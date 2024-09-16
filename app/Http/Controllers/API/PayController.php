@@ -35,12 +35,12 @@ class PayController extends Controller
         $config->accountId = env('ACCOUNT');
         $config->sharedSecret = env('SHARED_SECRET');
         $config->serviceUrl = env('ENVIRONMENT');
-        $config->version = 2;
+        // $config->version = 2;
 
         ServicesContainer::configureService($config);
     }
 
-    /**
+    /** 
      * Procesa un pago desde el frontend
      *
      * @param Request $request
@@ -59,7 +59,8 @@ class PayController extends Controller
                 'amount'        => 'required|numeric|min:1',
                 'orderId'       => 'required',
             ]);
-    
+
+            dd($request->all());
             // Crear el objeto de tarjeta
             $card = new CreditCardData();
             $card->number = $request->input('card_number');
