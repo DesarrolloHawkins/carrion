@@ -53,14 +53,6 @@
     
     <h2>Cliente: {{ $cliente->nombre }}</h2>
 
-    <div class="qr-code">
-        <h3>Código QR:</h3>
-        <img src="{{ $qrCodePath }}" alt="Código QR">
-    </div>
-
-    <div class="map-image">
-        <h3>Mapa de Zona:</h3>
-        <img src="{{ $mapImagePath }}" alt="Mapa de la zona">
-    </div>
+   
 </body>
 </html>

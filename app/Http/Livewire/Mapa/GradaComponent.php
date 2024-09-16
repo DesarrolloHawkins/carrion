@@ -16,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Bus\Queueable;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GradaComponent extends Component
 {
@@ -40,7 +40,6 @@ class GradaComponent extends Component
     public function mount($grada)
     {
         $this->grada = $grada;
-        $this->downloadTestFile();
         // Obtener todas las sillas de la grada
         $this->sillas = Sillas::where('id_grada', $this->grada->id)->with('reservas')
             ->get()
@@ -117,7 +116,7 @@ class GradaComponent extends Component
                 'isInvitado' => $this->isInvitado,
             ]);
 
-            // Alerta de éxito
+            //Alerta de éxito
             $this->alert('success', 'Reserva creada', [
                 'text' => 'La reserva ha sido creada con éxito.',
                 'position' => 'center',
@@ -136,7 +135,7 @@ class GradaComponent extends Component
                 'isInvitado' => $this->isInvitado,
             ]);
 
-            // Alerta de éxito
+           // Alerta de éxito
             $this->alert('success', 'Reserva actualizada', [
                 'text' => 'La reserva ha sido actualizada con éxito.',
                 'position' => 'center',
@@ -207,73 +206,63 @@ class GradaComponent extends Component
         }
         $this->reset(['clienteSeleccionado', 'selectedSillas']);
         $this->dispatchBrowserEvent('hide-modal');
-        $this->alert('success', 'Reservas creadas con éxito', ['position' => 'center']);
+        //$this->alert('success', 'Reservas creadas con éxito', ['position' => 'center']);
 
        
     }
     public function generarYDescargarPDF($reservas, $cliente)
-{
-    // Preparar los detalles de las reservas para el PDF
-    $detallesReservas = [];
-    $zona = null;
-
-    foreach ($reservas as $reserva) {
-        $silla = Sillas::find($reserva->id_silla);
-        $palco = $silla->id_palco ? Palcos::find($silla->id_palco) : null;
-        $grada = $silla->id_grada ? Gradas::find($silla->id_grada) : null;
-
-        if ($silla->id_zona) {
-            $zona = $silla->zona->nombre;
+    {
+        // Preparar los detalles de las reservas para el PDF
+        $detallesReservas = [];
+        $zona = null;
+    
+        foreach ($reservas as $reserva) {
+            $silla = Sillas::find($reserva->id_silla);
+            $palco = $silla->id_palco ? Palcos::find($silla->id_palco) : null;
+            $grada = $silla->id_grada ? Gradas::find($silla->id_grada) : null;
+    
+            if ($silla->id_zona) {
+                $zona = $silla->zona->nombre;
+            }
+    
+            $detallesReservas[] = [
+                'asiento' => $silla->numero ?? 'N/A',
+                'sector' => $silla->zona->nombre ?? 'N/A',
+                'fila' => $silla->fila ?? 'N/A',
+                'precio' => $reserva->precio,
+                'fecha' => $reserva->fecha,
+                'año' => $reserva->año,
+                'palco' => $palco ? $palco->numero : null,
+                'grada' => $grada ? $grada->numero : null,
+            ];
         }
-
-        $detallesReservas[] = [
-            'asiento' => $silla->numero ?? 'N/A',
-            'sector' => $silla->zona->nombre ?? 'N/A',
-            'fila' => $silla->fila ?? 'N/A',
-            'precio' => $reserva->precio,
-            'fecha' => $reserva->fecha,
-            'año' => $reserva->año,
-            'palco' => $palco ? $palco->numero : null,
-            'grada' => $grada ? $grada->numero : null,
+    
+        // // Obtener la ruta absoluta del mapa según la zona
+        // $mapImagePath = public_path($this->getMapImageByZona($zona));
+    
+        // // Generar el código QR como una imagen temporal
+        // $qrCodePath = storage_path('app/public/qrcodes/qr_' . time() . '.png');
+        // QrCode::format('png')->size(200)->generate(url('/reservas/' . $cliente->id), $qrCodePath);
+    
+        // Datos para la vista del PDF
+        $datos = [
+            'detallesReservas' => $detallesReservas,
+            'cliente' => $cliente,
+            // 'qrCodePath' => $qrCodePath,
+            // 'mapImagePath' => $mapImagePath,
         ];
+    
+        $pdf = Pdf::loadView('pdf.nueva_reserva', $datos);
+
+        // Descargar el PDF
+        return response()->streamDownload(function () use($pdf) {
+            echo  $pdf->stream();
+        }, 'report.pdf');
     }
-
-    // Obtener la ruta absoluta del mapa según la zona
-    $mapImagePath = public_path($this->getMapImageByZona($zona));
-
-    // Generar el código QR como una imagen temporal
-    $qrCodePath = storage_path('app/public/qrcodes/qr_' . time() . '.png');
-    QrCode::format('png')->size(200)->generate(url('/reservas/' . $cliente->id), $qrCodePath);
-
-    // Datos para la vista del PDF
-    $datos = [
-        'detallesReservas' => $detallesReservas,
-        'cliente' => $cliente,
-        'qrCodePath' => $qrCodePath,
-        'mapImagePath' => $mapImagePath,
-    ];
-
-    // Generar el PDF
-    $pdf = PDF::loadView('pdf.nueva_reserva', $datos);
-
-    // Guardar el PDF en el almacenamiento público
-    $pdfFilePath = 'pdf/reserva_' . time() . '.pdf';
-    $pdf->save(storage_path('app/public/' . $pdfFilePath));
-
-    // Descargar el PDF
-    return response()->download(storage_path('app/public/' . $pdfFilePath));
-}
+    
 
     
-public function downloadTestFile()
-{
-    $filePath = storage_path('app/public/test.txt');
 
-    // Crea un archivo de prueba
-    file_put_contents($filePath, "Este es un archivo de prueba.");
-
-    return response()->download($filePath);
-}
     
 
 // Función para obtener la imagen según el nombre de la zona
