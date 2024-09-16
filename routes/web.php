@@ -56,6 +56,7 @@ use App\Http\Controllers\CsvUploadController;
 use App\Http\Controllers\ClienteImportController;
 use App\Http\Middleware\IsAdmin;
 use FontLib\Table\Type\name;
+use App\Http\Livewire\Mapa\GradaComponent;
 
 /*
 |--------------------------------------------------------------------------
@@ -357,5 +358,11 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
     //Reservas
     Route::get('reservas', [ReservasController::class, 'index'])->name('reservas.index');
+
+
+
+
+    Route::get('/view-reserva/{id}', [GradaComponent::class, 'viewReservaPDF'])->name('view.reserva');
+
 
 });

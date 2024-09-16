@@ -56,6 +56,10 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="form-check mb-3 d-flex">
+                            <input class="form-check input" type="checkbox" wire:model="isInvitado" id="isInvitado">
+                            <label class="form-check label" for="isInvitado">¿Es Invitado?</label>
+                        </div>
 
                         <div class="form-group mb-3">
                             <label for="metodopago-select">Seleccionar Método de pago</label>

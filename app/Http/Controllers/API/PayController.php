@@ -150,9 +150,26 @@ class PayController extends Controller
     
             // Procesar el pago
             try {
-                $response = $card->charge($amount)
-                                ->withCurrency("EUR")
-                                ->execute();
+                $authResponse = $card->verify()
+                    ->withCurrency("EUR")
+                    ->withAmount($amount)
+                    ->with3DSecure()
+                    ->execute();
+
+                // Si se requiere 3DS, redirigir al usuario para autenticación
+                if ($authResponse->is3DSecureRequired()) {
+                    return response()->json([
+                        'status' => '3ds_required',
+                        'redirectUrl' => $authResponse->redirectUrl,
+                        'transactionId' => $authResponse->transactionId
+                    ]);
+                }
+
+                // Si no se requiere 3DS, proceder con el cargo
+                $chargeResponse = $card->charge($amount)
+                    ->withCurrency("EUR")
+                    ->withTransactionId($authResponse->transactionId)
+                    ->execute();    
             } catch (ApiException $e) {
 
                 Log::error('Error al procesar el pago: ' . $e->getMessage());

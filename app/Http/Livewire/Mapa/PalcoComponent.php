@@ -26,6 +26,7 @@ class PalcoComponent extends Component
     public $estadoSeleccionado;
     public $selectedSilla;
     public $metodoPago;
+    public $isInvitado = false;
 
     public function mount($palco)
     {
@@ -113,6 +114,7 @@ class PalcoComponent extends Component
                     'precio' => $this->calcularPrecio($silla),
                     'estado' => $this->estadoSeleccionado,
                     'metodo_pago' => $this->metodoPago,
+                    'isInvitado' => $this->isInvitado,
                 ]);
             } else {
                 $reservaSilla->update([
@@ -120,6 +122,7 @@ class PalcoComponent extends Component
                     'estado' => $this->estadoSeleccionado,
                     'precio' => $this->reservaPrecio,
                     'metodo_pago' => $this->metodoPago,
+                    'isInvitado' => $this->isInvitado,
                 ]);
 
                 $this->alert('success', 'Reserva actualizada', [
