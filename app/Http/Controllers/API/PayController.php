@@ -162,13 +162,7 @@ class PayController extends Controller
                         ->execute();
 
                 
-                return response()->json([
-                    'status' => '3ds_required',
-                    'redirectUrl' => $response->redirectUrl,
-                    'transactionId' => $response->transactionId,
-                    'message' => $response->transactionId,
-
-                ]);
+                return $response;
 
             
 
@@ -178,7 +172,7 @@ class PayController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Payment failed',
-                    'error' => $e->getMessage(),
+                    'error' => $e,
                 ]);
             }
 
