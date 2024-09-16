@@ -162,7 +162,7 @@ class PayController extends Controller
                         ->execute();
 
                 
-                return $response;
+                //return $response;
 
             
 
@@ -171,11 +171,11 @@ class PayController extends Controller
 
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Payment failed',
+                    'message' => 'Payment failed in try Secure3dService',
                     'error' => $e,
                 ]);
             }
-            return $response;
+            return 'Respuesto de Response: ' .$response;
             $status = $threeDSecureData->status;
 
             return response()->json([
