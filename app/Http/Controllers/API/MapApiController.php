@@ -152,9 +152,18 @@ public function reservarTemporal(Request $request)
                         ->first();
                 }
             }else{
+                $palcoIds = [205, 206, 207, 208, 209, 210, 211, 212,213,214,215,216,217,218,219, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466,
+
+                467, 468, 469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492
+                
+                ];
                 $precio = DB::table('precios_sillas')
                     ->where('tipo_asiento', 'palco')
                     ->first();
+
+                if (in_array($silla->id_palco, $palcoIds)) {
+                    $precio = (object) ['precio' => 20];
+                }
             }
 
             if ($reservaExistente) {
@@ -363,9 +372,21 @@ public function reservarTemporal(Request $request)
         $filaNumero = (int) filter_var($silla->fila, FILTER_SANITIZE_NUMBER_INT);
 
         if ($palco) {
+            $palcoIds = [205, 206, 207, 208, 209, 210, 211, 212,213,214,215,216,217,218,219, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466,
+
+            467, 468, 469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492
+            
+            ];
+
+
             $precio = DB::table('precios_sillas')
                 ->where('tipo_asiento', 'palco')
                 ->first();
+
+             if (in_array($palco->id, $palcoIds)) {
+                $precio = (object) ['precio' => 20];
+             }
+
         } else {
             $precio = DB::table('precios_sillas')
                 ->where('tipo_asiento', 'grada')
@@ -381,6 +402,9 @@ public function reservarTemporal(Request $request)
                     ->first();
             }
         }
+
+
+
 
         if(!$precio){
            //tengo que pasar precio->precio = 12

@@ -102,7 +102,18 @@ class PayController extends Controller
 
                 } elseif ($silla->id_palco != null) {
                     //si es de palco el precio es 50
-                    $precioTotal += 18;
+
+                    $palcoIds = [205, 206, 207, 208, 209, 210, 211, 212,213,214,215,216,217,218,219, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466,
+
+                467, 468, 469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492
+                
+                ];
+                    if (in_array($silla->id_palco, $palcoIds)) {
+                        $precioTotal += 20;
+                    }else{
+                        $precioTotal += 18;
+
+                    }
                 }
 
             }
