@@ -10,6 +10,7 @@ use App\Http\Controllers\API\MapApiController;
 use App\Http\Controllers\API\PayController;
 use App\Http\Controllers\API\ClienteController;
 use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\WebhookController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
