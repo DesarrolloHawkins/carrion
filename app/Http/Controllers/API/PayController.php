@@ -116,24 +116,7 @@ class PayController extends Controller
 
             //recibimos la confirmacion y mandamos el mandatory
 
-            // Add the customer's billing address
-            $billingAddress = new Address();
-            $billingAddress->streetAddress1 = "Apartment 852";
-            $billingAddress->streetAddress2 = "Complex 741";
-            $billingAddress->streetAddress3 = "Unit 4";
-            $billingAddress->city = "Chicago";
-            $billingAddress->state = "IL";
-            $billingAddress->postalCode = "50001";
-            $billingAddress->countryCode = "840";
-
-            // Add the customer's shipping address
-            $shippingAddress = new Address();
-            $shippingAddress->streetAddress1 = "Flat 456";
-            $shippingAddress->streetAddress2 = "House 789";
-            $shippingAddress->streetAddress3 = "Basement Flat";
-            $shippingAddress->city = "Halifax";
-            $shippingAddress->postalCode = "W5 9HR";
-            $shippingAddress->countryCode = "826";
+           
 
                 // Add captured browser data from the client-side and server-side 
             $browserData = new BrowserData();
@@ -157,8 +140,7 @@ class PayController extends Controller
                    ->withCurrency("EUR")
                    ->withOrderCreateDate(date("Y-m-d H:i:s"))
                    ->withCustomerEmail("james.mason@example.com")
-                   ->withAddress($billingAddress, AddressType::BILLING)
-                   ->withAddress($shippingAddress, AddressType::SHIPPING)
+              
                    ->withBrowserData($browserData)
                    ->withMethodUrlCompletion(MethodUrlCompletion::YES)
                    ->execute(Secure3dVersion::TWO);
