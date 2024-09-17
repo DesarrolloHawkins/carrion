@@ -74,8 +74,7 @@ class PayController extends Controller
             $orderId = $request->input('orderId');
 
             try{
-                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::ANY);
-                return $threeDSecureData;
+                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::TWO);
 
             }catch(ApiException $e){
                 return response()->json([
@@ -95,9 +94,15 @@ class PayController extends Controller
             $methodUrl = $threeDSecureData->issuerAcsUrl; // https://www.acsurl.com/method
             $encodedMethodData = $threeDSecureData->payerAuthenticationRequest; // Base64 encoded string
 
+            return response()->json([
+                'status' => '3ds_required',
+                'redirectUrl' => $threeDSecureData->redirectUrl,
+                'transactionId' => $threeDSecureData->transactionId,
+                'message' => $threeDSecureData->transactionId,
+            ]);
+
             //Prueba al POSTMAN lo que recibe
             //SIGUIENTE PASO
-            dd("hasta aqui");
 
             //recibimos la confirmacion y mandamos el mandatory
                 // Add captured browser data from the client-side and server-side 
