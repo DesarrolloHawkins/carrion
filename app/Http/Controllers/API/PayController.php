@@ -76,11 +76,9 @@ class PayController extends Controller
           
             
             try{
-                $response = $card->charge(10.01)
+                $response = $card->charge(0.01)
                     ->withCurrency("EUR")
                     ->execute();
-
-                
                 return $response;
 
             
