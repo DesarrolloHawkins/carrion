@@ -11,13 +11,14 @@ class WebhookController extends Controller
 {
     public function handleWebhook(Request $request)
     {
+            Log::info('Webhook recibido: ' . $request->getContent());
         // Obtén el cuerpo de la petición
         $payload = $request->getContent();
         $signature = $request->header('Stripe-Signature');
         $endpoint_secret = env('STRIPE_WEBHOOK_SECRET');
         
         $event = null;
-
+        Log::info('Webhook recibido: ' . $payload);
         // Verifica la firma del webhook para asegurar que la petición proviene de Stripe
         try {
             $event = Webhook::constructEvent(
@@ -25,9 +26,11 @@ class WebhookController extends Controller
             );
         } catch (\UnexpectedValueException $e) {
             // Payload inválido
+            Log::info('Payload inválido');
             return response()->json(['error' => 'Invalid payload'], 400);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
             // Firma inválida
+            Log::info('Firma inválida');
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
