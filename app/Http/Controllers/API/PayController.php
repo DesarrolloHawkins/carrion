@@ -37,6 +37,8 @@ use GlobalPayments\Api\Entities\ThreeDSecure;
 use GlobalPayments\Api\Entities\BrowserData;
 
 
+
+
 class PayController extends Controller
 {
     protected $globalPayService;
@@ -89,11 +91,7 @@ class PayController extends Controller
                 ]);
             }
 
-            return response()->json([
-                'status' => '3ds_required',
-                'redirectUrl' => $threeDSecureData,
-
-             ]);
+          
           
             $enrolled = $threeDSecureData->enrolled; // TRUE
             // if enrolled, the available response data
@@ -105,20 +103,29 @@ class PayController extends Controller
             $methodUrl = $threeDSecureData->issuerAcsUrl; // https://www.acsurl.com/method
             $encodedMethodData = $threeDSecureData->payerAuthenticationRequest; // Base64 encoded string
 
-            // return response()->json([
-            //     'status' => '3ds_required',
-            //     'transactionId' => $enrolled,
-            //     'message' => $threeDSecureData,
-            // ]);
+            
 
-            //Prueba al POSTMAN lo que recibe
+
             //SIGUIENTE PASO
+            $billingAddress = new Address();
+            $billingAddress->streetAddress1 = "Apartment 852";
+            $billingAddress->streetAddress2 = "Complex 741";
+            $billingAddress->streetAddress3 = "Unit 4";
+            $billingAddress->city = "Chicago";
+            $billingAddress->state = "IL";
+            $billingAddress->postalCode = "50001";
+            $billingAddress->countryCode = "840";
 
-            //recibimos la confirmacion y mandamos el mandatory
-
-           
-
-                // Add captured browser data from the client-side and server-side 
+            // Add the customer's shipping address
+            $shippingAddress = new Address();
+            $shippingAddress->streetAddress1 = "Flat 456";
+            $shippingAddress->streetAddress2 = "House 789";
+            $shippingAddress->streetAddress3 = "Basement Flat";
+            $shippingAddress->city = "Halifax";
+            $shippingAddress->postalCode = "W5 9HR";
+            $shippingAddress->countryCode = "826";
+         
+            // Add captured browser data from the client-side and server-side 
             $browserData = new BrowserData();
             $browserData->acceptHeader = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
             $browserData->colorDepth = ColorDepth::TWENTY_FOUR_BITS;
@@ -140,16 +147,24 @@ class PayController extends Controller
                    ->withCurrency("EUR")
                    ->withOrderCreateDate(date("Y-m-d H:i:s"))
                    ->withCustomerEmail("james.mason@example.com")
-              
+                   ->withAddress($billingAddress, AddressType::BILLING)
+                   ->withAddress($shippingAddress, AddressType::SHIPPING)
                    ->withBrowserData($browserData)
                    ->withMethodUrlCompletion(MethodUrlCompletion::YES)
                    ->execute(Secure3dVersion::TWO);
              } catch (ApiException $e) {
-                // TODO: add your error handling here
+                return response()->json([
+                    'status status prueba' => '3ds_required',
+                    'transactionId' => $e,
+                ]);
              }
              
              $status = $threeDSecureData->status;
-
+             return response()->json([
+                'status' => '3ds_required status',
+                'transactionId' => $enrolled,
+                'message' => $threeDSecureData,
+            ]);
             //  return response()->json([
             //     'status' => '3ds_required',
             //     'redirectUrl' => $threeDSecureData,
@@ -225,11 +240,11 @@ class PayController extends Controller
              //----------------------------------------------------------------------------//
 
 
- return response()->json([
-                'status' => '3ds_required',
-                'redirectUrl' => $response,
+                return response()->json([
+                                'status' => '3ds_required',
+                                'redirectUrl' => $response,
 
-             ]);
+                            ]);
 
 
 
