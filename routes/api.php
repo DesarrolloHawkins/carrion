@@ -9,6 +9,7 @@ use App\Http\Controllers\API\AuthAdminController;
 use App\Http\Controllers\API\MapApiController;
 use App\Http\Controllers\API\PayController;
 use App\Http\Controllers\API\ClienteController;
+use App\Http\Controllers\API\StripePaymentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +22,7 @@ use App\Http\Controllers\API\ClienteController;
 */
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('/create-checkout-session', [StripePaymentController::class, 'createCheckoutSession']);
 
 Route::prefix('cliente')->group(function () {
     Route::post('/register', [AuthClienteController::class, 'register']);

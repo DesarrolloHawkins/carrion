@@ -5,7 +5,19 @@ namespace App\Http\Livewire\Clientes;
 use Livewire\Component;
 use App\Models\Cliente;
 use App\Models\CategoriaJugadores;
+use App\Models\Reservas;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+use App\Models\Sillas;
+use App\Models\Zonas;
+use App\Models\Gradas;
+use App\Models\Palcos;
+use App\Models\Sectores;
+
+
+
+
 
 class IndexComponent extends Component
 {
@@ -104,6 +116,75 @@ public function edit($id)
     $this->dispatchBrowserEvent('open-edit-modal');
 }
 
+
+public function pdfDownload($cliente_id){
+
+    $cliente = Cliente::find($cliente_id);
+
+    if(!$cliente){
+        $this->alert('error', 'Cliente no encontrado.');
+
+        return;
+    }
+
+    $reservas = Reservas::where('id_cliente', $cliente_id)->where('estado', 'pagada')->get();
+
+    if($reservas->isEmpty()){
+        $this->alert('error', 'No hay reservas pagadas para este cliente.');
+
+        return;
+    }
+    $sillas = [];
+    $zonas = [];
+    $detallesReservas = [];
+
+    foreach ($reservas as $reserva) {
+        $silla = Sillas::find($reserva->id_silla); 
+        $zona = Zonas::find($silla->id_zona); 
+        if ($silla->id_palco != null) {
+            $palco = Palcos::find($silla->id_palco);
+            $zona = Sectores::find($palco->id_sector);
+        } elseif ($silla->id_grada != null) {
+            $grada = Gradas::find($silla->id_grada);
+            $zona = Zonas::find($grada->id_zona);
+        }
+        $detallesReservas[] = [
+            'asiento' => $silla->numero ?? 'N/A',
+            'sector' => $zona->nombre ?? 'N/A',
+            'fecha' => $reserva->fecha,
+            'año' => $reserva->año,
+            'precio' => $reserva->precio,
+            'fila' => $silla->fila ?? 'N/A',
+            'order' => $reserva->order,
+            'palco' => $palco->numero ?? '',
+            'grada' => $grada->numero ?? '',
+        ];
+    }
+    $reserva1 = $reservas[0];
+    $silla = Sillas::find($reserva1->id_silla); 
+    if($silla->id_palco != null){
+        $palco = Palcos::find($silla->id_palco);
+        $zona = zonas::find($palco->id_zona);
+    }elseif($silla->id_grada != null){
+        $grada = Gradas::find($silla->id_grada);
+        $zona = Zonas::find($grada->id_zona);
+    }else{
+        $zona = Zonas::find($silla->id_zona);
+    }
+
+    dd($detallesReservas);
+    
+    
+
+    //$pdf = \PDF::loadView('pdf.cliente', compact('cliente'));
+
+    $pdf = PDF::loadView('pdf.cliente')->setPaper('a4', 'vertical')->output(); 
+    return response()->streamDownload(
+        fn () => print($pdf),
+        'export_protocol.pdf'
+    );
+
+}
 
     public function confirmDelete($id)
     {

@@ -66,6 +66,34 @@ class PayController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+
+
+
+    public function checkout(Request $request)
+    {        
+        \Stripe\Stripe::setApiKey(env('STRIPE'));
+        header('Content-Type: application/json');
+        
+        $YOUR_DOMAIN = env('APP_URL');
+        
+        $checkout_session = \Stripe\Checkout\Session::create([
+          'line_items' => [[
+            # Provide the exact Price ID (e.g. pr_1234) of the product you want to sell
+            'price' => '{{PRICE_ID}}',
+            'quantity' => 1,
+          ]],
+          'mode' => 'payment',
+          'success_url' => $YOUR_DOMAIN . '?success=true',
+          'cancel_url' => $YOUR_DOMAIN . '?canceled=true',
+        ]);
+        
+        header("HTTP/1.1 303 See Other");
+        header("Location: " . $checkout_session->url);
+    }
+
+
+
+
     public function processPayment(Request $request)
     {
         
@@ -76,7 +104,12 @@ class PayController extends Controller
             $card->expYear = $request->input('expiry_year');
             $card->cvn = $request->input('cvv');
             $card->cardHolderName = $request->input('card_name');
-    
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment failed in try Secure3dService',
+                'error' => $card,
+            ]);
             $amount = $request->input('amount');
             $orderId = $request->input('orderId');
 
@@ -143,13 +176,14 @@ class PayController extends Controller
 
             try {
                 $threeDSecureData = Secure3dService::initiateAuthentication($card, $threeDSecureData)
-                   ->withAmount(0.01)
+                   ->withAmount(0.05)
                    ->withCurrency("EUR")
                    ->withOrderCreateDate(date("Y-m-d H:i:s"))
                    ->withCustomerEmail("james.mason@example.com")
                    ->withAddress($billingAddress, AddressType::BILLING)
                    ->withAddress($shippingAddress, AddressType::SHIPPING)
                    ->withBrowserData($browserData)
+                   ->withMobileNumber("44", "7123456789")
                    ->withMethodUrlCompletion(MethodUrlCompletion::YES)
                    ->execute(Secure3dVersion::TWO);
              } catch (ApiException $e) {
@@ -171,6 +205,8 @@ class PayController extends Controller
             //     'transactionId' => $threeDSecureData,
             //     'message' => $threeDSecureData,
             //  ]);
+
+
 
 
              //SIGUIENTE PASO

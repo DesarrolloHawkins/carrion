@@ -42,6 +42,23 @@ class ReservasController extends Controller
         ]);
     }
 
+    public function getZonasOcupadas($zonaId){
+        $zonas = [];
+        $sectores = [];
+        if($zonaId == 1){
+            $zonas = ['Arenal I', 'Arenal II', 'Arenal III' ,  'Arenal IV' , 'Arenal V'];
+        }else if($zonaId == 2){
+            $sectores = ['Lancería-Gallo Azul', 'Lancería-Gallo Azul I'];
+        }else if($zonaId == 3){
+            $sectores = ['Algarve-Plaza del Banco I', 'Algarve-Plaza del Banco II'];
+        }else if($zonaId == 4){
+            $sectores = ['Grada I', 'Grada II', 'Grada III' ,  'Grada IV' , 'Grada V'];
+        }
+
+
+
+    }
+
     public function getTotalReservasCliente($clienteId)
 {
     // Obtener las reservas del cliente
