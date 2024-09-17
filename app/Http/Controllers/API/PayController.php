@@ -30,6 +30,13 @@ use GlobalPayments\Api\Entities\HostedPaymentData;
 use GlobalPayments\Api\Entities\Enums\HppVersion;
 use GlobalPayments\Api\Services\HostedService;
 
+use GlobalPayments\Api\Entities\Enums\ColorDepth;
+use GlobalPayments\Api\Entities\Enums\ChallengeWindowSize;
+use GlobalPayments\Api\Entities\Enums\MethodUrlCompletion;
+use GlobalPayments\Api\Entities\ThreeDSecure;
+use GlobalPayments\Api\Entities\BrowserData;
+
+
 class PayController extends Controller
 {
     protected $globalPayService;
@@ -94,12 +101,11 @@ class PayController extends Controller
             $methodUrl = $threeDSecureData->issuerAcsUrl; // https://www.acsurl.com/method
             $encodedMethodData = $threeDSecureData->payerAuthenticationRequest; // Base64 encoded string
 
-            return response()->json([
-                'status' => '3ds_required',
-                'redirectUrl' => $threeDSecureData->redirectUrl,
-                'transactionId' => $threeDSecureData->transactionId,
-                'message' => $threeDSecureData->transactionId,
-            ]);
+            // return response()->json([
+            //     'status' => '3ds_required',
+            //     'transactionId' => $enrolled,
+            //     'message' => $threeDSecureData,
+            // ]);
 
             //Prueba al POSTMAN lo que recibe
             //SIGUIENTE PASO
@@ -135,6 +141,13 @@ class PayController extends Controller
              }
              
              $status = $threeDSecureData->status;
+
+             return response()->json([
+                'status' => '3ds_required',
+                'redirectUrl' => $threeDSecureData,
+                'transactionId' => $threeDSecureData,
+                'message' => $threeDSecureData,
+             ]);
 
 
              //SIGUIENTE PASO
