@@ -88,6 +88,12 @@ class PayController extends Controller
                     'error' => $e->getMessage(),
                 ]);
             }
+
+            return response()->json([
+                'status' => '3ds_required',
+                'redirectUrl' => $threeDSecureData,
+
+             ]);
           
             $enrolled = $threeDSecureData->enrolled; // TRUE
             // if enrolled, the available response data
