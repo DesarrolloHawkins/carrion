@@ -23,7 +23,7 @@ use App\Http\Controllers\StripePaymentController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('/create-checkout-session', [StripePaymentController::class, 'createCheckoutSession']);
-Route::post('/webhook/stripe', [WebhookController::class, 'handleWebhook']);
+Route::post('/payout', [WebhookController::class, 'handleWebhook']);
 
 Route::prefix('cliente')->group(function () {
     Route::post('/register', [AuthClienteController::class, 'register']);
