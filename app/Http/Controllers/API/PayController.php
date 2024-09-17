@@ -172,16 +172,6 @@ return response()->json([
                     'transactionId' => $response->transactionId,
                     'schemeReferenceData' => $response->schemeId,
                 ]);
-
-
-                // Actualizar el estado de la reserva
-                $reserva = Reservas::where('order', $orderId)->first();
-                $reserva->estado = 'pagada';
-                $reserva->transaction = $response->transactionId;
-                $reserva->metodo_pago = 'tarjeta';
-                $reserva->save();
-
-
             } else {
                 return response()->json([
                     'message' => 'Error en el pago: ' . $response->responseMessage,
