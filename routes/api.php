@@ -9,7 +9,7 @@ use App\Http\Controllers\API\AuthAdminController;
 use App\Http\Controllers\API\MapApiController;
 use App\Http\Controllers\API\PayController;
 use App\Http\Controllers\API\ClienteController;
-use App\Http\Controllers\API\StripePaymentController;
+use App\Http\Controllers\StripePaymentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
