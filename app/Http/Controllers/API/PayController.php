@@ -72,8 +72,26 @@ class PayController extends Controller
     
             $amount = $request->input('amount');
             $orderId = $request->input('orderId');
-    
+
+            try{
+                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::TWO);
+                return $threeDSecureData;
+
+            }catch(ApiException $e){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Payment failed in try principio',
+                    'error' => $e->getMessage(),
+                ]);
+            }
           
+
+
+
+
+
+
+
             
             try{
                 $response = $card->charge(0.01)
