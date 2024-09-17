@@ -19,7 +19,7 @@ use App\Models\Palcos;
 use Illuminate\Support\Facades\Mail;
 
 use GlobalPayments\Api\Entities\Enums\Secure3dVersion;
-use GlobalPayments\Api\Entities\ThreeDSecure;
+
 use GlobalPayments\Api\Services\Secure3dService;
 
 
@@ -41,8 +41,14 @@ class PayController extends Controller
 
         // $config->version = 2;
 
-        // https://api.globalpay-ecommerce.com
+        $config = new GpEcomConfig();
+        $config->merchantId = env('MERCHANT_ID');  
+        $config->accountId = env('ACCOUNT');  
+        $config->sharedSecret = env('SHARED_SECRET');
+        $config->serviceUrl = env('ENVIRONMENT');
 
+
+        ServicesContainer::configureService($config);
     }
 
     /** 
@@ -53,137 +59,143 @@ class PayController extends Controller
      */
     public function processPayment(Request $request)
     {
-        // Validar los datos de la solicitud
-        // $validatedData = $request->validate([
-        //     'authenticationValue' => 'required|string',
-        //     'directoryServerTransactionId' => 'required|string',
-        //     'eci' => 'required|string',
-        //     'card_number' => 'required|string',
-        //     'expiry_month' => 'required|numeric',
-        //     'expiry_year' => 'required|numeric',
-        //     'cvv' => 'required|string',
-        //     'card_name' => 'required|string',
-        //     'amount' => 'required|numeric',
-        //     'orderId' => 'required|string',
-        // ]);
+        
 
-// Add 3D Secure 2 Mandatory and Recommended Fields
-        $config = new GpEcomConfig();
-        $config->merchantId = env('MERCHANT_ID');
-        $config->accountId = env('ACCOUNT');
-        $config->sharedSecret = env('SHARED_SECRET');
-        $config->serviceUrl = env('ENVIRONMENT');
-
-        // configure client, request and HPP settings
-
-        $config->hostedPaymentConfig = new HostedPaymentConfig();
-        $config->hostedPaymentConfig->version = HppVersion::VERSION_2;
-        $service = new HostedService($config);
-        $hostedPaymentData = new HostedPaymentData();
-        $hostedPaymentData->customerEmail = "james.mason@example.com";
-        $hostedPaymentData->customerPhoneMobile = "44|07123456789";
-        $hostedPaymentData->addressesMatch = false;
-
-        $billingAddress = new Address();
-        $billingAddress->streetAddress1 = "Flat 123";
-        $billingAddress->streetAddress2 = "House 456";
-        $billingAddress->streetAddress3 = "Unit 4";
-        $billingAddress->city = "Halifax";
-        $billingAddress->postalCode = "W5 9HR";
-        $billingAddress->country = "826";
-
-        $shippingAddress = new Address();
-        $shippingAddress->streetAddress1 = "Apartment 825";
-        $shippingAddress->streetAddress2 = "Complex 741";
-        $shippingAddress->streetAddress3 = "House 963";
-        $shippingAddress->city = "Chicago";
-        $shippingAddress->state = "IL";
-        $shippingAddress->postalCode = "50001";
-        $shippingAddress->country = "840";
-
-        try {
-            $hppJson = $service->charge(19.99)
-               ->withCurrency("EUR")
-               ->withHostedPaymentData($hostedPaymentData)
-               ->withAddress($billingAddress, AddressType::BILLING)
-               ->withAddress($shippingAddress, AddressType::SHIPPING)
-               ->serialize();      
-            // TODO: pass the HPP JSON to the client-side    
-         } catch (ApiException $e) {
+     
+            // Crear el objeto de tarjeta
+            $card = new CreditCardData();
+            $card->number = $request->input('card_number');
+            $card->expMonth = $request->input('expiry_month');
+            $card->expYear = $request->input('expiry_year');
+            $card->cvn = $request->input('cvv');
+            $card->cardHolderName = $request->input('card_name');
+    
+            $amount = $request->input('amount');
+            $orderId = $request->input('orderId');
+    
+          
             
-            // Handle the exception
-            Log::error($e->getMessage());
+            try{
+                $response = Secure3dService::checkEnrollment($card)
+                        ->withAmount(0.01)
+                        ->withCurrency('EUR')
+                        ->execute(Secure3dVersion::TWO);
+
+                
+                return $response;
+
+            
+
+            }catch (ApiException $e){
+                Log::error('Error al procesar el pago: ' . $e->getMessage());
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Payment failed in try Secure3dService',
+                    'error' => $e->getMessage(),
+                ]);
+            }
+            return 'Respuesto de Response: ' .$response;
+            $status = $threeDSecureData->status;
 
             return response()->json([
-                'message' => 'Error en el procesamiento: ' . $e->getMessage(),
-            ], 500);
-         }
+                'status' => '3ds_required',
+                'redirectUrl' => $threeDSecureData->redirectUrl,
+                'transactionId' => $threeDSecureData->transactionId,
+                'message' => $response->transactionId,
+
+            ]);
+
+            $enrolled = $threeDSecureData->enrolled; // TRUE
+            // if enrolled, the available response data
+            $serverTransactionId = $threeDSecureData->serverTransactionId; // af65c369-59b9-4f8d-b2f6-7d7d5f5c69d5
+            $dsStartProtocolVersion = $threeDSecureData->directoryServerStartVersion; // 2.1.0
+            $dsEndProtocolVersion = $threeDSecureData->directoryServerEndVersion; // 2.1.0
+            $acsStartProtocolVersion = $threeDSecureData->acsStartVersion; // 2.1.0
+            $acsEndProtocolVersion = $threeDSecureData->acsEndVersion; // 2.1.0
+            $methodUrl = $threeDSecureData->issuerAcsUrl; // https://www.acsurl.com/method
+            $encodedMethodData = $threeDSecureData->payerAuthenticationRequest; // Base64 encoded string
 
 
+            // Procesar el pago
+            try {
 
-return response()->json([
-    'hppJson' => $hppJson,
-]);
+                $authResponse = $card->verify()
+                    ->withCurrency("EUR")
+                    ->withAmount($amount)
+                    ->with3DSecure()
+                    ->execute();
 
+                // Si se requiere 3DS, redirigir al usuario para autenticación
+                if ($authResponse->is3DSecureRequired()) {
+                    return response()->json([
+                        'status' => '3ds_required',
+                        'redirectUrl' => $authResponse->redirectUrl,
+                        'transactionId' => $authResponse->transactionId
+                    ]);
+                }
 
+                // Si no se requiere 3DS, proceder con el cargo
+                $chargeResponse = $card->charge($amount)
+                    ->withCurrency("EUR")
+                    ->withTransactionId($authResponse->transactionId)
+                    ->execute();    
+            } catch (ApiException $e) {
 
+                Log::error('Error al procesar el pago: ' . $e->getMessage());
 
-
-
-
-
-
-
-
-        // Crear el objeto de tarjeta
-        $card = new CreditCardData();
-        $card->number = $validatedData['card_number'];
-        $card->expMonth = intval($validatedData['expiry_month']);
-        $card->expYear = intval($validatedData['expiry_year']);
-        $card->cvn = $validatedData['cvv'];
-        $card->cardHolderName = $validatedData['card_name'];
-
-        $amount = $validatedData['amount'];
-        $orderId = $validatedData['orderId'];
-
-        // Crear los datos 3D Secure 2
-        $threeDSecureData = new ThreeDSecure();
-        $threeDSecureData->authenticationValue = $validatedData['authenticationValue'];
-        $threeDSecureData->directoryServerTransactionId = $validatedData['directoryServerTransactionId'];
-        $threeDSecureData->eci = $validatedData['eci'];
-        $threeDSecureData->messageVersion = "2.1.0";
-
-        // Añadir los datos 3D Secure 2 al objeto de tarjeta
-        $card->threeDSecure = $threeDSecureData;
-
-        try {
-            // Procesar el cargo utilizando el SDK de Global Payments
-            $response = $card->charge($amount)
-                ->withCurrency("EUR")
-                ->withOrderId($orderId)  // Usar el orderId si es necesario
-                ->execute();
-
-            // Verificar la respuesta del procesamiento de pago
-            if ($response->responseCode === '00') {
                 return response()->json([
-                    'message' => 'Pago autorizado',
-                    'orderId' => $response->orderId,
-                    'authCode' => $response->authorizationCode,
-                    'transactionId' => $response->transactionId,
-                    'schemeReferenceData' => $response->schemeId,
+                    'status' => 'error',
+                    'message' => 'Payment failed in try metodo continuado',
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // Si el pago es exitoso
+            if ($response->responseCode === '00') {
+                $orderId = $response->orderId;
+                foreach ($reservas as $reserva) {
+                    $reserva->estado = 'pagada';
+                    $reserva->order = $orderId;
+                    $reserva->save();
+                }
+                
+
+    
+                // Enviar correo de confirmación
+                try {
+                    $sillas = [];
+                    foreach ($reservas as $reserva) {
+                        $silla = Sillas::find($reserva->id_silla);
+                        array_push($sillas, $silla);
+                    }
+                    Log::info('Procesando envío de correo para el cliente: ' . $cliente->email);
+
+                    Mail::to($cliente->email)->send(new ReservaPagada($reservas, $sillas, $cliente));
+                    Log::info('Correo enviado correctamente a ' . $cliente->email);
+
+                } catch (\Exception $e) {
+                    Log::error('Error al enviar el correo: ' . $e->getMessage());
+
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Payment processed but email not sent',
+                        'error' => $e->getMessage() . ' ' . $e->getTraceAsString(),
+                    ]);
+                }
+    
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Payment processed successfully',
+                    'orderId' => $orderId,
                 ]);
             } else {
                 return response()->json([
-                    'message' => 'Error en el pago: ' . $response->responseMessage,
-                ], 400);
+                    'status' => 'error',
+                    'message' => 'Payment failed',
+                ]);
             }
-        } catch (\Exception $e) {
-            // Manejo de errores
-            return response()->json([
-                'message' => 'Error en el procesamiento: ' . $e->getMessage(),
-            ], 500);
-        }
+    
     }
-
     
 }
