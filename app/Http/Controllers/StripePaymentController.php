@@ -13,24 +13,25 @@ class StripePaymentController extends Controller
     {
         // Configura la clave secreta de Stripe
         Stripe::setApiKey(env('STRIPE_SECRET'));
-
+        $orderId = $request->input('orderId'); // Obtener el orderId desde el frontend
+        $amount = $request->input('amount'); // Obtener el monto desde el frontend
         try {
             // Crear sesión de pago
             $checkout_session = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => 'usd',
+                        'currency' => 'eur',
                         'product_data' => [
-                            'name' => 'Product name',
+                            'name' => 'Reserva de silla',
                         ],
-                        'unit_amount' => 2000, // Precio en centavos (20 USD)
+                        'unit_amount' => $amount, // Precio en centavos (20 USD)
                     ],
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => env('APP_URL') . '/success?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => env('APP_URL') . '/cancel',
+                'success_url' => 'myapp://resumen-compra?orderId=' . $orderId . '&session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => 'myapp://cancel?orderId=' . $orderId,
             ]);
 
             return response()->json(['id' => $checkout_session->id]);

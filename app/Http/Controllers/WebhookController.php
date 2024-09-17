@@ -7,6 +7,8 @@ use Stripe\Event;
 use Stripe\Webhook;
 use Log;
 
+
+
 class WebhookController extends Controller
 {
     public function handleWebhook(Request $request)
