@@ -74,7 +74,7 @@ class PayController extends Controller
             $orderId = $request->input('orderId');
 
             try{
-                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::Any);
+                $threeDSecureData = Secure3dService::checkEnrollment($card)->execute('default', Secure3dVersion::Secure3dVersion.Any);
                 return $threeDSecureData;
 
             }catch(ApiException $e){
