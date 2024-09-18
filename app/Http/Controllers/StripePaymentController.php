@@ -53,6 +53,7 @@ class StripePaymentController extends Controller
     public function registrarPago(Request $request)
     {
         try {
+            Stripe::setApiKey(env('STRIPE_SECRET'));
             $paymentIntentId = $request->input('paymentIntent');
             $orderId = $request->input('orderId');
             
