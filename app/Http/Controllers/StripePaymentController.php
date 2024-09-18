@@ -39,7 +39,7 @@ class StripePaymentController extends Controller
 
             // Devolver el cliente, la clave efímera y el PaymentIntent
             return response()->json([
-                'paymentIntent' => $paymentIntent->id,
+                'paymentIntent' => $paymentIntent,
                 'clientSecret' => $paymentIntent->client_secret,
                 'ephemeralKey' => $ephemeralKey->secret,
                 'customer' => $customer->id
