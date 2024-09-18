@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
-
+use Stripe\Customer;
+use Stripe\EphemeralKey;
+use Stripe\PaymentIntent;
 
 
 class StripePaymentController extends Controller
@@ -16,28 +18,34 @@ class StripePaymentController extends Controller
         $orderId = $request->input('orderId'); // Obtener el orderId desde el frontend
         $amount = $request->input('amount'); // Obtener el monto desde el frontend
         try {
-            // Crear sesión de pago
-            $checkout_session = Session::create([
-                'payment_method_types' => ['card'],
-                'line_items' => [[
-                    'price_data' => [
-                        'currency' => 'eur',
-                        'product_data' => [
-                            'name' => 'Reserva de silla',
-                        ],
-                        'unit_amount' => $amount, // Precio en centavos (20 USD)
-                    ],
-                    'quantity' => 1,
-                ]],
-                'mode' => 'payment',
-                'success_url' => 'myapp://resumen-compra?orderId=' . $orderId . '&session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => 'myapp://cancel?orderId=' . $orderId,
+            // Crear un cliente de Stripe
+            $customer = Customer::create([
+                'email' => $request->input('email'), // Asegúrate de pasar el email desde el frontend
             ]);
 
-            return response()->json(['id' => $checkout_session->id]);
+            // Crear una clave efímera (Ephemeral Key) para el cliente
+            $ephemeralKey = EphemeralKey::create(
+                ['customer' => $customer->id],
+                ['stripe_version' => '2024-06-20'] // Asegúrate de utilizar la versión de la API correcta
+            );
+
+            // Crear un PaymentIntent
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $request->input('amount'), // Cantidad en centavos
+                'currency' => 'eur',
+                'customer' => $customer->id,
+                'automatic_payment_methods' => ['enabled' => true],
+            ]);
+
+            // Devolver el cliente, la clave efímera y el PaymentIntent
+            return response()->json([
+                'paymentIntent' => $paymentIntent->client_secret,
+                'ephemeralKey' => $ephemeralKey->secret,
+                'customer' => $customer->id
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

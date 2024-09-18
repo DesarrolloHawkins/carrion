@@ -15,7 +15,12 @@ use App\Models\Gradas;
 use App\Models\Palcos;
 use App\Models\Sectores;
 
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 
 
@@ -136,54 +141,122 @@ public function pdfDownload($cliente_id){
     }
     $sillas = [];
     $zonas = [];
+
     $detallesReservas = [];
 
-    foreach ($reservas as $reserva) {
-        $silla = Sillas::find($reserva->id_silla); 
-        $zona = Zonas::find($silla->id_zona); 
-        if ($silla->id_palco != null) {
-            $palco = Palcos::find($silla->id_palco);
-            $zona = Sectores::find($palco->id_sector);
-        } elseif ($silla->id_grada != null) {
-            $grada = Gradas::find($silla->id_grada);
-            $zona = Zonas::find($grada->id_zona);
-        }
-        $detallesReservas[] = [
-            'asiento' => $silla->numero ?? 'N/A',
-            'sector' => $zona->nombre ?? 'N/A',
-            'fecha' => $reserva->fecha,
-            'año' => $reserva->año,
-            'precio' => $reserva->precio,
-            'fila' => $silla->fila ?? 'N/A',
-            'order' => $reserva->order,
-            'palco' => $palco->numero ?? '',
-            'grada' => $grada->numero ?? '',
-        ];
-    }
-    $reserva1 = $reservas[0];
-    $silla = Sillas::find($reserva1->id_silla); 
-    if($silla->id_palco != null){
+foreach ($reservas as $reserva) {
+    $silla = Sillas::find($reserva->id_silla); 
+    $zona = Zonas::find($silla->id_zona); 
+    $palco = null;
+    $grada = null;
+
+    if ($silla->id_palco != null) {
         $palco = Palcos::find($silla->id_palco);
-        $zona = zonas::find($palco->id_zona);
-    }elseif($silla->id_grada != null){
+        $zona = Sectores::find($palco->id_sector);
+    } elseif ($silla->id_grada != null) {
         $grada = Gradas::find($silla->id_grada);
         $zona = Zonas::find($grada->id_zona);
-    }else{
-        $zona = Zonas::find($silla->id_zona);
     }
 
-    dd($detallesReservas);
+    $detalleReserva = [
+        'asiento' => $silla->numero ?? 'N/A',
+        'sector' => $zona->nombre ?? 'N/A', // Asumiendo que $zona->nombre es el nombre de la zona
+        'fecha' => $reserva->fecha,
+        'año' => $reserva->año,
+        'precio' => $reserva->precio,
+        'fila' => $silla->fila ?? 'N/A',
+        'order' => $reserva->order,
+        'palco' => $palco->numero ?? '',
+        'grada' => $grada->numero ?? '',
+    ];
+
+    // Agrupar las reservas por zona
+    $detallesReservas[$zona->nombre][] = $detalleReserva;
+}
+$this->mapImage = $this->getMapImageByZona($zona->nombre);
+$this->mapImageBase64 = $this->imageToBase64( $this->mapImage);
+
+
+
+    
+    // $reserva1 = $reservas[0];
+    // $silla = Sillas::find($reserva1->id_silla); 
+    // if($silla->id_palco != null){
+    //     $palco = Palcos::find($silla->id_palco);
+    //     $zona = zonas::find($palco->id_zona);
+    // }elseif($silla->id_grada != null){
+    //     $grada = Gradas::find($silla->id_grada);
+    //     $zona = Zonas::find($grada->id_zona);
+    // }else{
+    //     $zona = Zonas::find($silla->id_zona);
+    // }
+
+    //dd($detallesReservas);
     
     
 
     //$pdf = \PDF::loadView('pdf.cliente', compact('cliente'));
 
-    $pdf = PDF::loadView('pdf.cliente')->setPaper('a4', 'vertical')->output(); 
+    $pdf = PDF::loadView('pdf.cliente', compact('detallesReservas'))->setPaper('a4', 'vertical')->output(); 
     return response()->streamDownload(
         fn () => print($pdf),
         'export_protocol.pdf'
     );
 
+}
+
+private function imageToBase64($path)
+{
+    if (file_exists(public_path($path))) {
+        $imageData = file_get_contents(public_path($path));
+        return base64_encode($imageData);
+    }
+    return null;
+}
+
+// Función para obtener la imagen según el nombre de la zona
+private function getMapImageByZona($zonaNombre)
+{
+    switch ($zonaNombre) {
+        case '01- Asunción (Protocolo)':
+        case 'Plaza Asunción (Protocolo)':
+            return '/images/zonas/asuncion.png';
+        case '02.- Consistorio':
+        case 'Consistorio II':
+        case 'Consistorio I':
+        case '':
+            return '/images/zonas/consistorio.png';
+        case '03. Arenal':
+        case 'Arenal II':
+        case 'Arenal I':
+        case 'Arenal III':
+        case 'Arenal IV':
+        case 'Arenal V':
+        case 'Arenal VI':
+            return '/images/zonas/arenal.png';
+        case '04.- Lancería-Gallo Azul':
+        case 'Lancería-Gallo Azul':
+            return '/images/zonas/lanceria.png';
+        case '05.- Algarve-Plaza del Banco':
+        case 'Algarve-Plaza del Banco':
+            return '/images/zonas/larga.png';
+        case '06.- Rotonda de los Casinos-Santo Domingo':
+        case 'Rotonda de los Casinos-Santo Domingo':    
+        case 'Rotonda de los Casinos-Santo Domingo II':
+            return '/images/zonas/casinos.png';
+        case '07.- Marqués de Casa Domecq':
+        case 'Marqués de Casa Domecq II':
+        case 'Marqués de Casa Domecq':
+        case 'Marqués de Casa Domecq I':
+            return '/images/zonas/santodomingo.png';
+        case '08.- Eguiluz':
+        case 'Eguiluz II':
+        case 'Eguiluz I':
+        case 'Eguiluz':
+            return '/images/zonas/domecq.png';
+        default:
+            return '/images/zonas/default.png';
+    }
 }
 
     public function confirmDelete($id)

@@ -230,6 +230,8 @@
                                         <td>
                                         <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editClienteModal" wire:click="edit({{ $cliente->id }})">Ver/Editar</button>
                                         <button class="btn btn-sm btn-danger" wire:click="confirmDelete({{ $cliente->id }})">Eliminar</button>
+                                        <button class="btn btn-dark" wire:click="pdfDownload({{$cliente->id}})">Descargar</button>
+
                                         </td>
                                     </tr>
                                 @endforeach
