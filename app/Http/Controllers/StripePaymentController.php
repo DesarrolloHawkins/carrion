@@ -8,6 +8,15 @@ use Stripe\Customer;
 use Stripe\EphemeralKey;
 use Stripe\PaymentIntent;
 
+use App\Models\Reservas;
+use App\Models\Clientes;
+use App\Models\Sillas;
+use App\Mail\ReservaPagada;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+
+
 
 class StripePaymentController extends Controller
 {
