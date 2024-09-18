@@ -28,8 +28,8 @@ class AuthClienteController extends Controller
             // Si no existe por DNI, buscar por teléfono o email
             $cliente = Cliente::where(function($query) use ($request) {
                 $query->where('email', $request->email)
-                    ->orWhere('movil', $request->movil)
-                    ->orWhere('fijo', $request->fijo);
+                    ->Where('movil', $request->movil)
+                    ->Where('fijo', $request->fijo);
             })->first();
         }
 
