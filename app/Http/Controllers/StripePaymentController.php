@@ -77,7 +77,7 @@ class StripePaymentController extends Controller
                 // $order->status = 'pagada';
                 // $order->save();
                 $reservas = Reservas::where('order', $orderId)->get();
-                $cliente = Clientes::find($reservas[0]->id_cliente);
+                $cliente = Cliente::find($reservas[0]->id_cliente);
                 foreach ($reservas as $reserva) {
                     $reserva->estado = 'pagada';
                     $reserva->order = $paymentIntentId;
