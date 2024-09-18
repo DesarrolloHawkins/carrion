@@ -11,6 +11,9 @@ use App\Models\Presupuesto;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ReservaPagada2;
+
 
 
 class HomeController extends Controller
@@ -54,5 +57,20 @@ class HomeController extends Controller
         $resultados_caja = $ingresos_caja - $gastos_caja;
 
         return view('mapa.index');
+    }
+
+    public function mandaremails()
+    {
+
+        Mail::to('david@hawkins.es')->send(new ReservaPagada2());
+
+        // // Enviar el correo a ivan.mayol@hawkins.es
+        // Mail::send('pdf.devuelta', [], function ($message) {
+        //     $message->to('ivan.mayol@hawkins.es')
+        //             ->subject('Confirmación de Reserva')
+        //             ->from(config('mail.from.address'), config('mail.from.name'));
+        // });
+
+        // Puedes usar alertas de LivewireAlert si quieres confirmar que el correo fue enviado
     }
 }

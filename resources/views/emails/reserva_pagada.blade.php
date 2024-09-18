@@ -27,7 +27,7 @@ Unión de Hermandades de Jerez
 
 @slot('footer')
 @component('mail::footer')
-Si tienes alguna duda, contáctanos en soporte@example.com
+Si tienes alguna duda, contáctanos en david@hawkins.es
 @endcomponent
 @endslot
 @endcomponent

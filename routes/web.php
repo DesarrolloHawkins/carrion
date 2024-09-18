@@ -82,7 +82,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //Route::get('/clients', [App\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
 
 Route::get('/reservas/{clienteId}', [App\Http\Controllers\ReservasController::class, 'show'])->name('reservas.show');
-
+Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails'])->name('reservas.create');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
