@@ -22,6 +22,7 @@ class CancelOldReservations extends Command
         
         // Encuentra todas las reservas que no han sido actualizadas en los últimos 15 minutos
         $expiredReservations = Reservas::where('estado', 'reservada')
+            ->where('isCRM', false)
             ->where('updated_at', '<', $expirationTime)
             ->get();
 

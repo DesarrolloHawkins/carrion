@@ -114,6 +114,7 @@ class GradaComponent extends Component
                 'estado' => $this->estadoSeleccionado,
                 'metodo_pago' => $this->metodoPago,
                 'isInvitado' => $this->isInvitado,
+                'isCRM' => true,
             ]);
 
             //Alerta de éxito
@@ -133,6 +134,7 @@ class GradaComponent extends Component
                 'precio' => $this->reservaPrecio,
                 'metodo_pago' => $this->metodoPago,
                 'isInvitado' => $this->isInvitado,
+                'isCRM' => true,
             ]);
 
            // Alerta de éxito
@@ -196,6 +198,7 @@ class GradaComponent extends Component
                     'estado' => $this->estadoSeleccionado,
                     'metodo_pago' => $this->metodoPago,
                     'isInvitado' => $this->isInvitado,
+                    'isCRM' => true,
                 ]);
             }
         }
@@ -215,49 +218,71 @@ class GradaComponent extends Component
         // Preparar los detalles de las reservas para el PDF
         $detallesReservas = [];
         $zona = null;
-    
+
+        $zonas = [];
+        $palco = null;
+        $grada = null;
+
         foreach ($reservas as $reserva) {
-            $silla = Sillas::find($reserva->id_silla);
-            $palco = $silla->id_palco ? Palcos::find($silla->id_palco) : null;
-            $grada = $silla->id_grada ? Gradas::find($silla->id_grada) : null;
-    
-            if ($silla->id_zona) {
-                $zona = $silla->zona->nombre;
+            $silla = Sillas::find($reserva->id_silla); 
+            $zona = Zonas::find($silla->id_zona); 
+            if ($silla->id_palco != null) {
+                $palco = Palcos::find($silla->id_palco);
+                $zona = Sectores::find($palco->id_sector);
+            } elseif ($silla->id_grada != null) {
+                $grada = Gradas::find($silla->id_grada);
+                $zona = Zonas::find($grada->id_zona);
             }
-    
             $detallesReservas[] = [
                 'asiento' => $silla->numero ?? 'N/A',
-                'sector' => $silla->zona->nombre ?? 'N/A',
-                'fila' => $silla->fila ?? 'N/A',
-                'precio' => $reserva->precio,
+                'sector' => $zona->nombre ?? 'N/A',
                 'fecha' => $reserva->fecha,
                 'año' => $reserva->año,
-                'palco' => $palco ? $palco->numero : null,
-                'grada' => $grada ? $grada->numero : null,
+                'precio' => $reserva->precio,
+                'fila' => $silla->fila ?? 'N/A',
+                'order' => $reserva->order,
+                'palco' => $palco->numero ?? '',
+                'grada' => $grada->numero ?? '',
             ];
         }
-    
-        // // Obtener la ruta absoluta del mapa según la zona
-        // $mapImagePath = public_path($this->getMapImageByZona($zona));
-    
-        // // Generar el código QR como una imagen temporal
-        // $qrCodePath = storage_path('app/public/qrcodes/qr_' . time() . '.png');
-        // QrCode::format('png')->size(200)->generate(url('/reservas/' . $cliente->id), $qrCodePath);
-    
-        // Datos para la vista del PDF
-        $datos = [
-            'detallesReservas' => $detallesReservas,
-            'cliente' => $cliente,
-            // 'qrCodePath' => $qrCodePath,
-            // 'mapImagePath' => $mapImagePath,
-        ];
-    
-        $pdf = Pdf::loadView('pdf.nueva_reserva', $datos);
 
-        // Descargar el PDF
-        return response()->streamDownload(function () use($pdf) {
-            echo  $pdf->stream();
-        }, 'report.pdf');
+        $reserva1 = $reservas[0];
+        $silla = Sillas::find($reserva1->id_silla); 
+        if($silla->id_palco != null){
+            $palco = Palcos::find($silla->id_palco);
+            $zona = zonas::find($palco->id_zona);
+        }elseif($silla->id_grada != null){
+            $grada = Gradas::find($silla->id_grada);
+            $zona = Zonas::find($grada->id_zona);
+        }else{
+            $zona = Zonas::find($silla->id_zona);
+        }
+
+        //$zona = Zonas::find($silla->id_zona);
+
+        // Obtener la imagen del mapa según la zona
+        $mapImage = $this->getMapImageByZona($zona->nombre);
+
+        $mapImageBase64 = $this->imageToBase64( $mapImage);
+
+        // Generar el código QR y almacenarlo como base64
+        $qrCodeBase64 = base64_encode(QrCode::format('png')
+            ->size(200)
+            ->generate(url('/reservas/' . $cliente->id)));
+
+            $pdf = PDF::loadView('pdf.reserva_qr', [
+                'detallesReservas' => $detallesReservas,
+                'qrCodeBase64' => $qrCodeBase64,
+                'cliente' => $cliente,
+                'mapImage' => $mapImageBase64, // Imagen seleccionada según la zona
+    
+            ])->setPaper('a4', 'vertical');
+
+            return response()->streamDownload(
+                fn () => print($pdf),
+                "reserva_.pdf"
+            );
+
     }
     
 
@@ -359,7 +384,7 @@ return null;
             })
             ->value('precio');
 
-        return $precio ?: 0;
+        return $precio ?: 12;
     }
 
     public function render()

@@ -115,6 +115,7 @@ class PalcoComponent extends Component
                     'estado' => $this->estadoSeleccionado,
                     'metodo_pago' => $this->metodoPago,
                     'isInvitado' => $this->isInvitado,
+                    'isCRM' => true,
                 ]);
             } else {
                 $reservaSilla->update([
@@ -123,6 +124,7 @@ class PalcoComponent extends Component
                     'precio' => $this->reservaPrecio,
                     'metodo_pago' => $this->metodoPago,
                     'isInvitado' => $this->isInvitado,
+                    'isCRM' => true,
                 ]);
 
                 $this->alert('success', 'Reserva actualizada', [

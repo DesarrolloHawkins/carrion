@@ -29,6 +29,7 @@ class Reservas extends Model
         'transaction',
         'metodo_pago',
         'isInvitado',
+        'isCRM',
 
     ];
 
