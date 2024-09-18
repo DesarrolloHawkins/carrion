@@ -85,24 +85,24 @@ class HomeController extends Controller
             // 'jaimegomezfm@gmail.com',
             // 'elentris@yahoo.es',
             // 'juanfragd@gmail.com',
-            'pablojimhar@hotmail.com',
-            'teresa.espinosa74@gmail.com',
-            'fernandobenitezmoreno@gmail.com',
-            'jm.avilabecerra@gmail.com',
-            'joselu_cuenda@hotmail.com',
-            'patrycya.80@hotmail.com',
-            'manuelpichacogutierrez@gmail.com',
-            'kleteklete@gmail.com',
-            'javier.rosaro@gmail.com',
-            'manueljesuslopezlopez14@gmail.com',
-            'mdelvallesoto@gmail.com',
-            'peracaula@live.com',
-            'josignacio1994@gmail.com',
-            'castellanoalexito@gmail.com',
-            'juampesantiago@gmail.com',
-            'juanlurobleda@gmail.com',
-            'jcmoralessan@hotmail.com',
-            'f.j.holgado@hotmail.com',
+            // 'pablojimhar@hotmail.com',
+            // 'teresa.espinosa74@gmail.com',
+            // 'fernandobenitezmoreno@gmail.com',
+            // 'jm.avilabecerra@gmail.com',
+            // 'joselu_cuenda@hotmail.com',
+            // 'patrycya.80@hotmail.com',
+            // 'manuelpichacogutierrez@gmail.com',
+            // 'kleteklete@gmail.com',
+            // 'javier.rosaro@gmail.com',
+            // 'manueljesuslopezlopez14@gmail.com',
+            // 'mdelvallesoto@gmail.com',
+            // 'peracaula@live.com',
+            // 'josignacio1994@gmail.com',
+            // 'castellanoalexito@gmail.com',
+            // 'juampesantiago@gmail.com',
+            // 'juanlurobleda@gmail.com',
+            // 'jcmoralessan@hotmail.com',
+            // 'f.j.holgado@hotmail.com',
             // 'pilar.martincamas8@gmail.com',
             // 'ELMARQUES21@HOTMAIL.COM',
             // 'lolitajerezana@gmail.com',
@@ -123,9 +123,9 @@ class HomeController extends Controller
             // 'mendezguijosa@gmail.com',
         ];
 
-        foreach ($emails as $email) {
-            Mail::to($email)->send(new ReservaPagada2());
-        }
+        // foreach ($emails as $email) {
+        //     Mail::to($email)->send(new ReservaPagada2());
+        // }
 
         // // Enviar el correo a ivan.mayol@hawkins.es
         // Mail::send('pdf.devuelta', [], function ($message) {
