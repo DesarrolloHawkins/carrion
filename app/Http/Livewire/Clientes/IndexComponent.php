@@ -173,8 +173,8 @@ foreach ($reservas as $reserva) {
     // Agrupar las reservas por zona
     $detallesReservas[$zona->nombre][] = $detalleReserva;
 }
-$this->mapImage = $this->getMapImageByZona($zona->nombre);
-$this->mapImageBase64 = $this->imageToBase64( $this->mapImage);
+$mapImage = $this->getMapImageByZona($zona->nombre);
+$mapImageBase64 = $this->imageToBase64( $this->mapImage);
 
 
 

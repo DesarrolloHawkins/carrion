@@ -48,4 +48,61 @@ class StripePaymentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+
+    public function registrarPago(Request $request)
+    {
+        try {
+            $paymentIntentId = $request->input('paymentIntent');
+            $orderId = $request->input('orderId');
+            
+            // Consultar el PaymentIntent para verificar el estado del pago
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+
+            if ($paymentIntent->status == 'succeeded') {
+                // Actualizar el estado de la orden a 'pagada'
+                // $order = Order::findOrFail($orderId);
+                // $order->status = 'pagada';
+                // $order->save();
+                $reservas = Reservas::where('order', $orderId)->get();
+                $cliente = Clientes::find($reservas[0]->id_cliente);
+                foreach ($reservas as $reserva) {
+                    $reserva->estado = 'pagada';
+                    $reserva->order = $paymentIntentId;
+                    $reserva->save();
+                }
+                try {
+                    $sillas = [];
+                    foreach ($reservas as $reserva) {
+                        $silla = Sillas::find($reserva->id_silla);
+                        array_push($sillas, $silla);
+                    }
+                    Log::info('Procesando envío de correo para el cliente: ' . $cliente->email);
+
+                    Mail::to($cliente->email)->send(new ReservaPagada($reservas, $sillas, $cliente));
+                    Log::info('Correo enviado correctamente a ' . $cliente->email);
+
+                } catch (\Exception $e) {
+                    Log::error('Error al enviar el correo: ' . $e->getMessage());
+
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Payment processed but email not sent',
+                        'error' => $e->getMessage() . ' ' . $e->getTraceAsString(),
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Payment processed successfully',
+                    'orderId' => $paymentIntentId,
+                ]);
+                //return response()->json(['message' => 'Pago registrado con éxito'], 200);
+            } else {
+                return response()->json(['error' => 'El pago no fue exitoso'], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
