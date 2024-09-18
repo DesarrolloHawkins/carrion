@@ -18,11 +18,10 @@ class CancelOldReservations extends Command
 
     public function handle()
     {
-        $expirationTime = Carbon::now()->subMinutes(15);
+        $expirationTime = Carbon::now()->subMinutes(5);
         
         // Encuentra todas las reservas que no han sido actualizadas en los últimos 15 minutos
         $expiredReservations = Reservas::where('estado', 'reservada')
-            ->where('isCRM', false)
             ->where('updated_at', '<', $expirationTime)
             ->get();
 
