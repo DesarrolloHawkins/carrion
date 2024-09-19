@@ -96,6 +96,17 @@ class MapApiController extends Controller
 
 public function reservarTemporal(Request $request)
 {
+    $reservasAnteriores = Reservas::where('order', '!=', $request->input('order'))
+    ->where('estado', 'reservada')
+    ->where('id_cliente', $request->input('cliente_id'))
+    ->get();
+
+    foreach ($reservasAnteriores as $reserva) {
+        $reserva->estado = 'cancelada';
+        $reserva->save();
+    }
+
+
     $sillas = $request->input('sillas');  // IDs de las sillas seleccionadas
     $clienteId = $request->input('cliente_id');
     $fecha = $request->input('fecha');
