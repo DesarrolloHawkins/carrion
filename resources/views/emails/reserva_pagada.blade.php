@@ -13,7 +13,16 @@ Gracias por su pago. Aquí están los detalles de su reserva con código {{ $det
 @endforeach
 @endcomponent
 
-El total pagado es: **{{ array_sum(array_column($detallesReservas, 'precio')) }}€**
+@php
+    $totalPrecio = $tasas - array_sum(array_column($detallesReservas, 'precio'));
+    
+@endphp
+
+Total de las sillas reservadas: **{{ array_sum(array_column($detallesReservas, 'precio')) }}€**
+
+Pago de tasas: **{{ $totalPrecio }}€**
+
+El total pagado es: **{{ $tasas}}€**
 
 <h3 style="margin-top:20px;">Escanee el siguiente código QR para acceder a sus reservas:</h3>
 <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">

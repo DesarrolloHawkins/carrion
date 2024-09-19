@@ -26,6 +26,7 @@ class ReservaPagada extends Mailable
     public $detallesReservas = [];
     public $qrCodeBase64; // Para almacenar el código QR en base64
     public $mapImageBase64;
+    public $montoCobrar;
 
     
 
@@ -39,7 +40,9 @@ class ReservaPagada extends Mailable
         $palco = null;
         $grada = null;
 
+        $totalPrecio = 0;
         foreach ($reservas as $reserva) {
+            $totalPrecio += $reserva->precio;
             $silla = Sillas::find($reserva->id_silla); 
             $zona = Zonas::find($silla->id_zona); 
             if ($silla->id_palco != null) {
@@ -61,6 +64,8 @@ class ReservaPagada extends Mailable
                 'grada' => $grada->numero ?? '',
             ];
         }
+
+
 
         $reserva1 = $reservas[0];
         $silla = Sillas::find($reserva1->id_silla); 
@@ -85,7 +90,71 @@ class ReservaPagada extends Mailable
         $this->qrCodeBase64 = base64_encode(QrCode::format('png')
             ->size(200)
             ->generate(url('/reservas/' . $cliente->id)));
+
+
+        //tasas
+        $montoObjetivo = $totalPrecio;  // Monto objetivo que deseas recibir
+        $tarifaFija = 0.30;      // Tarifa fija de Stripe (en dólares)
+        $tarifaPorcentaje = 0.029; // Tarifa porcentual de Stripe (2.9% es 0.029)
+        $this->montoCobrar = $this->calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcentaje);
     }
+
+
+    public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcentaje) {
+        // Fórmula: Pcarga = (Pobjetivo + Ffijo) / (1 - Fporcentaje)
+        $montoCobrar = ($montoObjetivo + $tarifaFija) / (1 - $tarifaPorcentaje);
+        return round($montoCobrar, 2); // Redondeamos a 2 decimales
+    }
+
+    public function calcularPrecioMultiple($sillaIds)
+    {
+        $totalPrecio = 0;
+        foreach ($sillaIds as $sillaId) {
+            $silla = Sillas::findOrFail($sillaId);
+            $totalPrecio += $this->calcularPrecio($silla);
+        }
+        return $totalPrecio;
+    }
+
+    public function calcularPrecio($silla)
+    {
+        $numeroFila = intval(substr($silla->fila, 1));
+
+        if($silla->id_grada){
+
+            $precio = \DB::table('precios_sillas')
+            ->where('tipo_asiento', 'grada')
+            ->where(function ($query) use ($numeroFila) {
+                $query->where('fila_inicio', '<=', $numeroFila)
+                    ->where(function ($query) use ($numeroFila) {
+                        $query->where('fila_fin', '>=', $numeroFila)
+                            ->orWhereNull('fila_fin');
+                    });
+            })
+            ->value('precio');
+
+            return $precio ?: 12;
+        }else{
+            $palcoIds = [
+                16, 17, 18, 19, 20,21,22,23,24,25,26,27,28,122,121,120,119,118,117,116,115,114,113,112,111,110,109,108,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+                534, 533, 532, 531, 530, 529, 528, 527, 526, 525, 524, 523, 522, 521, 520, 519, 518, 517, 516, 515, 514, 513, 512, 511, 510, 509, 508, 507, 506, 505, 504, 503, 502, 501, 500, 499, 498, 497, 496, 495, 494, 493,
+                
+            ];
+    
+            $palco = Palcos::find($silla->id_palco);
+    
+            if ($palco) {
+                if (in_array($palco->numero, $palcoIds)) {
+                    return 18;
+                } else {
+                    return 20;
+                }
+            }
+        }
+
+           
+    }
+
 
     // Función para obtener la imagen según el nombre de la zona
     private function getMapImageByZona($zonaNombre)
@@ -149,7 +218,7 @@ class ReservaPagada extends Mailable
             'qrCodeBase64' => $this->qrCodeBase64,
             'cliente' => $this->cliente,
             'mapImage' => $this->mapImageBase64, // Imagen seleccionada según la zona
-
+            'tasas' => $this->montoCobrar
         ]);
 
         return $this->from(config('mail.from.address'), config('mail.from.name'))
@@ -162,6 +231,7 @@ class ReservaPagada extends Mailable
                         'detallesReservas' => $this->detallesReservas,
                         'zonas' => $this->zonas,
                         'mapImage' => $this->mapImageBase64, // Imagen seleccionada según la zona
+                        'tasas' => $this->montoCobrar
 
                     ])
                     ->attachData($pdf->output(), 'reserva_qr.pdf', [

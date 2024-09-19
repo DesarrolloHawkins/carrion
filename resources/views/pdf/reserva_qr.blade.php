@@ -86,13 +86,26 @@
             @endforeach
         </tbody>
     </table>
+    
+        <!-- Cálculo de las tasas y total -->
+        @php
+            $totalPrecio = $tasas - array_sum(array_column($detallesReservas, 'precio')) ;
+        @endphp
+        <p><strong>Total de las sillas reservadas:</strong> {{ array_sum(array_column($detallesReservas, 'precio')) }}€</p>
+        <p><strong>Pago de tasas:</strong> {{ $totalPrecio }}€</p>
+        <p><strong>Total pagado:</strong> {{ $tasas }}€</p>
         <div class="margen">
 
         </div>
     <div class="qr-code">
         <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
     </div>
+    <div class="margen">
 
+    </div>
+    <div class="margen">
+
+    </div>
     <h3>Mapa de la Zona:</h3>
 
     <img src="data:image/png;base64,{{ $mapImage }}" alt="Mapa de la Zona">
