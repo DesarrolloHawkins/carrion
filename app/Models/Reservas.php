@@ -30,6 +30,7 @@ class Reservas extends Model
         'metodo_pago',
         'isInvitado',
         'isCRM',
+        'procesando'
 
     ];
 

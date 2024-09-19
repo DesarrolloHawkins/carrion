@@ -285,6 +285,7 @@ public function reservarTemporal(Request $request)
         // Verificar si hay una reserva para la silla
         $reserva = Reservas::where('id_silla', $id)
             ->whereIn('estado', ['pagada', 'reservada'])
+            ->orWhere('procesando', true)
             ->first();
 
         $reservada = $reserva !== null;
