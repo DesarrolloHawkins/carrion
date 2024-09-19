@@ -113,7 +113,9 @@ public function reservarTemporal(Request $request)
     $orderId = $request->input('order');  // Recibir el orderId generado en el frontend
 
     $cliente = Cliente::find($clienteId);
-
+    $subtotal = 0;
+    $comision = 0;
+    $total = 0;
 
     $fechaActual = Carbon::now();
     $fechaInicioReservas = Carbon::parse(env('FECHA_INICIO_RESERVAS')); 
@@ -198,21 +200,36 @@ public function reservarTemporal(Request $request)
                 'fecha' => $fecha,
                 'año' => date('Y', strtotime($fecha)),
                 'id_evento' => 1,
-                'precio' => $precio ? $precio->precio : 12,
+                'precio' => $precio ? $precio->precio : 12.00,
                 'estado' => 'reservada',
                 'order' => $orderId  // Usar el orderId recibido en lugar de generar uno nuevo
             ]);
+
+            $subtotal += $precio ? $precio->precio : 12.00;
+
         }
+        //calcular tasa de impuesto
+        $montoObjetivo = $subtotal;  // Monto objetivo que deseas recibir
+        $tarifaFija = 0.30;      // Tarifa fija de Stripe (en dólares)
+        $tarifaPorcentaje = 0.029; // Tarifa porcentual de Stripe (2.9% es 0.029)
+
+        $montoCobrar = $this->calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcentaje);
+        $montoCobrar = $montoCobrar; // Convertir a centavos
+        $comision = $montoCobrar - $subtotal;
 
         DB::commit();
-        return response()->json(['message' => 'Sillas reservadas temporalmente', 'order' => $orderId], 200);
+        return response()->json(['message' => 'Sillas reservadas temporalmente', 'order' => $orderId, 'total' => $montoCobrar, 'comision' => $comision], 200);
     } catch (\Exception $e) {
         DB::rollBack();
         return response()->json(['error' => $e->getMessage()], 400);
     }
 }
 
-
+public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcentaje) {
+    // Fórmula: Pcarga = (Pobjetivo + Ffijo) / (1 - Fporcentaje)
+    $montoCobrar = ($montoObjetivo + $tarifaFija) / (1 - $tarifaPorcentaje);
+    return round($montoCobrar, 2); // Redondeamos a 2 decimales
+}
 
     public function simularRespuestaRedsys(Request $request)
 {
@@ -434,7 +451,7 @@ public function reservarTemporal(Request $request)
 
         if(!$precio){
            //tengo que pasar precio->precio = 12
-            $precio = (object) ['precio' => 12];
+            $precio = (object) ['precio' => 12.00];
         }
 
 
