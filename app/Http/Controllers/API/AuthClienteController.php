@@ -46,6 +46,10 @@ class AuthClienteController extends Controller
             ], 200);
         }
 
+        //si ya hay un cliente con ese email, devolver un error
+        if (Cliente::where('email', $request->email)->exists()) {
+            return response()->json(['error' => 'Ya existe un cliente con ese email'], 400);
+        }
         // Si no existe, crear un nuevo cliente
         $cliente = Cliente::create([
             'nombre' => $request->nombre,
