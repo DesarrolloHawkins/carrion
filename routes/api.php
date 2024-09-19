@@ -31,7 +31,7 @@ Route::prefix('cliente')->group(function () {
     Route::post('/register', [AuthClienteController::class, 'register']);
     Route::post('/login', [AuthClienteController::class, 'login']);
     Route::middleware('auth:sanctum')->post('/logout', [AuthClienteController::class, 'logout']);
-    Route::middleware('auth:sanctum')->put('/update', [ClienteController::class, 'updateProfile']);
+    Route::put('/update', [ClienteController::class, 'updateProfile']);
 
 });
 

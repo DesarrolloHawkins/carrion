@@ -8,6 +8,7 @@ use App\Models\Cliente;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
 
 
 
@@ -63,7 +64,18 @@ class ClienteController extends Controller
 
     public function updateProfile(Request $request)
 {
-    $user = Auth::user(); // Obtiene el usuario autenticado
+
+     // Obtener el token de la petición
+     $token = $request->input('_token'); // Aquí el token que estás pasando desde el frontend
+
+     // Buscar el cliente asociado a ese token
+     $accessToken = PersonalAccessToken::findToken($token);
+     
+     if (!$accessToken) {
+         return response()->json(['error' => 'Token inválido o no autorizado.'], 401);
+     }
+     $user = $accessToken->tokenable;
+   
 
     // Validación de datos
     $rules = [

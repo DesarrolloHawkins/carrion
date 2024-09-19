@@ -348,16 +348,17 @@ public function reservarTemporal(Request $request)
             $perPage = $request->get('per_page');
             $sillas = $query->paginate($perPage);
         } else {
-            
             $sillas = $query->get();
-
         }
 
         // Obtener el estado de reserva para cada silla
         $sillas->each(function ($silla) {
             $silla->reservada = Reservas::where('id_silla', $silla->id)
-                ->whereIn('estado', ['pagada', 'reservada'])
-                ->exists();
+            ->where(function ($query) {
+                $query->whereIn('estado', ['pagada', 'reservada'])
+                    ->orWhere('procesando', true);
+            })
+            ->exists();
         });
 
         // Ajusta el número de elementos por página según sea necesario
