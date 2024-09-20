@@ -48,10 +48,10 @@ class Reservas extends Model
         return $this->belongsTo(Cliente::class, 'id_cliente');
     }
 
-    public function eventos()
-    {
-        return $this->belongsTo(Eventos::class, 'id_evento');
-    }
+    // public function eventos()
+    // {
+    //     return $this->belongsTo(Eventos::class, 'id_evento');
+    // }
 
     
 
