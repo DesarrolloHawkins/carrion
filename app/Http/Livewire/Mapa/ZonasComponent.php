@@ -6,6 +6,7 @@ use App\Models\Gradas;
 use App\Models\Palcos;
 use App\Models\Reservas;
 use App\Models\Sillas;
+use App\Models\Zonas;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
@@ -144,23 +145,23 @@ class ZonasComponent extends Component
    // Función para cargar los palcos y verificar si están completos
 public function loadPalcos()
 {
+    $zona = Zonas::find($this->identificador);
     // Obtener los palcos por zona (dependiendo de cómo relaciones zona y palco)
-    $palcos = Palcos::where('id_zona', $this->identificador)->get();
+    $palcos = Palcos::where('id_zona', $zona->id)->get();
 
     foreach ($palcos as $palco) {
         // Total de sillas del palco
-        $totalSillas = Sillas::where('id_palco', $palco->id)->count();
+         //$totalSillas = Sillas::where('id_palco', $palco->id)->count();
         
         // Sillas reservadas o pagadas
         $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($palco) {
             $query->where('id_palco', $palco->id);
         })->whereIn('estado', ['reservada', 'pagada'])->count();
 
-        // Verificamos si está completo
         $this->palcos[] = [
             'id' => $palco->id,
             'numero' => $palco->numero,
-            'completo' => $totalSillas === $sillasReservadas
+            'completo' => $palco->num_sillas == $sillasReservadas
         ];
     }
 }
