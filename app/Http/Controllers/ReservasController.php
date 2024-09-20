@@ -303,15 +303,7 @@ class ReservasController extends Controller
 
     public function deleted($id){
         $reserva = Reservas::find($id);
-        if ($reserva) {
-            $reserva->delete();
-            dd($reserva);
-
-            return response()->json("ok", 200);
-        }else {
-            return response()->json("No hay una reserva con el id: " . $id, 500);
-
-        }
+        return response()->json("ok", 200);
     }
 
 }

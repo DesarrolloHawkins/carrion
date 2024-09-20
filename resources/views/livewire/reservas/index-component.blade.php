@@ -98,9 +98,6 @@
                         <button data-id="{{ $detalle['id'] }}" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded eliminar-reserva">
                             Eliminar
                         </button>
-                        {{-- <button wire:click="confirmarEliminacion({{ $detalle['id'] }})" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
-                            Eliminar
-                        </button> --}}
                         <a href="{{ route('reservas.edit', $detalle['id']) }}" class="btn btn-success">
                             Editar
                         </a>
