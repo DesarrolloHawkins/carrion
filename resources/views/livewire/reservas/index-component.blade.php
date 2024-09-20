@@ -145,7 +145,7 @@
                     if (result.isConfirmed) {
                         // Hacer la petición AJAX para eliminar la reserva
                         $.ajax({
-                            url: 'admin/reservas/' + reservaId + '/delete', // La URL de tu ruta de eliminación
+                            url: 'https://unionhermandadesjerez.hawkins.es/admin/reservas/' + reservaId + '/delete', // La URL de tu ruta de eliminación
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}', // CSRF token para protección
