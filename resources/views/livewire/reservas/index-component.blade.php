@@ -50,7 +50,7 @@
                     infoFiltered: '(filtrado de _MAX_ total registros)',
                     search: 'Buscar:'
                 },
-            
+
             })
                             })" wire:key="{{ rand() }}">
         <table id="datatable-reservas" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;" wire:key="{{ rand() }}">
@@ -98,9 +98,12 @@
                         <button wire:click="confirmarEliminacion({{ $detalle['id'] }})" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
                             Eliminar
                         </button>
+                        <a href="{{ route('reservas.edit', $detalle['id']) }}" class="btn btn-success">
+                            Editar
+                        </a>
                         {{-- {{dd($detalle)}} --}}
                         <a href="{{ route('reservas.pdfDownload', $detalle['cliente_id']) }}" class="btn btn-primary">
-                            Descargar PDF
+                            PDF
                         </a>
                     </td>
                 </tr>

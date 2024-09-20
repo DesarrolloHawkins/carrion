@@ -36,14 +36,14 @@ class ReservasController extends Controller
 
     // public function generarYDescargarPDF($reservas, $cliente, $tasas)
     //     {
-            
+
     //     // Preparar los detalles de las reservas para el PDF
     //     $detallesReservas = [];
     //     $zona = null;
 
     //     foreach ($reservas as $reserva) {
-    //         $silla = Sillas::find($reserva->id_silla); 
-    //         $zona = Zonas::find($silla->id_zona); 
+    //         $silla = Sillas::find($reserva->id_silla);
+    //         $zona = Zonas::find($silla->id_zona);
 
     //         if ($silla->id_palco != null) {
     //             $palco = Palcos::find($silla->id_palco);
@@ -101,73 +101,72 @@ class ReservasController extends Controller
     // }
 
     public function generarYDescargarPDF($reservas, $cliente, $tasas)
-    {
-        // Preparar los detalles de las reservas para el PDF
-        $detallesReservas = [];
-        $zona = null;
-    
-        foreach ($reservas as $reserva) {
-            $silla = Sillas::find($reserva->id_silla); 
-            $zona = Zonas::find($silla->id_zona); 
-    
-            if ($silla->id_palco != null) {
-                $palco = Palcos::find($silla->id_palco);
-                $zona = Sectores::find($palco->id_sector);
-            } elseif ($silla->id_grada != null) {
-                $grada = Gradas::find($silla->id_grada);
-                $zona = Zonas::find($grada->id_zona);
-            }
-    
-            $detallesReservas[] = [
-                'asiento' => $silla->numero ?? 'N/A',
-                'sector' => $zona->nombre ?? 'N/A',
-                'fecha' => $reserva->fecha,
-                'año' => $reserva->año,
-                'precio' => $reserva->precio,
-                'fila' => $silla->fila ?? 'N/A',
-                'order' => $reserva->order,
-                'palco' => $palco->numero ?? '',
-                'grada' => $grada->numero ?? '',
-            ];
+{
+    // Preparar los detalles de las reservas para el PDF
+    $detallesReservas = [];
+    $zona = null;
+
+    foreach ($reservas as $reserva) {
+        $silla = Sillas::find($reserva->id_silla); 
+        $zona = Zonas::find($silla->id_zona); 
+
+        if ($silla->id_palco != null) {
+            $palco = Palcos::find($silla->id_palco);
+            $zona = Sectores::find($palco->id_sector);
+        } elseif ($silla->id_grada != null) {
+            $grada = Gradas::find($silla->id_grada);
+            $zona = Zonas::find($grada->id_zona);
         }
-    
-        // Si $zona no está definida (por ejemplo, si no hay reservas), establecer un valor por defecto
-        if (!$zona) {
-            $zona = new \stdClass();
-            $zona->nombre = 'default';
-        }
-    
-        // Generar el código QR en formato SVG
-        $qrCodeSvg = QrCode::format('svg')
-            ->size(200)
-            ->generate(url('/reservas/' . $cliente->id));
-    
-        // Obtener la imagen del mapa según la zona
-        $mapImage = $this->getMapImageByZona($zona->nombre);
-        $mapImageBase64 = $this->imageToBase64($mapImage);
-    
-        // Cálculo del total de precios
-        $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
-        $totalPagado = $tasas;
-    
-        // Generar el PDF
-        $pdf = PDF::loadView('pdf.reserva_qr_2', [
-            'detallesReservas' => $detallesReservas,
-            'qrCodeSvg' => $qrCodeSvg, // Pasar SVG directamente
-            'cliente' => $cliente,
-            'mapImage' => $mapImageBase64,
-            'totalReservas' => $totalReservas,
-            'tasas' => $tasas,
-            'totalPagado' => $totalPagado,
-        ])->setPaper('a4', 'portrait');
-    
-        // Abrir el PDF en una nueva pestaña
-        return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
+
+        $detallesReservas[] = [
+            'asiento' => $silla->numero ?? 'N/A',
+            'sector' => $zona->nombre ?? 'N/A',
+            'fecha' => $reserva->fecha,
+            'año' => $reserva->año,
+            'precio' => $reserva->precio,
+            'fila' => $silla->fila ?? 'N/A',
+            'order' => $reserva->order,
+            'palco' => $palco->numero ?? '',
+            'grada' => $grada->numero ?? '',
+        ];
     }
-    
+
+    // Si $zona no está definida (por ejemplo, si no hay reservas), establecer un valor por defecto
+    if (!$zona) {
+        $zona = new \stdClass();
+        $zona->nombre = 'default';
+    }
+
+    // Generar el código QR en formato SVG directamente
+    $qrCodeSvg = QrCode::format('svg')
+        ->size(200)
+        ->generate(url('/reservas/' . $cliente->id));
+
+    // Obtener la imagen del mapa según la zona
+    $mapImage = $this->getMapImageByZona($zona->nombre);
+    $mapImageBase64 = $this->imageToBase64($mapImage);
+
+    // Cálculo del total de precios
+    $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
+    $totalPagado = $tasas;
+
+    // Generar el PDF
+    $pdf = PDF::loadView('pdf.reserva_qr_2', [
+        'detallesReservas' => $detallesReservas,
+        'qrCodeSvg' => $qrCodeSvg, // Pasar SVG directamente
+        'cliente' => $cliente,
+        'mapImage' => $mapImageBase64,
+        'totalReservas' => $totalReservas,
+        'tasas' => $tasas,
+        'totalPagado' => $totalPagado,
+    ])->setPaper('a4', 'portrait');
+
+    // Abrir el PDF en una nueva pestaña
+    return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
+}
 
 
-    
+
 
     private function imageToBase64($path)
     {
@@ -186,12 +185,12 @@ class ReservasController extends Controller
             case '01- asunción (protocolo)':
             case 'plaza asunción (protocolo)':
                 return '/images/zonas/asuncion.png';
-                
+
             case '02.- consistorio':
             case 'consistorio ii':
             case 'consistorio i':
                 return '/images/zonas/consistorio.png';
-                
+
             case '03. arenal':
             case 'arenal ii':
             case 'arenal i':
@@ -200,31 +199,31 @@ class ReservasController extends Controller
             case 'arenal v':
             case 'arenal vi':
                 return '/images/zonas/arenal.png';
-                
+
             case '04.- lancería-gallo azul':
             case 'lancería-gallo azul':
             case 'lancería-gallo azul i':
                 return '/images/zonas/lanceria.png';
-                
+
             case '05.- algarve-plaza del banco':
             case 'algarve-plaza del banco':
                 return '/images/zonas/larga.png';
-                
+
             case '06.- rotonda de los casinos-santo domingo':
             case 'rotonda de los casinos-santo domingo':
             case 'rotonda de los casinos-santo domingo ii':
                 return '/images/zonas/casinos.png';
-                
+
             case '07.- marqués de casa domecq':
             case 'marqués de casa domecq ii':
             case 'marqués de casa domecq i':
                 return '/images/zonas/santodomingo.png';
-                
+
             case '08.- eguiluz':
             case 'eguiluz ii':
             case 'eguiluz i':
                 return '/images/zonas/domecq.png';
-                
+
             default:
                 return '/images/zonas/default.png';
         }
@@ -234,6 +233,12 @@ class ReservasController extends Controller
     public function index()
     {
         return view('reservas.index');
+    }
+    //index
+    public function edit($id)
+    {
+            // Retornar la vista de edición y pasarle los datos necesarios
+        return view('reservas.edit', compact('id'));
     }
 
 
@@ -257,10 +262,10 @@ class ReservasController extends Controller
     foreach ($reservas as $reserva) {
         // Buscar la silla asociada a la reserva
         $silla = Sillas::find($reserva->id_silla);
-        
+
         // Buscar la zona correspondiente a la silla
         $zona = Zonas::find($silla->id_zona);
-        
+
         // Verificar si la silla pertenece a un palco o una grada
         $palco = null;
         $grada = null;
@@ -292,6 +297,6 @@ class ReservasController extends Controller
     return view('reservas.show', compact('detallesReservas', 'cliente'));
 }
 
-   
+
 
 }
