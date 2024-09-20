@@ -212,12 +212,12 @@ class PalcoComponent extends Component
             ->size(200)
             ->generate(url('/reservas/' . $cliente->id));
         // dd($zona->nombre);
-        $QrFinal = $this->svgToBase64($qrCodeSvg);
-
         // Obtener la imagen del mapa según la zona
         $mapImage = $this->getMapImageByZona($zona->nombre);
         $mapImageBase64 = $this->imageToBase64($mapImage);
         // dd($mapImageBase64);
+        $QrFinal = $this->svgToBase64($qrCodeSvg);
+
         // Cálculo del total de precios
         $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
         $totalPagado = $tasas;
@@ -233,18 +233,19 @@ class PalcoComponent extends Component
             'totalPagado' => $totalPagado,
         ])->setPaper('a4', 'portrait');
     
-        // // Guardar el PDF en una ubicación temporal
-        // $fileName = 'reserva_cliente_' . $cliente->id . '.pdf';
-        // Storage::put('public/pdfs/' . $fileName, $pdf->output());
-    
-        // Retornar la URL del archivo generado
-        return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
-    }
-    function svgToBase64($svgContent) {
-        $output = base64_encode($svgContent);
-        return 'data:image/svg+xml;base64,' . $output;
-    }
+        // Guardar el PDF en una ubicación temporal
+        $fileName = 'reserva_cliente_' . $cliente->id . '.pdf';
+        // Define la ruta del archivo en la carpeta 'public/pdfs'
+        $filePath = 'pdfs/' . $fileName;
 
+        // Almacenar el PDF en la carpeta 'public' (asegúrate de que la carpeta 'pdfs' exista dentro de 'public')
+        Storage::disk('public')->put($filePath, $pdf->output());
+
+        // Retornar la URL pública del archivo generado
+        return asset('pdfs/' . $fileName);
+
+    }
+    
     private function imageToBase64($path)
     {
         if (file_exists(public_path($path))) {
