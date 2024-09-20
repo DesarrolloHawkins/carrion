@@ -34,7 +34,10 @@ class Reservas extends Model
 
     ];
 
-
+    public function silla()
+    {
+        return $this->belongsTo(Sillas::class, 'id_silla');
+    }
     public function sillas()
     {
         return $this->belongsTo(Sillas::class, 'id_silla');

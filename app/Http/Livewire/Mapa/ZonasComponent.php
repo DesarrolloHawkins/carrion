@@ -2,6 +2,10 @@
 
 namespace App\Http\Livewire\Mapa;
 
+use App\Models\Gradas;
+use App\Models\Palcos;
+use App\Models\Reservas;
+use App\Models\Sillas;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
@@ -11,7 +15,8 @@ class ZonasComponent extends Component
 
     public $identificador;
     public $svgFile;
-
+    public $palcos = []; // Arreglo para almacenar la información de los palcos
+    public $gradas = []; // Arreglo para almacenar la información de las gradas
     // Propiedades para almacenar los datos seleccionados
     public $selectedId;
     public $selectedZona;
@@ -53,6 +58,9 @@ class ZonasComponent extends Component
             default:
                 $this->svgFile = 'default.svg';
         }
+        // Llamar a las funciones que verifican si los palcos o gradas están completos
+        $this->loadPalcos();
+        $this->loadGradas();
     }
 
     public function selectZone($id, $zona, $type, $sector)
@@ -120,6 +128,8 @@ class ZonasComponent extends Component
     {
         return view('livewire.mapa.zonas-component', [
             'svgFile' => $this->svgFile,
+            'palcos' => $this->palcos,
+            'gradas' => $this->gradas,
         ]);
     }
      // Función para cuando se llama a la alerta
@@ -130,6 +140,54 @@ class ZonasComponent extends Component
              'selectZone'
          ];
      }
+
+   // Función para cargar los palcos y verificar si están completos
+public function loadPalcos()
+{
+    // Obtener los palcos por zona (dependiendo de cómo relaciones zona y palco)
+    $palcos = Palcos::where('id_zona', $this->identificador)->get();
+
+    foreach ($palcos as $palco) {
+        // Total de sillas del palco
+        $totalSillas = Sillas::where('id_palco', $palco->id)->count();
+        
+        // Sillas reservadas o pagadas
+        $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($palco) {
+            $query->where('id_palco', $palco->id);
+        })->whereIn('estado', ['reservada', 'pagada'])->count();
+
+        // Verificamos si está completo
+        $this->palcos[] = [
+            'id' => $palco->id,
+            'numero' => $palco->numero,
+            'completo' => $totalSillas === $sillasReservadas
+        ];
+    }
+}
+
+// Función para cargar las gradas y verificar si están completas
+public function loadGradas()
+{
+    // Obtener las gradas por zona (dependiendo de cómo relaciones zona y grada)
+    $gradas = Gradas::where('id_zona', $this->identificador)->get();
+
+    foreach ($gradas as $grada) {
+        // Total de sillas de la grada
+        $totalSillas = Sillas::where('id_grada', $grada->id)->count();
+
+        // Sillas reservadas o pagadas
+        $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($grada) {
+            $query->where('id_grada', $grada->id);
+        })->whereIn('estado', ['reservada', 'pagada'])->count();
+
+        // Verificamos si está completo
+        $this->gradas[] = [
+            'id' => $grada->id,
+            'numero' => $grada->numero,
+            'completo' => $totalSillas === $sillasReservadas
+        ];
+    }
+}
 
    
     

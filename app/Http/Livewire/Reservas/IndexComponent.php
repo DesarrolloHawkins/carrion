@@ -16,6 +16,7 @@ use App\Models\Palcos;
 
 use App\Models\Sectores;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 
@@ -74,7 +75,8 @@ class IndexComponent extends Component
             }
 
             $this->detallesReservas[] = [
-                'cliente' => $reserva->clientes->nombre  ? $reserva->clientes->nombre . ' '.$reserva->clientes->apellidos  : 'N/A',
+                'nombre' => $reserva->clientes->nombre  ? $reserva->clientes->nombre  : 'N/A',
+                'apellidos' => $reserva->clientes->apellidos  ? $reserva->clientes->apellidos : 'N/A',
                 'DNI' => $reserva->clientes->DNI ?? 'N/A',
                 'movil' => $reserva->clientes->movil ?? 'N/A',
                 'asiento' => $silla->numero ?? 'N/A',
@@ -89,6 +91,7 @@ class IndexComponent extends Component
                 'estado' => $reserva->estado,
                 'id' => $reserva->id,
                 'metodo_pago' => $reserva->metodo_pago,
+                'cliente_id' => $reserva->id_cliente,
             ];
         }
     }
@@ -170,4 +173,7 @@ class IndexComponent extends Component
     {
         return view('livewire.reservas.index-component');
     }
+
+
+    
 }

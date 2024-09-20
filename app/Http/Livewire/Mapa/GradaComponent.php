@@ -17,6 +17,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Bus\Queueable;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+
 
 class GradaComponent extends Component
 {
@@ -93,82 +95,65 @@ class GradaComponent extends Component
     
 
     public function editarReserva()
-{
-    $reservas = [];
-    foreach ($this->selectedSillas as $sillaId) {
-        $silla = Sillas::findOrFail($sillaId);
-        $reservaSilla = Reservas::where('id_silla', $silla->id)
-            ->where('id_evento', 1)
-            ->where('estado', '!=', 'cancelada')
-            ->first();
-
-        // Crear la reserva si no está ya reservada
-        if (!$reservaSilla) {
-            $reserva = Reservas::create([
-                'id_silla' => $silla->id,
-                'id_cliente' => $this->clienteSeleccionado,
-                'id_evento' => 1,
-                'fecha' => now(),
-                'año' => date('Y'),
-                'precio' => $this->calcularPrecio($silla),
-                'estado' => $this->estadoSeleccionado,
-                'metodo_pago' => $this->metodoPago,
-                'isInvitado' => $this->isInvitado,
-                'isCRM' => true,
-            ]);
-
-            //Alerta de éxito
-            $this->alert('success', 'Reserva creada', [
-                'text' => 'La reserva ha sido creada con éxito.',
-                'position' => 'center',
-            ]);
-
-            // Añadir la reserva al array para generar el PDF
-            $reservas[] = $reserva;
-            
-        } else {
-            // Si ya está reservada, actualiza la reserva existente
-            $reservaSilla->update([
-                'id_cliente' => $this->clienteSeleccionado,
-                'estado' => $this->estadoSeleccionado,
-                'precio' => $this->reservaPrecio,
-                'metodo_pago' => $this->metodoPago,
-                'isInvitado' => $this->isInvitado,
-                'isCRM' => true,
-            ]);
-
-           // Alerta de éxito
-            $this->alert('success', 'Reserva actualizada', [
-                'text' => 'La reserva ha sido actualizada con éxito.',
-                'position' => 'center',
-            ]);
-
-            // Añadir la reserva al array para generar el PDF
-            $reservas[] = $reservaSilla;
+    {
+        $reservas = [];
+        foreach ($this->selectedSillas as $sillaId) {
+            $silla = Sillas::findOrFail($sillaId);
+            $reservaSilla = Reservas::where('id_silla', $silla->id)
+                ->where('id_evento', 1)
+                ->where('estado', '!=', 'cancelada')
+                ->first();
+    
+            if (!$reservaSilla) {
+                $reserva = Reservas::create([
+                    'id_silla' => $silla->id,
+                    'id_cliente' => $this->clienteSeleccionado,
+                    'id_evento' => 1,
+                    'fecha' => now(),
+                    'año' => date('Y'),
+                    'precio' => $this->calcularPrecio($silla),
+                    'estado' => $this->estadoSeleccionado,
+                    'metodo_pago' => $this->metodoPago,
+                    'isInvitado' => $this->isInvitado,
+                    'isCRM' => true,
+                ]);
+    
+                $reservas[] = $reserva;
+            } else {
+                $reservaSilla->update([
+                    'id_cliente' => $this->clienteSeleccionado,
+                    'estado' => $this->estadoSeleccionado,
+                    'precio' => $this->reservaPrecio,
+                    'metodo_pago' => $this->metodoPago,
+                    'isInvitado' => $this->isInvitado,
+                    'isCRM' => true,
+                ]);
+    
+                $reservas[] = $reservaSilla;
+            }
         }
-
-        
+    
+        if (count($reservas) > 0) {
+            // Generar el PDF y obtener la URL
+            $pdfUrl = $this->generarYDescargarPDF($reservas, Cliente::findOrFail($this->clienteSeleccionado));
+    
+            // Abrir el PDF en una nueva pestaña
+            $this->dispatchBrowserEvent('open-pdf', ['url' => $pdfUrl]);
+        }
+    
+        $this->dispatchBrowserEvent('hide-modal-editar-reserva');
+        $this->dispatchBrowserEvent('hide-modal');
+    
+        $this->reset(['clienteSeleccionado', 'selectedSilla', 'estadoSeleccionado', 'selectedSillas']);
+    
+        $this->sillas = Sillas::where('id_grada', $this->grada->id)->with('reservas')
+            ->get()
+            ->sortBy(function ($silla) {
+                return intval(str_replace('F', '', $silla->fila));
+            })
+            ->sortBy('numero');
     }
-
-    // Generar el PDF para descargar
-    if (count($reservas) > 0) {
-        $this->generarYDescargarPDF($reservas, Cliente::findOrFail($this->clienteSeleccionado));
-    }
-
-    // Cerrar el modal y resetear los campos
-    $this->dispatchBrowserEvent('hide-modal-editar-reserva');
-    $this->dispatchBrowserEvent('hide-modal');
-
-    $this->reset(['clienteSeleccionado', 'selectedSilla', 'estadoSeleccionado', 'selectedSillas']);
-
-    // Actualizar las sillas
-    $this->sillas = Sillas::where('id_grada', $this->grada->id)->with('reservas')
-        ->get()
-        ->sortBy(function ($silla) {
-            return intval(str_replace('F', '', $silla->fila));
-        })
-        ->sortBy('numero');
-}
+    
 
     public function reservarSillas()
     {
@@ -203,29 +188,26 @@ class GradaComponent extends Component
             }
         }
         // Generar el PDF para descargar
-        if (count($reservas) > 0) {
+        // if ($reservas != null) {
                 
-            $this->generarYDescargarPDF($reservas, $cliente);
-        }
+        //     $this->generarYDescargarPDF($reservas, $cliente);
+        // }
         $this->reset(['clienteSeleccionado', 'selectedSillas']);
         $this->dispatchBrowserEvent('hide-modal');
         //$this->alert('success', 'Reservas creadas con éxito', ['position' => 'center']);
 
        
     }
-    public function generarYDescargarPDF($reservas, $cliente)
+    public function generarYDescargarPDF($reservas, $cliente, $tasas = null)
     {
         // Preparar los detalles de las reservas para el PDF
         $detallesReservas = [];
         $zona = null;
-
-        $zonas = [];
-        $palco = null;
-        $grada = null;
-
+    
         foreach ($reservas as $reserva) {
             $silla = Sillas::find($reserva->id_silla); 
             $zona = Zonas::find($silla->id_zona); 
+    
             if ($silla->id_palco != null) {
                 $palco = Palcos::find($silla->id_palco);
                 $zona = Sectores::find($palco->id_sector);
@@ -233,6 +215,7 @@ class GradaComponent extends Component
                 $grada = Gradas::find($silla->id_grada);
                 $zona = Zonas::find($grada->id_zona);
             }
+    
             $detallesReservas[] = [
                 'asiento' => $silla->numero ?? 'N/A',
                 'sector' => $zona->nombre ?? 'N/A',
@@ -245,104 +228,107 @@ class GradaComponent extends Component
                 'grada' => $grada->numero ?? '',
             ];
         }
-
-        $reserva1 = $reservas[0];
-        $silla = Sillas::find($reserva1->id_silla); 
-        if($silla->id_palco != null){
-            $palco = Palcos::find($silla->id_palco);
-            $zona = zonas::find($palco->id_zona);
-        }elseif($silla->id_grada != null){
-            $grada = Gradas::find($silla->id_grada);
-            $zona = Zonas::find($grada->id_zona);
-        }else{
-            $zona = Zonas::find($silla->id_zona);
+    
+        // Si $zona no está definida, establecer un valor por defecto
+        if (!$zona) {
+            $zona = new \stdClass();
+            $zona->nombre = 'default';
         }
-
-        //$zona = Zonas::find($silla->id_zona);
-
+    
+        // Generar el código QR en formato SVG directamente
+        $qrCodeSvg = QrCode::format('svg')
+            ->size(200)
+            ->generate(url('/reservas/' . $cliente->id));
+    
         // Obtener la imagen del mapa según la zona
         $mapImage = $this->getMapImageByZona($zona->nombre);
-
-        $mapImageBase64 = $this->imageToBase64( $mapImage);
-
-        // Generar el código QR y almacenarlo como base64
-        $qrCodeBase64 = base64_encode(QrCode::format('png')
-            ->size(200)
-            ->generate(url('/reservas/' . $cliente->id)));
-
-            $pdf = PDF::loadView('pdf.reserva_qr', [
-                'detallesReservas' => $detallesReservas,
-                'qrCodeBase64' => $qrCodeBase64,
-                'cliente' => $cliente,
-                'mapImage' => $mapImageBase64, // Imagen seleccionada según la zona
+        $mapImageBase64 = $this->imageToBase64($mapImage);
+        // Cálculo del total de precios
+        $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
+        $totalPagado = $tasas;
     
-            ])->setPaper('a4', 'vertical');
-
-            return response()->streamDownload(
-                fn () => print($pdf),
-                "reserva_.pdf"
-            );
-
+        // Generar el PDF
+        $pdf = PDF::loadView('pdf.reserva_qr_2', [
+            'detallesReservas' => $detallesReservas,
+            'qrCodeSvg' => $qrCodeSvg,
+            'cliente' => $cliente,
+            'mapImage' => $mapImageBase64,
+            'totalReservas' => $totalReservas,
+            'tasas' => $tasas,
+            'totalPagado' => $totalPagado,
+        ])->setPaper('a4', 'portrait');
+    
+        // Guardar el PDF en una ubicación temporal
+        $fileName = 'reserva_cliente_' . $cliente->id . '.pdf';
+        Storage::put('public/pdfs/' . $fileName, $pdf->output());
+    
+        // Retornar la URL del archivo generado
+        return Storage::url('public/pdfs/' . $fileName);
     }
     
 
     
 
-    
-
-// Función para obtener la imagen según el nombre de la zona
-private function getMapImageByZona($zonaNombre)
-{
-    switch ($zonaNombre) {
-        case '01- Asunción (Protocolo)':
-        case 'Plaza Asunción (Protocolo)':
-            return '/images/zonas/asuncion.png';
-        case '02.- Consistorio':
-        case 'Consistorio II':
-        case 'Consistorio I':
-        case '':
-            return '/images/zonas/consistorio.png';
-        case '03. Arenal':
-        case 'Arenal II':
-        case 'Arenal I':
-        case 'Arenal III':
-        case 'Arenal IV':
-        case 'Arenal V':
-        case 'Arenal VI':
-            return '/images/zonas/arenal.png';
-        case '04.- Lancería-Gallo Azul':
-        case 'Lancería-Gallo Azul':
-            return '/images/zonas/lanceria.png';
-        case '05.- Algarve-Plaza del Banco':
-        case 'Algarve-Plaza del Banco':
-            return '/images/zonas/larga.png';
-        case '06.- Rotonda de los Casinos-Santo Domingo':
-        case 'Rotonda de los Casinos-Santo Domingo':    
-        case 'Rotonda de los Casinos-Santo Domingo II':
-            return '/images/zonas/casinos.png';
-        case '07.- Marqués de Casa Domecq':
-        case 'Marqués de Casa Domecq II':
-        case 'Marqués de Casa Domecq':
-        case 'Marqués de Casa Domecq I':
-            return '/images/zonas/santodomingo.png';
-        case '08.- Eguiluz':
-        case 'Eguiluz II':
-        case 'Eguiluz I':
-        case 'Eguiluz':
-            return '/images/zonas/domecq.png';
-        default:
-            return '/images/zonas/default.png';
+    private function imageToBase64($path)
+    {
+        if (file_exists(public_path($path))) {
+            $imageData = file_get_contents(public_path($path));
+            return base64_encode($imageData);
+        }
+        return null;
     }
-}
+    private function getMapImageByZona($zonaNombre)
+    {
+        // Normalizar el nombre de la zona: eliminar espacios y convertir todo a minúsculas
+        $zonaNombre = trim(strtolower($zonaNombre));
 
-private function imageToBase64($path)
-{
-if (file_exists(public_path($path))) {
-    $imageData = file_get_contents(public_path($path));
-    return base64_encode($imageData);
-}
-return null;
-}
+        switch ($zonaNombre) {
+            case '01- asunción (protocolo)':
+            case 'plaza asunción (protocolo)':
+                return '/images/zonas/asuncion.png';
+                
+            case '02.- consistorio':
+            case 'consistorio ii':
+            case 'consistorio i':
+                return '/images/zonas/consistorio.png';
+                
+            case '03. arenal':
+            case 'arenal ii':
+            case 'arenal i':
+            case 'arenal iii':
+            case 'arenal iv':
+            case 'arenal v':
+            case 'arenal vi':
+                return '/images/zonas/arenal.png';
+                
+            case '04.- lancería-gallo azul':
+            case 'lancería-gallo azul':
+            case 'lancería-gallo azul i':
+                return '/images/zonas/lanceria.png';
+                
+            case '05.- algarve-plaza del banco':
+            case 'algarve-plaza del banco':
+                return '/images/zonas/larga.png';
+                
+            case '06.- rotonda de los casinos-santo domingo':
+            case 'rotonda de los casinos-santo domingo':
+            case 'rotonda de los casinos-santo domingo ii':
+                return '/images/zonas/casinos.png';
+                
+            case '07.- marqués de casa domecq':
+            case 'marqués de casa domecq ii':
+            case 'marqués de casa domecq i':
+                return '/images/zonas/santodomingo.png';
+                
+            case '08.- eguiluz':
+            case 'eguiluz ii':
+            case 'eguiluz i':
+                return '/images/zonas/domecq.png';
+                
+            default:
+                return '/images/zonas/default.png';
+        }
+    }
 
 
      
@@ -373,7 +359,7 @@ return null;
     {
         $numeroFila = intval(substr($silla->fila, 1));
 
-        $precio = \DB::table('precios_sillas')
+        $precio = DB::table('precios_sillas')
             ->where('tipo_asiento', 'grada')
             ->where(function ($query) use ($numeroFila) {
                 $query->where('fila_inicio', '<=', $numeroFila)

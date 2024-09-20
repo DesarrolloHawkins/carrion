@@ -191,4 +191,10 @@
         });
     });
 </script>
+<script>
+    window.addEventListener('open-pdf', event => {
+        window.open(event.detail.url, '_blank');
+    });
+</script>
+
 @endsection

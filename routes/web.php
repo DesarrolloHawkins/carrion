@@ -311,6 +311,7 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
      Route::get('/clientes-create', [ClienteController::class, 'create'])->name('clientes.create');
      Route::get('/clientes-create-from-budget', [ClienteController::class, 'createFromBudget'])->name('clientes.create-from-budget');
      Route::get('/clientes-edit/{id}', [ClienteController::class, 'edit'])->name('clientes.edit');
+     Route::get('/reservas/{cliente_id}/pdf', [ReservasController::class, 'pdfDownload'])->name('reservas.pdfDownload');
 
      // Clientes
      Route::get('/contratos', [ContratoController::class, 'index'])->name('contratos.index');

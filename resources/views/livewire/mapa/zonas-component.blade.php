@@ -1,6 +1,6 @@
 <div>
     <h1>Mapa de Zonas</h1>
-    
+
     @if($svgFile)
         <div id="svgContainer">
             <object type="image/svg+xml" data="{{ asset('svg/'.$svgFile) }}" id="svgObject"></object>
@@ -14,137 +14,124 @@
     @endif
 
     <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function() {
-            var svgObject = document.getElementById("svgObject").contentDocument;
-            var svgElement = svgObject.documentElement;
+        document.addEventListener("DOMContentLoaded", function () {
+            var svgObject = document.getElementById("svgObject");
 
-            var zoomLevel = 1;
-            var zoomStep = 0.1;
-            var maxZoom = 5; // Zoom máximo
-            var minZoom = 0.5; // Zoom mínimo
+            svgObject.addEventListener('load', function () {
+                var svgDoc = svgObject.contentDocument;
+                var svgElement = svgDoc.documentElement;
 
-            var isPanning = false;
-            var startPoint = { x: 0, y: 0 };
-            var panOffset = { x: 0, y: 0 };
+                // Variables de Palcos y Gradas pasadas desde el backend
+                var palcos = @json($palcos);
+                var gradas = @json($gradas);
 
-            // Función para actualizar la transformación del SVG
-            function updateTransform() {
-                svgElement.style.transform = `scale(${zoomLevel}) translate(${panOffset.x}px, ${panOffset.y}px)`;
-            }
+                var zoomLevel = 1;
+                var zoomStep = 0.1;
+                var maxZoom = 5;
+                var minZoom = 0.5;
 
-            document.getElementById('zoomIn').addEventListener('click', function() {
-                if (zoomLevel < maxZoom) {
-                    zoomLevel += zoomStep;
-                    updateTransform();
+                var isPanning = false;
+                var startPoint = {x: 0, y: 0};
+                var panOffset = {x: 0, y: 0};
+
+                // Función para actualizar la transformación del SVG
+                function updateTransform() {
+                    svgElement.style.transform = `scale(${zoomLevel}) translate(${panOffset.x}px, ${panOffset.y}px)`;
                 }
-            });
 
-            document.getElementById('zoomOut').addEventListener('click', function() {
-                if (zoomLevel > minZoom) {
-                    zoomLevel -= zoomStep;
-                    updateTransform();
-                }
-            });
-
-            // Añadir zoom con scroll del ratón
-            svgElement.addEventListener('wheel', function(e) {
-                e.preventDefault();
-                if (e.deltaY < 0) {
-                    // Scroll hacia arriba (zoom in)
+                // Zoom in/out functionality
+                document.getElementById('zoomIn').addEventListener('click', function () {
                     if (zoomLevel < maxZoom) {
                         zoomLevel += zoomStep;
+                        updateTransform();
                     }
-                } else {
-                    // Scroll hacia abajo (zoom out)
+                });
+
+                document.getElementById('zoomOut').addEventListener('click', function () {
                     if (zoomLevel > minZoom) {
                         zoomLevel -= zoomStep;
+                        updateTransform();
                     }
-                }
-                updateTransform();
-            });
+                });
 
-            svgElement.addEventListener('mousedown', function(e) {
-                isPanning = true;
-                startPoint = { x: e.clientX, y: e.clientY };
-            });
-
-            svgElement.addEventListener('mousemove', function(e) {
-                if (isPanning) {
-                    var dx = (e.clientX - startPoint.x) / zoomLevel;
-                    var dy = (e.clientY - startPoint.y) / zoomLevel;
-
-                    panOffset.x += dx;
-                    panOffset.y += dy;
-
+                // Zoom with mouse scroll
+                svgElement.addEventListener('wheel', function (e) {
+                    e.preventDefault();
+                    if (e.deltaY < 0) {
+                        if (zoomLevel < maxZoom) {
+                            zoomLevel += zoomStep;
+                        }
+                    } else {
+                        if (zoomLevel > minZoom) {
+                            zoomLevel -= zoomStep;
+                        }
+                    }
                     updateTransform();
+                });
 
-                    startPoint = { x: e.clientX, y: e.clientY };
-                }
-            });
-
-            svgElement.addEventListener('mouseup', function() {
-                isPanning = false;
-            });
-
-            svgElement.addEventListener('mouseleave', function() {
-                isPanning = false;
-            });
-
-            // Soporte para dispositivos móviles
-            var initialDistance = 0;
-            var initialZoomLevel = zoomLevel;
-
-            svgElement.addEventListener('touchstart', function(e) {
-                if (e.touches.length === 2) {
-                    isPanning = false;
-                    initialDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    initialZoomLevel = zoomLevel;
-                } else if (e.touches.length === 1) {
+                // Pan functionality (dragging)
+                svgElement.addEventListener('mousedown', function (e) {
                     isPanning = true;
-                    startPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                }
-            });
+                    startPoint = {x: e.clientX, y: e.clientY};
+                });
 
-            svgElement.addEventListener('touchmove', function(e) {
-                if (e.touches.length === 2) {
-                    var newDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    zoomLevel = initialZoomLevel * (newDistance / initialDistance);
-                    if (zoomLevel > maxZoom) zoomLevel = maxZoom;
-                    if (zoomLevel < minZoom) zoomLevel = minZoom;
-                    updateTransform();
-                } else if (e.touches.length === 1 && isPanning) {
-                    var dx = (e.touches[0].clientX - startPoint.x) / zoomLevel;
-                    var dy = (e.touches[0].clientY - startPoint.y) / zoomLevel;
+                svgElement.addEventListener('mousemove', function (e) {
+                    if (isPanning) {
+                        var dx = (e.clientX - startPoint.x) / zoomLevel;
+                        var dy = (e.clientY - startPoint.y) / zoomLevel;
 
-                    panOffset.x += dx;
-                    panOffset.y += dy;
+                        panOffset.x += dx;
+                        panOffset.y += dy;
 
-                    updateTransform();
+                        updateTransform();
 
-                    startPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                }
-            });
+                        startPoint = {x: e.clientX, y: e.clientY};
+                    }
+                });
 
-            svgElement.addEventListener('touchend', function() {
-                isPanning = false;
-            });
+                svgElement.addEventListener('mouseup', function () {
+                    isPanning = false;
+                });
 
-            var paths = svgObject.querySelectorAll('path[data-id][data-zona]');
+                svgElement.addEventListener('mouseleave', function () {
+                    isPanning = false;
+                });
 
-            paths.forEach(function(path) {
-                path.addEventListener("click", function() {
-                    var dataId = this.getAttribute('data-id');
-                    var dataZona = this.getAttribute('data-zona');
-                    var dataType = this.getAttribute('data-type');
-                    var dataSector = this.getAttribute('data-sector');
+                // Colorear palcos y gradas completos
+                palcos.forEach(function (palco) {
+                    if (palco.completo) {
+                        var palcoElement = svgDoc.querySelector('path[data-id="' + palco.id + '"]');
+                        if (palcoElement) {
+                            palcoElement.style.fill = 'red'; // Cambia el color a rojo
+                        }
+                    }
+                });
+                console.log(gradas)
+                gradas.forEach(function (grada) {
+                    console.log(grada)
+                    if (grada.id == 8) {
+                        
+                    }
+                    if (grada.completo) {
+                        var gradaElement = svgDoc.querySelector('path[data-id="' + grada.id + '"]');
+                        if (gradaElement) {
+                            gradaElement.style.fill = 'red'; // Cambia el color a rojo
+                        }
+                    }
+                });
 
-                    Livewire.emit('selectZone', dataId, dataZona, dataType, dataSector);
+                // Hacer clic en una zona para seleccionar
+                var paths = svgDoc.querySelectorAll('path[data-id][data-zona]');
+                paths.forEach(function (path) {
+                    path.addEventListener("click", function () {
+                        var dataId = this.getAttribute('data-id');
+                        var dataZona = this.getAttribute('data-zona');
+                        var dataType = this.getAttribute('data-type');
+                        var dataSector = this.getAttribute('data-sector');
+                        console.log(dataId)
+
+                        Livewire.emit('selectZone', dataId, dataZona, dataType, dataSector);
+                    });
                 });
             });
         });
@@ -154,7 +141,7 @@
         #svgContainer {
             width: 100%;
             height: 600px;
-            overflow: hidden; 
+            overflow: hidden;
             position: relative;
             border: 1px solid #ddd;
             cursor: grab; /* Cambia el cursor a una mano abierta */
@@ -167,7 +154,7 @@
         #svgObject {
             width: 100%;
             height: 100%;
-            transform-origin: center center; 
+            transform-origin: center center;
         }
 
         .zoom-controls {
@@ -176,7 +163,7 @@
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 5px;
             padding: 5px;
-            z-index: 99; /* Asegura que los controles estén por encima del SVG */
+            z-index: 99;
         }
 
         .zoom-controls button {
