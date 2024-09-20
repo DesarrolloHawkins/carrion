@@ -12,22 +12,22 @@ use App\Models\Reservas;
 class ZonaController extends Controller
 {
     public function checkIfFull(Request $request)
-{
-    // Recibir datos del path enviados desde el frontend
-    $dataId = $request->input('data-id');
-    $dataType = $request->input('data-type');
+    {
+        // Recibir datos del path enviados desde el frontend
+        $dataId = $request->input('data-id');
+        $dataType = $request->input('data-type');
 
-    // Verificar si es un palco o grada y si está completo
-    if ($dataType === 'palco') {
-        $completo = $this->checkPalcoCompleto($dataId);
-    } elseif ($dataType === 'grada') {
-        $completo = $this->checkGradaCompleto($dataId);
-    } else {
-        return response()->json(['id' => $dataId, 'completo' => false]);
+        // Verificar si es un palco o grada y si está completo
+        if ($dataType === 'palco') {
+            $completo = $this->checkPalcoCompleto($dataId);
+        } elseif ($dataType === 'grada') {
+            $completo = $this->checkGradaCompleto($dataId);
+        } else {
+            return response()->json(['id' => $dataId, 'completo' => false]);
+        }
+
+        return response()->json(['id' => $dataId, 'completo' => $completo]);
     }
-
-    return response()->json(['id' => $dataId, 'completo' => $completo]);
-}
 
 public function checkPalcoCompleto($palcoId)
 {
@@ -40,11 +40,9 @@ public function checkPalcoCompleto($palcoId)
 
     // Número total de sillas en el palco
     $totalSillas = $palco->num_sillas;
-
+    $sillasReservadas = Reservas::where('id_palco')->where('estado', ['reservada', 'pagada'])->count();
     // Contar cuántas sillas en este palco tienen reservas activas (reservada o pagada)
-    $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($palcoId) {
-        $query->where('id_palco', $palcoId);
-    })->whereIn('estado', ['reservada', 'pagada'])->count();
+
 
     // Verificar si todas las sillas están reservadas
     return $totalSillas === $sillasReservadas;
@@ -59,10 +57,11 @@ public function checkGradaCompleto($gradaId)
         return false; // Si no hay sillas en esta grada, no puede estar completa
     }
 
+    $sillasReservadas = Reservas::where('id_zona')->where('estado', ['reservada', 'pagada'])->count();
     // Contar cuántas sillas en esta grada tienen reservas activas (reservada o pagada)
-    $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($gradaId) {
-        $query->where('id_grada', $gradaId);
-    })->whereIn('estado', ['reservada', 'pagada'])->count();
+    // $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($gradaId) {
+    //     $query->where('id_grada', $gradaId);
+    // })->whereIn('estado', ['reservada', 'pagada'])->count();
 
     // Verificar si todas las sillas están reservadas
     return $totalSillas === $sillasReservadas;
