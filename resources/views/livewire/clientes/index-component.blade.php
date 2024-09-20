@@ -189,57 +189,62 @@
                                 <input type="text" class="form-control" id="nombre" wire:model="nombre" placeholder="Nombre">
                                 @error('nombre') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="apellido">Apellidos</label>
                                 <input type="text" class="form-control" id="apellido" wire:model="apellidos" placeholder="Apellidos">
                                 @error('apellidos') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="nombre">DNI</label>
                                 <input type="text" class="form-control" id="DNI" wire:model="DNI" placeholder="DNI">
                                 @error('DNI') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="email1">Email</label>
                                 <input type="email" class="form-control" id="email1" wire:model="email" placeholder="Email">
                                 @error('email') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="fijo">Teléfono Fijo</label>
                                 <input type="text" class="form-control" id="fijo" wire:model="fijo" placeholder="Teléfono Fijo">
                                 @error('fijo') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="movil">Teléfono Movil</label>
                                 <input type="text" class="form-control" id="movil" wire:model="movil" placeholder="Movil">
                                 @error('movil') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="ciudad">Dirección</label>
                                 <input type="text" class="form-control" id="direccion" wire:model="direccion" placeholder="Direccion">
                                 @error('direccion') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="codigo_postal">Codigo Postal</label>
                                 <input type="text" class="form-control" id="codigo_postal" wire:model="codigo_postal" placeholder="Código postal">
                                 @error('codigo_postal') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="codigo_postal">Población</label>
                                 <input type="text" class="form-control" id="poblacion" wire:model="poblacion" placeholder="Población">
                                 @error('poblacion') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
 
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="codigo_postal">Provincia</label>
                                 <input type="text" class="form-control" id="provincia" wire:model="provincia" placeholder="Provincia">
                                 @error('provincia') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="form-group col-6">
+                            <div class="form-group col-12">
                                 <label for="abonado">Abonado</label>
                                 <input type="checkbox" class="form-check" id="abonado" wire:model="abonado" placeholder="abonado">
-                                @error('provincia') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('abonado') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="form-group col-12">
+                                <label for="tipo_abonado">Tipo - Palco</label>
+                                <input type="checkbox" class="form-check" id="tipo_abonado" wire:model="tipo_abonado" placeholder="tipo_abonado">
+                                @error('tipo_abonado') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
                     </form>

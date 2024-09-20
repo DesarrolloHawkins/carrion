@@ -40,6 +40,7 @@ class IndexComponent extends Component
     public $DNI;
     public $email;
     public $abonado;
+    public $tipo_abonado;
     public $cliente_id;
     public $mapImage;
 
@@ -54,16 +55,16 @@ class IndexComponent extends Component
 
     protected $rules = [
         'nombre' => 'required',
-        'apellidos' => 'nullable',
+        'apellidos' => 'required',
         'direccion' => 'nullable',
         'codigo_postal' => 'nullable',
         'poblacion' => 'nullable',
         'provincia' => 'nullable',
         'fijo' => 'nullable',
-        'movil' => 'nullable',
+        'movil' => 'required',
         'DNI' => 'required',
         'email' => 'required',
-        'abonado' => 'required',
+        'abonado' => 'nullable',
     ];
 
     public function mount()
@@ -100,6 +101,7 @@ class IndexComponent extends Component
             // dd($this->abonado);
             $cliente = Cliente::findOrFail($this->cliente_id);
             $cliente->abonado = $this->abonado;
+            $cliente->tipo_abonado = $this->tipo_abonado == true ? 'palco' : 'silla';
             $cliente->update($validatedData);
         } else {
             Cliente::create($validatedData);
@@ -107,6 +109,33 @@ class IndexComponent extends Component
 
         $this->resetFields();
         $this->loadData();
+        $this->dispatchBrowserEvent('close-modal');
+        $this->alert('success', 'Cliente guardado correctamente.');
+    }
+    public function update()
+    {
+        // $validatedData = $this->validate();
+            // dd($this->abonado);
+            $cliente = Cliente::findOrFail($this->cliente_id);
+            $cliente->nombre =  $this->nombre;
+            $cliente->apellidos =  $this->apellidos;
+            $cliente->direccion =  $this->direccion;
+            $cliente->codigo_postal =  $this->codigo_postal;
+            $cliente->poblacion =  $this->poblacion;
+            $cliente->provincia =  $this->provincia;
+            $cliente->fijo =  $this->fijo;
+            $cliente->movil =  $this->movil;
+            $cliente->DNI =  $this->DNI;
+            $cliente->email =  $this->email;
+            $cliente->abonado = $this->abonado;
+            $cliente->tipo_abonado = $this->tipo_abonado == true ? 'palco' : 'silla';
+            $cliente->DNI =  $this->DNI;
+           
+            $cliente->save();
+        
+
+        // $this->resetFields();
+        // $this->loadData();
         $this->dispatchBrowserEvent('close-modal');
         $this->alert('success', 'Cliente guardado correctamente.');
     }
@@ -133,6 +162,8 @@ class IndexComponent extends Component
         $this->DNI = $cliente->DNI;
         $this->email = $cliente->email;
         $this->abonado = $cliente->abonado;
+        $this->tipo_abonado = $cliente->tipo_abonado;
+        // $cliente->tipo = $this->tipo == true ? 'palco' : 'silla';
 
         $this->dispatchBrowserEvent('open-edit-modal');
     }
