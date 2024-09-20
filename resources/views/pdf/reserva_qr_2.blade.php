@@ -56,6 +56,7 @@
     </style>
 </head>
 <body>
+    {{-- {{dd($qrCodeSvg)}} --}}
     <h2 style="margin:0">Magna de Jerez 2024</h2>
     <p>Aquí tiene sus reservas disponibles para la Magna de Jerez 2024. Gracias por confiar en nosotros.</p>
 
@@ -113,9 +114,10 @@
     </table>
 
     <p><strong>Total de las sillas reservadas:</strong> {{ $totalReservas }}€</p>
+    {{-- {{dd($qrCodeSvg)}} --}}
 
-    <div class="qr-code">
-        {!! $qrCodeSvg !!} <!-- Inserta el SVG directamente -->
+    <div class="qr-code" style="text-align: center; margin: 20px;">
+        <img src="{{ $qrCodeSvg }}" alt="QR Code" />
     </div>
 
     <h3 style="margin:0 0 8px 0;">Mapa de la Zona:</h3>
