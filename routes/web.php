@@ -88,6 +88,7 @@ Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->nam
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
+    Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
 
     Route::post('/import-clientes', [ClienteImportController::class, 'importClientes']);
     Route::get('/import-clientes', [ClienteImportController::class, 'getterForm']);
@@ -362,7 +363,6 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
     //Reservas
     Route::get('reservas', [ReservasController::class, 'index'])->name('reservas.index');
     Route::get('reservas/edit/{id}', [ReservasController::class, 'edit'])->name('reservas.edit');
-    Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
 
 
 

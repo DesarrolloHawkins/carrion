@@ -305,6 +305,8 @@ class ReservasController extends Controller
         $reserva = Reservas::find($id);
         if ($reserva) {
             $reserva->delete();
+            dd($reserva);
+
             return response()->json("ok", 200);
         }else {
             return response()->json("No hay una reserva con el id: " . $id, 500);
