@@ -212,6 +212,8 @@ class PalcoComponent extends Component
             ->size(200)
             ->generate(url('/reservas/' . $cliente->id));
         // dd($zona->nombre);
+        $QrFinal = $this->svgToBase64($qrCodeSvg);
+
         // Obtener la imagen del mapa según la zona
         $mapImage = $this->getMapImageByZona($zona->nombre);
         $mapImageBase64 = $this->imageToBase64($mapImage);
@@ -223,7 +225,7 @@ class PalcoComponent extends Component
         // Generar el PDF
         $pdf = PDF::loadView('pdf.reserva_qr_2', [
             'detallesReservas' => $detallesReservas,
-            'qrCodeSvg' => $qrCodeSvg,
+            'qrCodeSvg' => $QrFinal,
             'cliente' => $cliente,
             'mapImage' => $mapImageBase64,
             'totalReservas' => $totalReservas,
@@ -238,7 +240,11 @@ class PalcoComponent extends Component
         // Retornar la URL del archivo generado
         return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
     }
-    
+    function svgToBase64($svgContent) {
+        $output = base64_encode($svgContent);
+        return 'data:image/svg+xml;base64,' . $output;
+    }
+
     private function imageToBase64($path)
     {
         if (file_exists(public_path($path))) {

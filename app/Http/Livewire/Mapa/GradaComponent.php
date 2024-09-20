@@ -239,7 +239,8 @@ class GradaComponent extends Component
         $qrCodeSvg = QrCode::format('svg')
             ->size(200)
             ->generate(url('/reservas/' . $cliente->id));
-    
+        $QrFinal = $this->svgToBase64($qrCodeSvg);
+
         // Obtener la imagen del mapa según la zona
         $mapImage = $this->getMapImageByZona($zona->nombre);
         $mapImageBase64 = $this->imageToBase64($mapImage);
@@ -250,7 +251,7 @@ class GradaComponent extends Component
         // Generar el PDF
         $pdf = PDF::loadView('pdf.reserva_qr_2', [
             'detallesReservas' => $detallesReservas,
-            'qrCodeSvg' => $qrCodeSvg,
+            'qrCodeSvg' => $QrFinal,
             'cliente' => $cliente,
             'mapImage' => $mapImageBase64,
             'totalReservas' => $totalReservas,
