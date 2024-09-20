@@ -303,6 +303,7 @@ class ReservasController extends Controller
 
     public function deleted($id){
         $reserva = Reservas::find($id);
+        $reserva->delete();
         return response()->json("ok", 200);
     }
 
