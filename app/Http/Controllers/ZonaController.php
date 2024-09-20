@@ -43,7 +43,7 @@ public function checkPalcoCompleto($palcoId)
     $numeroTotal = $palco->num_sillas;
     $total = 0;
     foreach ($totalSillas as $silla) {
-        $reservaSilla = Reservas::where('id_silla', $silla->id)->where('estado', ['reservada', 'pagada'])->fisrt();
+        $reservaSilla = Reservas::where('id_silla', $silla->id)->where('estado', ['reservada', 'pagada'])->first();
         if (isset($reservaSilla)) {
             $total += 1;
         }
@@ -85,7 +85,7 @@ public function checkGradaCompleto($gradaId)
     $numeroTotal = $palco->num_sillas;
     $total = 0;
     foreach ($totalSillas as $silla) {
-        $reservaSilla = Reservas::where('id_silla', $silla->id)->where('estado', ['reservada', 'pagada'])->fisrt();
+        $reservaSilla = Reservas::where('id_silla', $silla->id)->where('estado', ['reservada', 'pagada'])->first();
         if (isset($reservaSilla)) {
             $total += 1;
         }
