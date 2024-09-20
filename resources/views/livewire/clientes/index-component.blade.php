@@ -236,6 +236,11 @@
                                 <input type="text" class="form-control" id="provincia" wire:model="provincia" placeholder="Provincia">
                                 @error('provincia') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                            <div class="form-group col-6">
+                                <label for="abonado">Abonado</label>
+                                <input type="checkbox" class="form-check" id="abonado" wire:model="abonado" placeholder="abonado">
+                                @error('provincia') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
                         <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
                     </form>
                 </div>

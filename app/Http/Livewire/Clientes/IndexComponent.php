@@ -39,7 +39,9 @@ class IndexComponent extends Component
     public $movil;
     public $DNI;
     public $email;
+    public $abonado;
     public $cliente_id;
+    public $mapImage;
 
     public function getListeners()
     {
@@ -61,6 +63,7 @@ class IndexComponent extends Component
         'movil' => 'nullable',
         'DNI' => 'required',
         'email' => 'required',
+        'abonado' => 'required',
     ];
 
     public function mount()
@@ -94,7 +97,9 @@ class IndexComponent extends Component
         $validatedData = $this->validate();
 
         if ($this->cliente_id) {
+            // dd($this->abonado);
             $cliente = Cliente::findOrFail($this->cliente_id);
+            $cliente->abonado = $this->abonado;
             $cliente->update($validatedData);
         } else {
             Cliente::create($validatedData);
@@ -114,7 +119,7 @@ class IndexComponent extends Component
 
     public function edit($id)
     {
-    // dd("hola");
+        // dd("hola");
         $cliente = Cliente::findOrFail($id);
         $this->cliente_id = $cliente->id;
         $this->nombre = $cliente->nombre;
@@ -127,6 +132,7 @@ class IndexComponent extends Component
         $this->movil = $cliente->movil;
         $this->DNI = $cliente->DNI;
         $this->email = $cliente->email;
+        $this->abonado = $cliente->abonado;
 
         $this->dispatchBrowserEvent('open-edit-modal');
     }
@@ -183,6 +189,7 @@ class IndexComponent extends Component
             // Agrupar las reservas por zona
             $detallesReservas[$zona->nombre][] = $detalleReserva;
         }
+
         $mapImage = $this->getMapImageByZona($zona->nombre);
         $mapImageBase64 = $this->imageToBase64( $this->mapImage);
 
