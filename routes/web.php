@@ -34,6 +34,7 @@ use App\Http\Controllers\PistasController;
 use App\Http\Controllers\SociosController;
 use App\Http\Controllers\ReservasController;
 
+use App\Http\Controllers\ZonaController;
 
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\ServicioCategoriaController;
@@ -83,6 +84,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::get('/reservas/{clienteId}', [App\Http\Controllers\ReservasController::class, 'show'])->name('reservas.show');
 Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails'])->name('reservas.create');
+Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
@@ -363,6 +365,7 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
 
 
+    
     Route::get('/view-reserva/{id}', [GradaComponent::class, 'viewReservaPDF'])->name('view.reserva');
 
 
