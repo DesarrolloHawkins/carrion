@@ -101,69 +101,70 @@ class ReservasController extends Controller
     // }
 
     public function generarYDescargarPDF($reservas, $cliente, $tasas)
-{
-    // Preparar los detalles de las reservas para el PDF
-    $detallesReservas = [];
-    $zona = null;
-
-    foreach ($reservas as $reserva) {
-        $silla = Sillas::find($reserva->id_silla); 
-        $zona = Zonas::find($silla->id_zona); 
-
-        if ($silla->id_palco != null) {
-            $palco = Palcos::find($silla->id_palco);
-            $zona = Sectores::find($palco->id_sector);
-        } elseif ($silla->id_grada != null) {
-            $grada = Gradas::find($silla->id_grada);
-            $zona = Zonas::find($grada->id_zona);
+    {
+        // Preparar los detalles de las reservas para el PDF
+        $detallesReservas = [];
+        $zona = null;
+    
+        foreach ($reservas as $reserva) {
+            $silla = Sillas::find($reserva->id_silla); 
+            $zona = Zonas::find($silla->id_zona); 
+    
+            if ($silla->id_palco != null) {
+                $palco = Palcos::find($silla->id_palco);
+                $zona = Sectores::find($palco->id_sector);
+            } elseif ($silla->id_grada != null) {
+                $grada = Gradas::find($silla->id_grada);
+                $zona = Zonas::find($grada->id_zona);
+            }
+    
+            $detallesReservas[] = [
+                'asiento' => $silla->numero ?? 'N/A',
+                'sector' => $zona->nombre ?? 'N/A',
+                'fecha' => $reserva->fecha,
+                'año' => $reserva->año,
+                'precio' => $reserva->precio,
+                'fila' => $silla->fila ?? 'N/A',
+                'order' => $reserva->order,
+                'palco' => $palco->numero ?? '',
+                'grada' => $grada->numero ?? '',
+            ];
         }
-
-        $detallesReservas[] = [
-            'asiento' => $silla->numero ?? 'N/A',
-            'sector' => $zona->nombre ?? 'N/A',
-            'fecha' => $reserva->fecha,
-            'año' => $reserva->año,
-            'precio' => $reserva->precio,
-            'fila' => $silla->fila ?? 'N/A',
-            'order' => $reserva->order,
-            'palco' => $palco->numero ?? '',
-            'grada' => $grada->numero ?? '',
-        ];
+    
+        // Si $zona no está definida (por ejemplo, si no hay reservas), establecer un valor por defecto
+        if (!$zona) {
+            $zona = new \stdClass();
+            $zona->nombre = 'default';
+        }
+    
+        // Generar el código QR en formato SVG
+        $qrCodeSvg = QrCode::format('svg')
+            ->size(200)
+            ->generate(url('/reservas/' . $cliente->id));
+    
+        // Obtener la imagen del mapa según la zona
+        $mapImage = $this->getMapImageByZona($zona->nombre);
+        $mapImageBase64 = $this->imageToBase64($mapImage);
+    
+        // Cálculo del total de precios
+        $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
+        $totalPagado = $tasas;
+    
+        // Generar el PDF
+        $pdf = PDF::loadView('pdf.reserva_qr_2', [
+            'detallesReservas' => $detallesReservas,
+            'qrCodeSvg' => $qrCodeSvg, // Pasar SVG directamente
+            'cliente' => $cliente,
+            'mapImage' => $mapImageBase64,
+            'totalReservas' => $totalReservas,
+            'tasas' => $tasas,
+            'totalPagado' => $totalPagado,
+        ])->setPaper('a4', 'portrait');
+    
+        // Abrir el PDF en una nueva pestaña
+        return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
     }
-
-    // Si $zona no está definida (por ejemplo, si no hay reservas), establecer un valor por defecto
-    if (!$zona) {
-        $zona = new \stdClass();
-        $zona->nombre = 'default';
-    }
-
-    // Generar el código QR en formato SVG directamente
-    $qrCodeSvg = QrCode::format('svg')
-        ->size(200)
-        ->generate(url('/reservas/' . $cliente->id));
-
-    // Obtener la imagen del mapa según la zona
-    $mapImage = $this->getMapImageByZona($zona->nombre);
-    $mapImageBase64 = $this->imageToBase64($mapImage);
-
-    // Cálculo del total de precios
-    $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
-    $totalPagado = $tasas;
-
-    // Generar el PDF
-    $pdf = PDF::loadView('pdf.reserva_qr_2', [
-        'detallesReservas' => $detallesReservas,
-        'qrCodeSvg' => $qrCodeSvg, // Pasar SVG directamente
-        'cliente' => $cliente,
-        'mapImage' => $mapImageBase64,
-        'totalReservas' => $totalReservas,
-        'tasas' => $tasas,
-        'totalPagado' => $totalPagado,
-    ])->setPaper('a4', 'portrait');
-
-    // Abrir el PDF en una nueva pestaña
-    return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
-}
+    
 
 
     
