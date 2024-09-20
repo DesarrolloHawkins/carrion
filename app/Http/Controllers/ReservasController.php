@@ -166,7 +166,6 @@ class ReservasController extends Controller
         return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
     }
 
-
     function svgToBase64($svgContent) {
         $output = base64_encode($svgContent);
         return 'data:image/svg+xml;base64,' . $output;
@@ -180,6 +179,7 @@ class ReservasController extends Controller
         }
         return null;
     }
+
     private function getMapImageByZona($zonaNombre)
     {
         // Normalizar el nombre de la zona: eliminar espacios y convertir todo a minúsculas
@@ -301,6 +301,15 @@ class ReservasController extends Controller
     return view('reservas.show', compact('detallesReservas', 'cliente'));
 }
 
+    public function deleted($id){
+        $reserva = Reservas::find($id);
+        if ($reserva) {
+            $reserva->delete();
+            return response()->json("ok", 200);
+        }else {
+            return response()->json("No hay una reserva con el id: " . $id, 500);
 
+        }
+    }
 
 }

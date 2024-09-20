@@ -362,6 +362,7 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
     //Reservas
     Route::get('reservas', [ReservasController::class, 'index'])->name('reservas.index');
     Route::get('reservas/edit/{id}', [ReservasController::class, 'edit'])->name('reservas.edit');
+    Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
 
 
 

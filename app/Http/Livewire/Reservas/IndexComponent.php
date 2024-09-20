@@ -147,7 +147,7 @@ class IndexComponent extends Component
         }
 
         // Actualizar la lista de reservas
-        $this->mount();
+        $this->render();
     }
 
 

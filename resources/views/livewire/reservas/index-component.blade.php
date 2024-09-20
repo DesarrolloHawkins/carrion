@@ -95,9 +95,12 @@
                         <button wire:click="confirmarCancelacion({{ $detalle['id'] }})" class="btn-warning bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
                             Cancelar
                         </button>
-                        <button wire:click="confirmarEliminacion({{ $detalle['id'] }})" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                        <button data-id="{{ $detalle['id'] }}" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded eliminar-reserva">
                             Eliminar
                         </button>
+                        {{-- <button wire:click="confirmarEliminacion({{ $detalle['id'] }})" class="btn-danger bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                            Eliminar
+                        </button> --}}
                         <a href="{{ route('reservas.edit', $detalle['id']) }}" class="btn btn-success">
                             Editar
                         </a>
@@ -121,4 +124,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
 
     <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/b-print-3.0.1/r-3.0.1/datatables.min.js"></script>
-@endsection
+
+    @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Manejar clic en el botón de eliminar
+            $('.eliminar-reserva').on('click', function() {
+                var reservaId = $(this).data('id'); // Obtener el ID de la reserva
+    
+                // Lanzar el modal de confirmación con SweetAlert
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "¡Esta acción no se puede deshacer!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Hacer la petición AJAX para eliminar la reserva
+                        $.ajax({
+                            url: '/reservas/' + reservaId + '/delete', // La URL de tu ruta de eliminación
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}', // CSRF token para protección
+                                _method: 'DELETE' // Método DELETE para eliminar
+                            },
+                            success: function(response) {
+                                // Mostrar alerta de éxito
+                                Swal.fire(
+                                    'Eliminado',
+                                    'La reserva ha sido eliminada con éxito.',
+                                    'success'
+                                ).then(() => {
+                                    // Recargar la página para reflejar los cambios
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                // Mostrar alerta de error
+                                Swal.fire(
+                                    'Error',
+                                    'Ocurrió un error al intentar eliminar la reserva.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    @endsection
+    
+    @endsection
