@@ -157,10 +157,10 @@ class IndexComponent extends Component
         $reserva = Reservas::where('id',$reservaId['data']['reservaId'])->first();
 
         if (isset($reserva)) {
-            $this->alert('success', 'Reserva eliminada exitosamente.');
-           // $reserva->delete();
+            $reserva->delete();
 
             // Notificar al usuario que se ha eliminado la reserva
+            $this->alert('success', 'Reserva eliminada exitosamente.');
 
             // Actualizar la lista de reservas
             $this->mount();

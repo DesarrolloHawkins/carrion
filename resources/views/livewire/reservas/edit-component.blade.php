@@ -28,9 +28,9 @@
                     @endif
 
                     <div class="row">
-                        <div class="col-md-6 form-group">
+                        <div class="col-md-6 form-group" wire:ignore>
                             <label for="cliente">Cliente</label>
-                            <select wire:model="reserva.id_cliente" class="form-control" id="select2-cliente" required>
+                            <select wire:model="reserva.id_cliente" class="form-control" id="select2-cliente" required wire:key='{{rand()}}'>
                                 <option value="">Seleccionar cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }} {{ $cliente->apellidos }}</option>
@@ -50,9 +50,15 @@
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <label for="metodo_pago">Método de pago</label>
-                            <input type="text" wire:model="reserva.metodo_pago" class="form-control" id="metodo_pago" placeholder="Método de pago (opcional)">
+                            <label for="metodo_pago">Seleccionar Metodo de pago</label>
+                            <select id="metodo_pago" class="form-control" wire:model="reserva.metodo_pago">
+                                <option value="">-- Selecciona un estado --</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="transferencia">Transferencia</option>
+                            </select>
                             @error('reserva.metodo_pago') <span class="text-danger">{{ $message }}</span> @enderror
+
                         </div>
                     </div>
                 </div>
@@ -70,6 +76,9 @@
             </div>
         </div>
     </form>
+</div>
+@section('scripts')
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -93,4 +102,4 @@
             });
         });
     </script>
-</div>
+@endsection
