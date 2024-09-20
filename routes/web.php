@@ -84,10 +84,10 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails'])->name('reservas.create');
 Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
+Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
-    Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
     Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
 
     Route::post('/import-clientes', [ClienteImportController::class, 'importClientes']);
