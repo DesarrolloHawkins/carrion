@@ -86,6 +86,7 @@ Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails
 Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
+    
     Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
     Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
 
