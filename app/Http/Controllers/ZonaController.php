@@ -33,38 +33,69 @@ public function checkPalcoCompleto($palcoId)
 {
     // Obtener el número total de sillas en el palco
     $palco = Palcos::find($palcoId);
+    $totalSillas = Sillas::where('id_palco', $palcoId)->get();
     
-    if (!$palco) {
-        return false;
-    }
+    // if (!$palco) {
+    //     return false;
+    // }
 
     // Número total de sillas en el palco
-    $totalSillas = $palco->num_sillas;
-    $sillasReservadas = Reservas::where('id_palco')->where('estado', ['reservada', 'pagada'])->count();
+    $numeroTotal = $palco->num_sillas;
+    $total = 0;
+    foreach ($totalSillas as $silla) {
+        $reservaSilla = Reservas::wheare('id_silla', $silla->id)->where('estado', ['reservada', 'pagada'])->fisrt();
+        if (isset($reservaSilla)) {
+            $total += 1;
+        }
+    }
+    // $sillasReservadas = Reservas::where('id_palco')->where('estado', ['reservada', 'pagada'])->count();
     // Contar cuántas sillas en este palco tienen reservas activas (reservada o pagada)
 
 
     // Verificar si todas las sillas están reservadas
-    return $totalSillas === $sillasReservadas;
+    return $numeroTotal === $total;
 }
 
 public function checkGradaCompleto($gradaId)
 {
-    // Contar el número total de sillas en la grada
-    $totalSillas = Sillas::where('id_grada', $gradaId)->count();
+    // // Contar el número total de sillas en la grada
+    // $totalSillas = Sillas::where('id_grada', $gradaId)->count();
 
-    if ($totalSillas == 0) {
-        return false; // Si no hay sillas en esta grada, no puede estar completa
+    // if ($totalSillas == 0) {
+    //     return false; // Si no hay sillas en esta grada, no puede estar completa
+    // }
+
+    // $sillasReservadas = Reservas::where('id_zona')->where('estado', ['reservada', 'pagada'])->count();
+    // // Contar cuántas sillas en esta grada tienen reservas activas (reservada o pagada)
+    // // $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($gradaId) {
+    // //     $query->where('id_grada', $gradaId);
+    // // })->whereIn('estado', ['reservada', 'pagada'])->count();
+
+    // // Verificar si todas las sillas están reservadas
+    // return $totalSillas === $sillasReservadas;
+    // Obtener el número total de sillas en el palco
+    $palco = Gradas::find($gradaId);
+    $totalSillas = Sillas::where('id_palco', $gradaId)->get();
+    
+    // if (!$palco) {
+    //     return false;
+    // }
+
+    // Número total de sillas en el palco
+    $numeroTotal = $palco->num_sillas;
+    $total = 0;
+    foreach ($totalSillas as $silla) {
+        $reservaSilla = Reservas::wheare('id_silla', $silla->id)->where('estado', ['reservada', 'pagada'])->fisrt();
+        if (isset($reservaSilla)) {
+            $total += 1;
+        }
     }
+    // $sillasReservadas = Reservas::where('id_palco')->where('estado', ['reservada', 'pagada'])->count();
+    // Contar cuántas sillas en este palco tienen reservas activas (reservada o pagada)
 
-    $sillasReservadas = Reservas::where('id_zona')->where('estado', ['reservada', 'pagada'])->count();
-    // Contar cuántas sillas en esta grada tienen reservas activas (reservada o pagada)
-    // $sillasReservadas = Reservas::whereHas('silla', function ($query) use ($gradaId) {
-    //     $query->where('id_grada', $gradaId);
-    // })->whereIn('estado', ['reservada', 'pagada'])->count();
 
     // Verificar si todas las sillas están reservadas
-    return $totalSillas === $sillasReservadas;
+    return $numeroTotal === $total;
 }
 
 }
