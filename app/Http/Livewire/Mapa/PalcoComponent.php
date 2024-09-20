@@ -231,12 +231,12 @@ class PalcoComponent extends Component
             'totalPagado' => $totalPagado,
         ])->setPaper('a4', 'portrait');
     
-        // Guardar el PDF en una ubicación temporal
-        $fileName = 'reserva_cliente_' . $cliente->id . '.pdf';
-        Storage::put('public/pdfs/' . $fileName, $pdf->output());
+        // // Guardar el PDF en una ubicación temporal
+        // $fileName = 'reserva_cliente_' . $cliente->id . '.pdf';
+        // Storage::put('public/pdfs/' . $fileName, $pdf->output());
     
         // Retornar la URL del archivo generado
-        return Storage::url('public/pdfs/' . $fileName);
+        return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
     }
     
     private function imageToBase64($path)
