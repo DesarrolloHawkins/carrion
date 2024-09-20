@@ -149,7 +149,7 @@
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}', // CSRF token para protección
-                                _method: 'DELETE' // Método DELETE para eliminar
+                                _method: 'POST' // Método DELETE para eliminar
                             },
                             success: function(response) {
                                 // Mostrar alerta de éxito
