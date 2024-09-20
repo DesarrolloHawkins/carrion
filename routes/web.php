@@ -82,12 +82,11 @@ Route::name('inicio')->get('/', function () {
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //Route::get('/clients', [App\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
 
-Route::get('/reservas/{clienteId}', [App\Http\Controllers\ReservasController::class, 'show'])->name('reservas.show');
 Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails'])->name('reservas.create');
 Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
-
+    Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
     Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
 
     Route::post('/import-clientes', [ClienteImportController::class, 'importClientes']);
