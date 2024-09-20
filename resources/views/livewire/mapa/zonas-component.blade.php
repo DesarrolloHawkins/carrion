@@ -96,6 +96,7 @@
                 svgElement.addEventListener('mouseleave', function () {
                     isPanning = false;
                 });
+                console.log(palcos)
 
                 // Colorear palcos y gradas completos
                 palcos.forEach(function (palco) {
