@@ -184,7 +184,7 @@
                 </div>
                 <div class="modal-body">
                     <form wire:submit.prevent="submit">
-                    <div class="form-group col-6">
+                    <div class="form-group col-12">
                                 <label for="nombre">Nombre</label>
                                 <input type="text" class="form-control" id="nombre" wire:model="nombre" placeholder="Nombre">
                                 @error('nombre') <span class="text-danger">{{ $message }}</span> @enderror
