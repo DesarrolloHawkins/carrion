@@ -107,8 +107,8 @@ class ReservasController extends Controller
     $zona = null;
 
     foreach ($reservas as $reserva) {
-        $silla = Sillas::find($reserva->id_silla);
-        $zona = Zonas::find($silla->id_zona);
+        $silla = Sillas::find($reserva->id_silla); 
+        $zona = Zonas::find($silla->id_zona); 
 
         if ($silla->id_palco != null) {
             $palco = Palcos::find($silla->id_palco);
