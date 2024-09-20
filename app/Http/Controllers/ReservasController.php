@@ -36,14 +36,14 @@ class ReservasController extends Controller
 
     // public function generarYDescargarPDF($reservas, $cliente, $tasas)
     //     {
-            
+
     //     // Preparar los detalles de las reservas para el PDF
     //     $detallesReservas = [];
     //     $zona = null;
 
     //     foreach ($reservas as $reserva) {
-    //         $silla = Sillas::find($reserva->id_silla); 
-    //         $zona = Zonas::find($silla->id_zona); 
+    //         $silla = Sillas::find($reserva->id_silla);
+    //         $zona = Zonas::find($silla->id_zona);
 
     //         if ($silla->id_palco != null) {
     //             $palco = Palcos::find($silla->id_palco);
@@ -107,8 +107,8 @@ class ReservasController extends Controller
     $zona = null;
 
     foreach ($reservas as $reserva) {
-        $silla = Sillas::find($reserva->id_silla); 
-        $zona = Zonas::find($silla->id_zona); 
+        $silla = Sillas::find($reserva->id_silla);
+        $zona = Zonas::find($silla->id_zona);
 
         if ($silla->id_palco != null) {
             $palco = Palcos::find($silla->id_palco);
@@ -166,7 +166,7 @@ class ReservasController extends Controller
 }
 
 
-    
+
 
     private function imageToBase64($path)
     {
@@ -185,12 +185,12 @@ class ReservasController extends Controller
             case '01- asunción (protocolo)':
             case 'plaza asunción (protocolo)':
                 return '/images/zonas/asuncion.png';
-                
+
             case '02.- consistorio':
             case 'consistorio ii':
             case 'consistorio i':
                 return '/images/zonas/consistorio.png';
-                
+
             case '03. arenal':
             case 'arenal ii':
             case 'arenal i':
@@ -199,31 +199,31 @@ class ReservasController extends Controller
             case 'arenal v':
             case 'arenal vi':
                 return '/images/zonas/arenal.png';
-                
+
             case '04.- lancería-gallo azul':
             case 'lancería-gallo azul':
             case 'lancería-gallo azul i':
                 return '/images/zonas/lanceria.png';
-                
+
             case '05.- algarve-plaza del banco':
             case 'algarve-plaza del banco':
                 return '/images/zonas/larga.png';
-                
+
             case '06.- rotonda de los casinos-santo domingo':
             case 'rotonda de los casinos-santo domingo':
             case 'rotonda de los casinos-santo domingo ii':
                 return '/images/zonas/casinos.png';
-                
+
             case '07.- marqués de casa domecq':
             case 'marqués de casa domecq ii':
             case 'marqués de casa domecq i':
                 return '/images/zonas/santodomingo.png';
-                
+
             case '08.- eguiluz':
             case 'eguiluz ii':
             case 'eguiluz i':
                 return '/images/zonas/domecq.png';
-                
+
             default:
                 return '/images/zonas/default.png';
         }
@@ -233,6 +233,12 @@ class ReservasController extends Controller
     public function index()
     {
         return view('reservas.index');
+    }
+    //index
+    public function edit($id)
+    {
+            // Retornar la vista de edición y pasarle los datos necesarios
+        return view('reservas.edit', compact('id'));
     }
 
 
@@ -256,10 +262,10 @@ class ReservasController extends Controller
     foreach ($reservas as $reserva) {
         // Buscar la silla asociada a la reserva
         $silla = Sillas::find($reserva->id_silla);
-        
+
         // Buscar la zona correspondiente a la silla
         $zona = Zonas::find($silla->id_zona);
-        
+
         // Verificar si la silla pertenece a un palco o una grada
         $palco = null;
         $grada = null;
@@ -291,6 +297,6 @@ class ReservasController extends Controller
     return view('reservas.show', compact('detallesReservas', 'cliente'));
 }
 
-   
+
 
 }

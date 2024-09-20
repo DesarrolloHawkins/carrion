@@ -52,15 +52,15 @@ class IndexComponent extends Component
         }
 
         $this->reservas = $query->get();
-        
+
         $this->detallesReservas = [];
         $palco = null;
         $grada = null;
 
         // Iterar sobre todas las reservas
         foreach ($this->reservas as $reserva) {
-            $silla = Sillas::find($reserva->id_silla); 
-            
+            $silla = Sillas::find($reserva->id_silla);
+
             if (!$silla) {
                 continue;
             }
@@ -120,7 +120,7 @@ class IndexComponent extends Component
             ],
         ]);
     }
-    
+
     public function confirmarEliminacion($reservaId) {
         $this->confirm('¿Estás seguro de que deseas eliminar esta reserva?', [
             'toast' => false,
@@ -133,12 +133,12 @@ class IndexComponent extends Component
             ],
         ]);
     }
-    
+
 
      // Método para cancelar la reserva
      public function cancelarReserva($reservaId) {
-        $reserva = Reservas::where('id', $reservaId['data']['reservaId'])->first();
-        if ($reserva) {
+         $reserva = Reservas::where('id', $reservaId['data']['reservaId'])->first();
+         if (isset($reserva)) {
             $reserva->estado = 'cancelada';
             $reserva->save();
 
@@ -150,24 +150,24 @@ class IndexComponent extends Component
         $this->mount();
     }
 
-   
+
 
     // Método para eliminar la reserva
     public function eliminarReserva($reservaId) {
         $reserva = Reservas::where('id',$reservaId['data']['reservaId'])->first();
 
-        if ($reserva) {
-            $reserva->delete();
+        if (isset($reserva)) {
+            $this->alert('success', 'Reserva eliminada exitosamente.');
+           // $reserva->delete();
 
             // Notificar al usuario que se ha eliminado la reserva
-            $this->alert('success', 'Reserva eliminada exitosamente.');
 
             // Actualizar la lista de reservas
             $this->mount();
         }
     }
 
-    
+
 
     public function render()
     {
@@ -175,5 +175,5 @@ class IndexComponent extends Component
     }
 
 
-    
+
 }
