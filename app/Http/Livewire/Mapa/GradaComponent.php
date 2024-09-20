@@ -259,18 +259,30 @@ class GradaComponent extends Component
             'totalPagado' => $totalPagado,
         ])->setPaper('a4', 'portrait');
     
-        // // Guardar el PDF en una ubicación temporal
-        // $fileName = 'reserva_cliente_' . $cliente->id . '.pdf';
-        // Storage::put('public/pdfs/' . $fileName, $pdf->output());
-    
-        // // Retornar la URL del archivo generado
-        // return Storage::url('public/pdfs/' . $fileName);
-        return $pdf->stream('reserva_cliente_' . $cliente->id . '.pdf');
+        /// Definir el nombre del archivo
+        $fileName = 'reserva_' . $cliente->id . '.pdf';
+
+        // Definir la ruta completa en la carpeta 'public/pdfs'
+        $filePath = public_path('pdfs/' . $fileName);
+
+        // Asegurarse de que la carpeta 'pdfs' exista en 'public', si no, se crea
+        if (!file_exists(public_path('pdfs'))) {
+            mkdir(public_path('pdfs'), 0777, true); // Crear la carpeta con permisos 0777
+        }
+
+        // Guardar el archivo PDF directamente en 'public/pdfs'
+        file_put_contents($filePath, $pdf->output());
+
+        // Retornar la URL pública del archivo generado
+        return asset('pdfs/' . $fileName);
 
     }
     
 
-    
+    function svgToBase64($svgContent) {
+        $output = base64_encode($svgContent);
+        return 'data:image/svg+xml;base64,' . $output;
+    }
 
     private function imageToBase64($path)
     {
