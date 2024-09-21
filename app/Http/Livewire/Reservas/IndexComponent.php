@@ -67,9 +67,11 @@ class IndexComponent extends Component
 
             $zona = Zonas::find($silla->id_zona);
             if ($silla->id_palco != null) {
+                $grada = null;
                 $palco = Palcos::find($silla->id_palco);
                 $zona = Sectores::find($palco->id_sector);
             } elseif ($silla->id_grada != null) {
+                $palco = null;
                 $grada = Gradas::find($silla->id_grada);
                 $zona = Zonas::find($grada->id_zona);
             }
