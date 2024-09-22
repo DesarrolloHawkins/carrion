@@ -5,9 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Models\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CodigoVerificacionMail;
 
 class AuthController extends Controller
 {
@@ -50,5 +53,47 @@ class AuthController extends Controller
     {
         $request->user()->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    public function olvideContrasenia(Request $request)
+    {
+        if (!isset($request->email)) {
+            return response()->json(['error' => 'Email no enviado'], 401);
+        }
+
+        $email = $request->email;
+        $cliente = Cliente::where('email', $email)->first();
+
+        if (!$cliente) {
+            return response()->json(['error' => 'Email no corresponde con ningún usuario'], 401);
+        }
+
+        // Generar un código de verificación de 6 dígitos
+        $codigo = rand(100000, 999999);
+        $cliente->code = $codigo;
+        $cliente->save();
+
+        // Enviar el correo con el código de verificación
+        Mail::to($cliente->email)->send(new CodigoVerificacionMail($codigo));
+
+        return response()->json(['message' => 'Correo de verificación enviado correctamente']);
+    }
+
+    public function passwordRestore(Request $request)
+    {
+        if (!isset($request->password) && !isset($request->email)) {
+            return response()->json(['error' => 'La contraseña no enviada'], 401);
+        }
+        $email = $request->email;
+        $password = $request->password;
+        $cliente = Cliente::where('email', $email)->first();
+        if (!$cliente) {
+            return response()->json(['error' => 'Email no corresponde con ningun usuario'], 401);
+
+        }
+        $cliente->password = Hash::make($password);
+        $cliente->save();
+
+        return response()->json(['message' => 'Contraseña actualizada correctamente']);
     }
 }

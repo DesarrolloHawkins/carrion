@@ -29,6 +29,7 @@ class Cliente extends Model
         'email',
         'categoria_id',
         'password',
+        'code'
     ];
 
 

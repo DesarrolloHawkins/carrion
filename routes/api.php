@@ -26,6 +26,9 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('/create-checkout-session', [StripePaymentController::class, 'createCheckoutSession']);
 Route::post('/payout', [WebhookController::class, 'handleWebhook']);
 Route::post('/registrar-pago', [StripePaymentController::class, 'registrarPago']);
+Route::post('olvide-contrasenia', [AuthController::class, 'olvideContrasenia']);
+Route::post('password-restore', [AuthController::class, 'passwordRestore']);
+
 
 Route::prefix('cliente')->group(function () {
     Route::post('/register', [AuthClienteController::class, 'register']);
@@ -85,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('clubes', App\Http\Controllers\API\ClubController::class);
 
     //Sillas
-    
+
     //perfil
 
 
