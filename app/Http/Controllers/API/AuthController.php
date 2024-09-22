@@ -81,19 +81,30 @@ class AuthController extends Controller
 
     public function passwordRestore(Request $request)
     {
-        if (!isset($request->password) && !isset($request->email)) {
-            return response()->json(['error' => 'La contraseña no enviada'], 401);
+        if (!isset($request->password) || !isset($request->email) || !isset($request->codigo)) {
+            return response()->json(['error' => 'Información incompleta'], 401);
         }
+
         $email = $request->email;
         $password = $request->password;
-        $cliente = Cliente::where('email', $email)->first();
-        if (!$cliente) {
-            return response()->json(['error' => 'Email no corresponde con ningun usuario'], 401);
+        $codigo = $request->codigo;
 
+        $cliente = Cliente::where('email', $email)->first();
+
+        if (!$cliente) {
+            return response()->json(['error' => 'Email no corresponde con ningún usuario'], 401);
         }
+
+        if ($cliente->code != $codigo) {
+            return response()->json(['error' => 'Código de verificación incorrecto'], 401);
+        }
+
+        // Actualizar la contraseña y borrar el código
         $cliente->password = Hash::make($password);
+        $cliente->code = null; // Eliminar el código una vez utilizado
         $cliente->save();
 
         return response()->json(['message' => 'Contraseña actualizada correctamente']);
     }
+
 }
