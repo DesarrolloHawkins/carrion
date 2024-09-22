@@ -109,11 +109,10 @@
                         }
                     }
                 });
-                console.log(gradas)
                 gradas.forEach(function (grada) {
                     console.log(grada)
                     if (grada.id == 8) {
-                        
+
                     }
                     if (grada.completo) {
                         var gradaElement = svgDoc.querySelector('path[data-id="' + grada.id + '"]');
@@ -127,7 +126,7 @@
                 var paths = svgDoc.querySelectorAll('path[data-id][data-zona]');
                 paths.forEach(function (path) {
 
-                    
+
 
                     path.addEventListener("click", function () {
                         var dataId = this.getAttribute('data-id');

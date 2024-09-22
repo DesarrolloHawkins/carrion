@@ -16,7 +16,7 @@ class Gradas extends Model
     protected $fillable = [
         'numero',
         'id_zona',
-        
+
     ];
 
 
@@ -29,5 +29,6 @@ class Gradas extends Model
     {
         return $this->hasMany(Sillas::class, 'id_grada');
     }
+
 
 }
