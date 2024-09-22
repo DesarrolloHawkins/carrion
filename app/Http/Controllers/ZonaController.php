@@ -29,6 +29,39 @@ class ZonaController extends Controller
 
         return response()->json(['id' => $dataId, 'completo' => $completo]);
     }
+    public function checkIfFullBulk(Request $request)
+{
+    // Recibe un array de zonas desde el frontend
+    $zonas = $request->input('zonas');
+    $results = [];
+
+    foreach ($zonas as $zona) {
+        $dataId = $zona['data-id'];
+        $dataType = $zona['data-type'];
+        $dataZona = $zona['data-zona'];
+
+        // Verificar si es un palco o grada y si está completo
+        if ($dataType === 'palco') {
+            $completo = $this->checkPalcoCompleto($dataId);
+        } elseif ($dataType === 'grada') {
+            $completo = $this->checkGradaCompleto($dataId, $dataZona);
+        } else {
+            $completo = false;
+        }
+
+        // Almacenar el resultado para cada zona
+        $results[] = [
+            'id' => $dataId,
+            'completo' => $completo,
+            'type' => $dataType,
+            'zona' => $dataZona,
+        ];
+    }
+
+    // Devolver el resultado completo como JSON
+    return response()->json($results);
+}
+
 
 public function checkPalcoCompleto($palcoId)
 {

@@ -29,7 +29,7 @@ Route::post('/create-checkout-session', [StripePaymentController::class, 'create
 Route::post('/payout', [WebhookController::class, 'handleWebhook']);
 Route::post('/registrar-pago', [StripePaymentController::class, 'registrarPago']);
 
-Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
+Route::post('/check-zona-completa-bulk', [ZonaController::class, 'checkIfFullBulk'])->name('check.zona.completa.bulk');
 
 
 Route::prefix('cliente')->group(function () {
