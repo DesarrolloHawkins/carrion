@@ -265,23 +265,23 @@
    <path data-id="152" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2242.57,1117.91 L2278.78,1177.1 L2209.57,1219.45 L2173.36,1160.27 L2242.57,1117.91" vector-effect="none"/>
   </g>
   <g fill="#d647ef" font-size="34.375" stroke-linejoin="bevel" stroke-width="2.3622" font-family="MS Shell Dlg 2" stroke-opacity="1" stroke-linecap="square" transform="matrix(0.999751,0,0,0.999751,0,-5.23966e-15)" fill-opacity="1" font-style="normal" font-weight="400" stroke="#cccccc">
-   <path fill-rule="evenodd" d="M2173.34,1160.24 L2209.55,1219.42 L2140.34,1261.77 L2104.13,1202.59 L2173.34,1160.24" vector-effect="none"/>
+   <path data-id="151" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2173.34,1160.24 L2209.55,1219.42 L2140.34,1261.77 L2104.13,1202.59 L2173.34,1160.24" vector-effect="none"/>
   </g>
   <g fill="#cccccc" font-size="34.375" stroke-linejoin="bevel" stroke-width="2.3622" font-family="MS Shell Dlg 2" stroke-opacity="1" stroke-linecap="square" transform="matrix(0.999751,0,0,0.999751,0,-5.23966e-15)" fill-opacity="0.419608" font-style="normal" font-weight="400" stroke="#7a7a7a">
-   <path fill-rule="evenodd" d="M2545.77,984.402 L2498.29,933.852 L2557.43,878.301 L2604.91,928.851 L2545.77,984.402" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2664.05,873.301 L2616.58,822.751 L2675.72,767.2 L2723.2,817.75 L2664.05,873.301" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2604.91,928.851 L2557.43,878.301 L2616.58,822.751 L2664.05,873.301 L2604.91,928.851" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2782.34,762.2 L2734.86,711.65 L2794.01,656.099 L2841.49,706.649 L2782.34,762.2" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2900.63,651.099 L2853.15,600.549 L2912.29,544.998 L2959.77,595.548 L2900.63,651.099" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2841.49,706.649 L2794.01,656.099 L2853.15,600.549 L2900.63,651.099 L2841.49,706.649" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2723.2,817.75 L2675.72,767.2 L2734.86,711.65 L2782.34,762.2 L2723.2,817.75" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M3038.75,338.86 L3097.71,373.528 L3098.03,373.686 L3056.91,443.671 L3056.65,443.528 L2998.36,409.255 L3038.75,338.86" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M2998.36,409.255 L3056.65,443.528 L3056.91,443.671 L3016.29,512.812 L2957.97,479.65 L2998.36,409.255" vector-effect="none"/>
+   <path data-id="157" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2545.77,984.402 L2498.29,933.852 L2557.43,878.301 L2604.91,928.851 L2545.77,984.402" vector-effect="none"/>
+   <path data-id="159" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2664.05,873.301 L2616.58,822.751 L2675.72,767.2 L2723.2,817.75 L2664.05,873.301" vector-effect="none"/>
+   <path data-id="158" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2604.91,928.851 L2557.43,878.301 L2616.58,822.751 L2664.05,873.301 L2604.91,928.851" vector-effect="none"/>
+   <path data-id="161" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2782.34,762.2 L2734.86,711.65 L2794.01,656.099 L2841.49,706.649 L2782.34,762.2" vector-effect="none"/>
+   <path data-id="163" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2900.63,651.099 L2853.15,600.549 L2912.29,544.998 L2959.77,595.548 L2900.63,651.099" vector-effect="none"/>
+   <path data-id="162" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2841.49,706.649 L2794.01,656.099 L2853.15,600.549 L2900.63,651.099 L2841.49,706.649" vector-effect="none"/>
+   <path data-id="160" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2723.2,817.75 L2675.72,767.2 L2734.86,711.65 L2782.34,762.2 L2723.2,817.75" vector-effect="none"/>
+   <path data-id="166" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M3038.75,338.86 L3097.71,373.528 L3098.03,373.686 L3056.91,443.671 L3056.65,443.528 L2998.36,409.255 L3038.75,338.86" vector-effect="none"/>
+   <path data-id="165" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2998.36,409.255 L3056.65,443.528 L3056.91,443.671 L3016.29,512.812 L2957.97,479.65 L2998.36,409.255" vector-effect="none"/>
   </g>
   <g fill="#d647ef" font-size="34.375" stroke-linejoin="bevel" stroke-width="2.3622" font-family="MS Shell Dlg 2" stroke-opacity="1" stroke-linecap="square" transform="matrix(0.999751,0,0,0.999751,0,-5.23966e-15)" fill-opacity="1" font-style="normal" font-weight="400" stroke="#cccccc">
-   <path fill-rule="evenodd" d="M2957.97,479.65 L3016.05,513.768 L2959.77,595.548 L2912.29,544.998 L2957.97,479.65" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M3263.13,93.4723 L3262.81,93.314 L3203.84,58.6464 L3244.23,-11.7487 L3304.53,23.0041 L3263.13,93.4723" vector-effect="none"/>
-   <path fill-rule="evenodd" d="M3203.84,58.6464 L3262.81,93.314 L3263.13,93.4723 L3222.01,163.457 L3221.75,163.314 L3163.46,129.041 L3203.84,58.6464" vector-effect="none"/>
+   <path data-id="164" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M2957.97,479.65 L3016.05,513.768 L2959.77,595.548 L2912.29,544.998 L2957.97,479.65" vector-effect="none"/>
+   <path data-id="171" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M3263.13,93.4723 L3262.81,93.314 L3203.84,58.6464 L3244.23,-11.7487 L3304.53,23.0041 L3263.13,93.4723" vector-effect="none"/>
+   <path data-id="170" data-zona="Lancería-Gallo Azul" data-sector = "Lancería-Gallo Azul I" data-type="palco" fill-rule="evenodd" d="M3203.84,58.6464 L3262.81,93.314 L3263.13,93.4723 L3222.01,163.457 L3221.75,163.314 L3163.46,129.041 L3203.84,58.6464" vector-effect="none"/>
   </g>
   <g fill="none" font-size="34.375" stroke-linejoin="bevel" stroke-width="1" font-family="MS Shell Dlg 2" stroke-opacity="1" stroke-linecap="square" transform="matrix(0.999751,0,0,0.999751,0,-5.23966e-15)" font-style="normal" font-weight="400" stroke="#000000"/>
   <g stroke-dashoffset="0" fill="none" font-size="34.375" stroke-linejoin="bevel" stroke-width="1.1811" font-family="MS Shell Dlg 2" stroke-opacity="1" stroke-linecap="square" transform="matrix(0.999751,0,0,0.999751,0,-5.23966e-15)" stroke-dasharray="1.1811,2.3622" font-style="normal" font-weight="400" stroke="#03bb93">
