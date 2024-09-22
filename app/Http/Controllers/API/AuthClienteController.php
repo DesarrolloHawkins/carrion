@@ -24,6 +24,11 @@ class AuthClienteController extends Controller
         // Comprobación si existe por DNI
         $cliente = Cliente::where('DNI', $request->dni)->first();
 
+              //si ya hay un cliente con ese email, devolver un error
+              if (Cliente::where('email', $request->email)->exists()) {
+                return response()->json(['error' => 'Ya existe un cliente con ese email'], 400);
+            }
+
         if (!$cliente) {
             // Si no existe por DNI, buscar por teléfono o email
             $cliente = Cliente::where(function($query) use ($request) {
@@ -46,10 +51,7 @@ class AuthClienteController extends Controller
             ], 200);
         }
 
-        //si ya hay un cliente con ese email, devolver un error
-        if (Cliente::where('email', $request->email)->exists()) {
-            return response()->json(['error' => 'Ya existe un cliente con ese email'], 400);
-        }
+
         // Si no existe, crear un nuevo cliente
         $cliente = Cliente::create([
             'nombre' => $request->nombre,
@@ -70,17 +72,17 @@ class AuthClienteController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-    
+
         $cliente = Cliente::where('email', $request->email)->first();
-    
+
         if (!$cliente || !Hash::check($request->password, $cliente->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
-    
+
         $token = $cliente->createToken('cliente-token')->plainTextToken;
-    
+
         // Devolvemos el token junto con la información del cliente
         return response()->json([
             'token' => $token,
@@ -97,7 +99,7 @@ class AuthClienteController extends Controller
             ]
         ], 200);
     }
-    
+
 
     public function logout(Request $request)
     {
