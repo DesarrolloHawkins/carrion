@@ -26,8 +26,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('/create-checkout-session', [StripePaymentController::class, 'createCheckoutSession']);
 Route::post('/payout', [WebhookController::class, 'handleWebhook']);
 Route::post('/registrar-pago', [StripePaymentController::class, 'registrarPago']);
-Route::post('olvide-contrasenia', [AuthController::class, 'olvideContrasenia']);
-Route::post('password-restore', [AuthController::class, 'passwordRestore']);
+
 
 
 Route::prefix('cliente')->group(function () {
@@ -35,7 +34,8 @@ Route::prefix('cliente')->group(function () {
     Route::post('/login', [AuthClienteController::class, 'login']);
     Route::middleware('auth:sanctum')->post('/logout', [AuthClienteController::class, 'logout']);
     Route::put('/update', [ClienteController::class, 'updateProfile']);
-
+    Route::post('olvide-contrasenia', [AuthController::class, 'olvideContrasenia']);
+    Route::post('password-restore', [AuthController::class, 'passwordRestore']);
 });
 
 Route::prefix('admin')->group(function () {
