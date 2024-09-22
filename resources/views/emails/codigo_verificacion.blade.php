@@ -56,7 +56,7 @@
             <p>Si no solicitaste este código, por favor, ignora este correo.</p>
         </div>
         <div class="email-footer">
-            &copy; {{ date('Y') }} Tu Empresa. Todos los derechos reservados.
+            &copy; {{ date('Y') }} Union de Hermandades de Jerez. Todos los derechos reservados.
         </div>
     </div>
 </body>
