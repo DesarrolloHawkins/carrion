@@ -19,19 +19,19 @@ class ReservaPagada2 extends Mailable
 {
     use Queueable, SerializesModels;
 
-   
+
 
     public function __construct()
     {
-        
+
     }
 
 
     public function build()
     {
-        
 
-        return $this->from(config('mail.from.address'), config('mail.from.name'))
+
+        return $this->from('noreply@unionhermandades.com', 'Unión de Hermandades de Jerez') // Configura el alias aquí
                     ->subject('Confirmación de Reserva')
                     ->markdown('pdf.devuelta');
     }

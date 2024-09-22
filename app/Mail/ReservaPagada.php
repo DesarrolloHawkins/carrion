@@ -28,7 +28,7 @@ class ReservaPagada extends Mailable
     public $mapImageBase64;
     public $montoCobrar;
 
-    
+
 
     public function __construct($reservas, $sillas, $cliente)
     {
@@ -43,8 +43,8 @@ class ReservaPagada extends Mailable
         $totalPrecio = 0;
         foreach ($reservas as $reserva) {
             $totalPrecio += $reserva->precio;
-            $silla = Sillas::find($reserva->id_silla); 
-            $zona = Zonas::find($silla->id_zona); 
+            $silla = Sillas::find($reserva->id_silla);
+            $zona = Zonas::find($silla->id_zona);
             if ($silla->id_palco != null) {
                 $palco = Palcos::find($silla->id_palco);
                 $zona = Sectores::find($palco->id_sector);
@@ -68,7 +68,7 @@ class ReservaPagada extends Mailable
 
 
         $reserva1 = $reservas[0];
-        $silla = Sillas::find($reserva1->id_silla); 
+        $silla = Sillas::find($reserva1->id_silla);
         if($silla->id_palco != null){
             $palco = Palcos::find($silla->id_palco);
             $zona = zonas::find($palco->id_zona);
@@ -138,11 +138,11 @@ class ReservaPagada extends Mailable
             $palcoIds = [
                 16, 17, 18, 19, 20,21,22,23,24,25,26,27,28,122,121,120,119,118,117,116,115,114,113,112,111,110,109,108,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
                 534, 533, 532, 531, 530, 529, 528, 527, 526, 525, 524, 523, 522, 521, 520, 519, 518, 517, 516, 515, 514, 513, 512, 511, 510, 509, 508, 507, 506, 505, 504, 503, 502, 501, 500, 499, 498, 497, 496, 495, 494, 493,
-                
+
             ];
-    
+
             $palco = Palcos::find($silla->id_palco);
-    
+
             if ($palco) {
                 if (in_array($palco->numero, $palcoIds)) {
                     return 18;
@@ -152,7 +152,7 @@ class ReservaPagada extends Mailable
             }
         }
 
-           
+
     }
 
 
@@ -183,7 +183,7 @@ class ReservaPagada extends Mailable
             case 'Algarve-Plaza del Banco':
                 return '/images/zonas/larga.png';
             case '06.- Rotonda de los Casinos-Santo Domingo':
-            case 'Rotonda de los Casinos-Santo Domingo':    
+            case 'Rotonda de los Casinos-Santo Domingo':
             case 'Rotonda de los Casinos-Santo Domingo II':
                 return '/images/zonas/casinos.png';
             case '07.- Marqués de Casa Domecq':
@@ -221,7 +221,7 @@ class ReservaPagada extends Mailable
             'tasas' => $this->montoCobrar
         ]);
 
-        return $this->from(config('mail.from.address'), config('mail.from.name'))
+        return $this->from('noreply@unionhermandades.com', 'Unión de Hermandades de Jerez') // Configura el alias aquí
                     ->subject('Confirmación de Reserva')
                     ->markdown('emails.reserva_pagada')
                     ->with([
