@@ -11,6 +11,8 @@ use App\Http\Controllers\API\PayController;
 use App\Http\Controllers\API\ClienteController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\ZonaController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,6 +29,7 @@ Route::post('/create-checkout-session', [StripePaymentController::class, 'create
 Route::post('/payout', [WebhookController::class, 'handleWebhook']);
 Route::post('/registrar-pago', [StripePaymentController::class, 'registrarPago']);
 
+Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 
 
 Route::prefix('cliente')->group(function () {

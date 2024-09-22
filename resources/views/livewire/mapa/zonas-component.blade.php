@@ -143,59 +143,59 @@
 
 
         document.addEventListener('DOMContentLoaded', function () {
-    var svgObject = document.getElementById('svgObject');
+        var svgObject = document.getElementById('svgObject');
 
-    // Verificamos que el objeto SVG está presente
-    if (svgObject) {
-        svgObject.addEventListener('load', function () {
-            var svgDoc = svgObject.contentDocument;
+        // Verificamos que el objeto SVG está presente
+        if (svgObject) {
+            svgObject.addEventListener('load', function () {
+                var svgDoc = svgObject.contentDocument;
 
-            if (svgDoc) {
-                var paths = svgDoc.querySelectorAll('path[data-id][data-zona]');
+                if (svgDoc) {
+                    var paths = svgDoc.querySelectorAll('path[data-id][data-zona]');
 
-                // Para cada path del SVG, hacemos una petición al backend
-                paths.forEach(function (path) {
-                    var dataId = path.getAttribute('data-id');
-                    var dataZona = path.getAttribute('data-zona');
-                    var dataType = path.getAttribute('data-type');
+                    // Para cada path del SVG, hacemos una petición al backend
+                    paths.forEach(function (path) {
+                        var dataId = path.getAttribute('data-id');
+                        var dataZona = path.getAttribute('data-zona');
+                        var dataType = path.getAttribute('data-type');
 
-                    // Crear el objeto que enviaremos al servidor
-                    var data = {
-                        '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'data-id': dataId,
-                        'data-zona': dataZona,
-                        'data-type': dataType,
-                    };
+                        // Crear el objeto que enviaremos al servidor
+                        var data = {
+                            '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'data-id': dataId,
+                            'data-zona': dataZona,
+                            'data-type': dataType,
+                        };
 
-                    // Hacemos una petición POST al controlador
-                    fetch('/check-zona-completa', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Necesitas asegurarte de tener el token CSRF en la vista
-                        },
-                        body: JSON.stringify(data),
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        console.log('Result:', result); // Para depuración
+                        // Hacemos una petición POST al controlador
+                        fetch('/check-zona-completa', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Necesitas asegurarte de tener el token CSRF en la vista
+                            },
+                            body: JSON.stringify(data),
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Result:', result); // Para depuración
 
-                        // Colorear el path según si está completo o no
-                        if (result.completo) {
-                            path.style.fill = 'red'; // Colorea en rojo si está completo
-                        } else {
-                            path.style.fill = 'green'; // O en verde si no está completo
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                });
-            } else {
-                console.error('No se pudo acceder al documento SVG.');
-            }
-        });
-    } else {
-        console.error('No se encontró el elemento con el ID "svgMap".');
-    }
+                            // Colorear el path según si está completo o no
+                            if (result.completo) {
+                                path.style.fill = 'red'; // Colorea en rojo si está completo
+                            } else {
+                                path.style.fill = 'green'; // O en verde si no está completo
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    });
+                } else {
+                    console.error('No se pudo acceder al documento SVG.');
+                }
+            });
+        } else {
+            console.error('No se encontró el elemento con el ID "svgMap".');
+        }
 });
 
 
