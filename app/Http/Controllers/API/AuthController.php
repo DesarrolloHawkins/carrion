@@ -76,7 +76,7 @@ class AuthController extends Controller
         // Enviar el correo con el código de verificación
         Mail::to($cliente->email)->send(new CodigoVerificacionMail($codigo));
 
-        return response()->json(['message' => 'Correo de verificación enviado correctamente']);
+        return response()->json(['message' => 'Correo de verificación enviado correctamente', 'code' =>  $codigo]);
     }
 
     public function passwordRestore(Request $request)
