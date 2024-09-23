@@ -347,22 +347,36 @@ class ReservasController extends Controller
             ->whereColumn('r1.id_cliente', '<>', 'r2.id_cliente')
             ->whereColumn('r1.id_cliente', '<', 'r2.id_cliente')  // Evitar duplicados
             ->join('sillas', 'r1.id_silla', '=', 'sillas.id')
+            ->join('clientes as c1', 'r1.id_cliente', '=', 'c1.id')
+            ->join('clientes as c2', 'r2.id_cliente', '=', 'c2.id')
             ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
             ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
             ->join('zonas', 'sillas.id_zona', '=', 'zonas.id')
-            ->groupBy('r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero', 'zonas.nombre', 'palcos.numero', 'gradas.numero')
+            ->groupBy('r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
             ->orderBy('r1.id_silla', 'asc')
-            ->select('r1.id_silla', 'r1.id_cliente as cliente_1', 'r2.id_cliente as cliente_2', 'sillas.numero as silla_numero', 'zonas.nombre as zona_nombre', 'palcos.numero as palco_numero', 'gradas.numero as grada_numero')
+            ->select(
+                'r1.id_silla',
+                'sillas.numero as silla_numero',
+                'sillas.id as silla_id',
+                'c1.nombre as cliente_1_nombre',
+                'c1.apellidos as cliente_1_apellidos',
+                'c2.nombre as cliente_2_nombre',
+                'c2.apellidos as cliente_2_apellidos',
+                'zonas.nombre as zona_nombre',
+                'palcos.numero as palco_numero',
+                'gradas.numero as grada_numero'
+            )
             ->get();
 
         $reservasArray = [];
 
         foreach ($reservas as $reserva) {
             $reservasArray[] = [
-                'silla' => $reserva->silla_numero,
+                'silla_id' => $reserva->silla_id,
+                'silla_numero' => $reserva->silla_numero,
                 'zona' => $reserva->zona_nombre,
-                'cliente_1' => $reserva->cliente_1,
-                'cliente_2' => $reserva->cliente_2,
+                'cliente_1' => $reserva->cliente_1_nombre . ' ' . $reserva->cliente_1_apellidos,
+                'cliente_2' => $reserva->cliente_2_nombre . ' ' . $reserva->cliente_2_apellidos,
                 'palco' => $reserva->palco_numero,
                 'grada' => $reserva->grada_numero,
             ];
@@ -370,6 +384,8 @@ class ReservasController extends Controller
 
         dd($reservasArray);
     }
+
+
 
 
     }
