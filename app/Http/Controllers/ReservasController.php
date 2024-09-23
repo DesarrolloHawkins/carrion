@@ -388,8 +388,8 @@ class ReservasController extends Controller
                 'cliente_2' => $reserva->cliente_2_nombre . ' ' . $reserva->cliente_2_apellidos,
             ];
         }
-        //return Excel::download(new ReservasDuplicadasExport($reservasArray), 'reservas_duplicadas.xlsx');
-        dd($reservasArray);
+        return $reservasArray;
+       // dd($reservasArray);
     }
 
 
