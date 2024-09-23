@@ -107,8 +107,8 @@ class ReservasController extends Controller
         $zona = null;
 
         foreach ($reservas as $reserva) {
-            $silla = Sillas::find($reserva->id_silla); 
-            $zona = Zonas::find($silla->id_zona); 
+            $silla = Sillas::find($reserva->id_silla);
+            $zona = Zonas::find($silla->id_zona);
 
             if ($silla->id_palco != null) {
                 $palco = Palcos::find($silla->id_palco);
@@ -305,6 +305,22 @@ class ReservasController extends Controller
         $reserva = Reservas::find($id);
         $reserva->delete();
         return response()->json("ok", 200);
+    }
+
+
+
+    public function duplicados(){
+        $reservasConSillasRepetidas = Reservas::join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+        ->whereIn('id_silla', function($query) {
+            $query->select('id_silla')
+                  ->from('reservas')
+                  ->groupBy('id_silla')
+                  ->havingRaw('COUNT(*) > 1');
+        })
+        ->select('reservas.*', 'clientes.nombre', 'clientes.apellidos')
+        ->get();
+
+        return  $reservasConSillasRepetidas;
     }
 
 }

@@ -85,6 +85,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails'])->name('reservas.create');
 Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
+Route::get('/duplicados', [ReservasController::class, 'duplicados'])->name('reservas.duplicados');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
@@ -367,7 +368,7 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
 
 
-    
+
     Route::get('/view-reserva/{id}', [GradaComponent::class, 'viewReservaPDF'])->name('view.reserva');
 
 
