@@ -353,12 +353,14 @@ class ReservasController extends Controller
             ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
             ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
             ->join('zonas', 'sillas.id_zona', '=', 'zonas.id')
-            ->groupBy('r1.id','r2.id', 'r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero','sillas.fila', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
+            ->groupBy('r1.id','r2.id','r1.created_at','r2.created_at', 'r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero','sillas.fila', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
             ->orderBy('r1.id_silla', 'asc')
             ->select(
                 'r1.id_silla',
                 'r1.id as id1',
                 'r2.id as id2',
+                'r1.created_at as fecha1',
+                'r2.created_at as fecha2',
                 'sillas.numero as silla_numero',
                 'sillas.id as silla_id',
                 'sillas.fila as fila',
@@ -383,8 +385,10 @@ class ReservasController extends Controller
                 'grada' => $reserva->grada_numero,
                 'zona' => $reserva->zona_nombre,
                 'Reserva 1' => $reserva->id1,
+                'Creacion 1' => $reserva->fecha1,
                 'cliente_1' => $reserva->cliente_1_nombre . ' ' . $reserva->cliente_1_apellidos,
                 'Reserva 2' => $reserva->id2,
+                'Creacion 2' => $reserva->fecha2,
                 'cliente_2' => $reserva->cliente_2_nombre . ' ' . $reserva->cliente_2_apellidos,
             ];
         }
