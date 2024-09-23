@@ -313,22 +313,25 @@ class ReservasController extends Controller
 
      public function duplicados()
     {
-        $reservasDuplicadas = Reservas::select('sillas.id as silla_id', 'clientes.nombre', 'clientes.apellidos', 'sillas.id_palco', 'sillas.id_grada', DB::raw('COUNT(reservas.id_silla) as total_reservas'))
+        $sillasDuplicadas = Reservas::select('id_silla')
+        ->where('estado', 'pagada')  // Filtrar solo reservas pagadas
+        ->groupBy('id_silla')
+        ->having(DB::raw('COUNT(id_silla)'), '>', 1)
+        ->pluck('id_silla');
+
+        // Obtener todas las reservas asociadas a las sillas duplicadas
+        $reservasConSillasDuplicadas = Reservas::select('reservas.*', 'clientes.nombre', 'clientes.apellidos', 'sillas.id_palco', 'sillas.id_grada')
         ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
         ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
-        ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
-        ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
-        ->where('reservas.estado', 'pagada')  // Filtrar solo reservas pagadas
-        ->groupBy('reservas.id_silla')  // Agrupar solo por id_silla
-        ->having('total_reservas', '>', 1)  // Solo sillas reservadas más de una vez
-        ->orderBy('clientes.apellidos')  // Ordenar por cliente (apellido)
-        ->orderBy('sillas.id_palco')  // Ordenar por palco
-        ->orderBy('sillas.id_grada')  // Ordenar por grada
+        ->whereIn('reservas.id_silla', $sillasDuplicadas)
+        ->orderBy('clientes.apellidos')  // Ordenar por apellido del cliente
+        ->orderBy('sillas.id_palco')  // Luego ordenar por palco
+        ->orderBy('sillas.id_grada')  // Luego ordenar por grada
         ->get();
 
         return [
-            'reservas' =>  $reservasDuplicadas,
-            'count' => count( $reservasDuplicadas),
+            'reservas' =>  $reservasConSillasDuplicadas,
+            'count' => count( value: $reservasConSillasDuplicadas),
         ];
     }
 
