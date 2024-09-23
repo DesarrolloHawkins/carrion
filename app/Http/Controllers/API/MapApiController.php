@@ -68,7 +68,10 @@ class MapApiController extends Controller
     public function cancelarReserva(Request $request)
     {
         $orderId = $request->input('order_id');
-        
+        if(!$orderId){
+            return response()->json(['message' => 'No se ha proporcionado un ID de pedido', 'status' => 'error'], 400);
+            throw new \Exception("No se ha proporcionado un ID de pedido");
+        }
         DB::beginTransaction();
         try {
             if(!$orderId){
@@ -82,10 +85,10 @@ class MapApiController extends Controller
             }
 
             // Actualiza el estado de las reservas a 'cancelada'
-            foreach ($reservas as $reserva) {
-                $reserva->estado = 'cancelada';
-                $reserva->save();
-            }
+            // foreach ($reservas as $reserva) {
+            //     $reserva->estado = 'cancelada';
+            //     $reserva->save();
+            // }
 
             DB::commit();
             return response()->json(['message' => 'Reservas canceladas con éxito', 'status' => 'success'], 200);
