@@ -12,6 +12,7 @@ use App\Models\Palcos;
 use App\Models\Sectores;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class ReservasController extends Controller
 {
