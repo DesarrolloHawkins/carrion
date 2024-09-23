@@ -353,7 +353,7 @@ class ReservasController extends Controller
             ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
             ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
             ->join('zonas', 'sillas.id_zona', '=', 'zonas.id')
-            ->groupBy('r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
+            ->groupBy('r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero','sillas.fila', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
             ->orderBy('r1.id_silla', 'asc')
             ->select(
                 'r1.id_silla',
