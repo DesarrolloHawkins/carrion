@@ -318,6 +318,7 @@ class ReservasController extends Controller
         ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
         ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
         ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
+        ->where('reservas.estado', 'pagada')  // Filtrar por estado pagada
         ->groupBy('clientes.id', 'clientes.nombre', 'clientes.apellidos', 'reservas.id_silla', 'sillas.id_palco', 'sillas.id_grada')
         ->having('total_reservas', '>', 1)
         ->get();
