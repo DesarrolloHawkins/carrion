@@ -324,6 +324,7 @@ class ReservasController extends Controller
         ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
         ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
         ->whereIn('reservas.id_silla', $sillasDuplicadas)
+        ->where('estado', 'pagada')
         ->orderBy('clientes.apellidos')  // Ordenar por apellido del cliente
         ->orderBy('sillas.id_palco')  // Luego ordenar por palco
         ->orderBy('sillas.id_grada')  // Luego ordenar por grada
