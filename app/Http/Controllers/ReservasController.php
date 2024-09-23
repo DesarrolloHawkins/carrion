@@ -314,6 +314,7 @@ class ReservasController extends Controller
      public function duplicados()
     {
         $reservasRepetidas = Reservas::select('id_silla', DB::raw('COUNT(*) as total'))
+        ->where('estado', 'pagada') // Filtra solo las reservas con estado "pagada"
         ->groupBy('id_silla')
         ->having('total', '>', 1)
         ->with(['clientes' => function($query) {
