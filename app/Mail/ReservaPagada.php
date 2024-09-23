@@ -221,7 +221,7 @@ class ReservaPagada extends Mailable
             'tasas' => $this->montoCobrar
         ]);
 
-        return $this->from('noreply@unionhermandades.com', 'Unión de Hermandades de Jerez') // Configura el alias aquí
+        return $this->from('info@unionhermandadesjerez.hawkins.es', 'Unión de Hermandades de Jerez') // Configura el alias aquí
                     ->subject('Confirmación de Reserva')
                     ->markdown('emails.reserva_pagada')
                     ->with([
