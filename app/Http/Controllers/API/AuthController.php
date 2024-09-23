@@ -57,26 +57,31 @@ class AuthController extends Controller
 
     public function olvideContrasenia(Request $request)
     {
-        if (!isset($request->email)) {
-            return response()->json(['error' => 'Email no enviado'], 401);
+        try{
+            if (!isset($request->email)) {
+                return response()->json(['error' => 'Email no enviado'], 401);
+            }
+    
+            $email = $request->email;
+            $cliente = Cliente::where('email', $email)->first();
+    
+            if (!$cliente) {
+                return response()->json(['error' => 'Email no corresponde con ningún usuario'], 401);
+            }
+    
+            // Generar un código de verificación de 6 dígitos
+            $codigo = rand(100000, 999999);
+            $cliente->code = $codigo;
+            $cliente->save();
+    
+            // Enviar el correo con el código de verificación
+            Mail::to($cliente->email)->send(new CodigoVerificacionMail($codigo));
+    
+            return response()->json(['message' => 'Correo de verificación enviado correctamente', 'code' =>  $codigo]);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al enviar el correo de verificación', 'message' => $e], 401);
         }
-
-        $email = $request->email;
-        $cliente = Cliente::where('email', $email)->first();
-
-        if (!$cliente) {
-            return response()->json(['error' => 'Email no corresponde con ningún usuario'], 401);
-        }
-
-        // Generar un código de verificación de 6 dígitos
-        $codigo = rand(100000, 999999);
-        $cliente->code = $codigo;
-        $cliente->save();
-
-        // Enviar el correo con el código de verificación
-        Mail::to($cliente->email)->send(new CodigoVerificacionMail($codigo));
-
-        return response()->json(['message' => 'Correo de verificación enviado correctamente', 'code' =>  $codigo]);
+       
     }
 
     public function passwordRestore(Request $request)
