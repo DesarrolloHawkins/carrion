@@ -313,19 +313,17 @@ class ReservasController extends Controller
 
      public function duplicados()
     {
-        $reservasRepetidas = Reservas::select('id_silla', DB::raw('COUNT(*) as total'))
-        ->where('estado', 'pagada') // Filtra solo las reservas con estado "pagada"
-        ->groupBy('id_silla')
-        ->having('total', '>', 1)
-        ->with(['clientes' => function($query) {
-            $query->select('id', 'nombre', 'apellidos');
-        }])
+        $reservasRepetidas = Reservas::select('clientes.nombre', 'clientes.apellidos', 'clientes.id', 'sillas.id_palco', 'sillas.id_grada', 'reservas.id_silla', DB::raw('COUNT(reservas.id_silla) as total_reservas'))
+        ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+        ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
+        ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
+        ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
+        ->groupBy('clientes.id', 'reservas.id_silla', 'sillas.id_palco', 'sillas.id_grada')
+        ->having('total_reservas', '>', 1)
         ->get();
-
-
         return [
-            'reservas' => $reservasRepetidas,
-            'count' => count($reservasRepetidas)
+            'reservas' =>  $reservasRepetidas,
+            'count' => count( $reservasRepetidas),
         ];
     }
 
