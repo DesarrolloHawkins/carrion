@@ -309,36 +309,39 @@ class ReservasController extends Controller
 
 
 
-    public function duplicados()
+
+     public function duplicados()
     {
-        // Obtener las reservas duplicadas con los nombres y apellidos de los clientes
-        $reservasConSillasRepetidas = Reservas::join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
-            ->whereIn('id_silla', function($query) {
-                $query->select('id_silla')
-                      ->from('reservas')
-                      ->groupBy('id_silla')
-                      ->havingRaw('COUNT(*) > 1');
-            })
-            ->where('reservas.estado', 'pagada')
-            ->select('reservas.*', 'clientes.nombre', 'clientes.apellidos')
-            ->get();
+            // Obtener las reservas duplicadas con los nombres y apellidos de los clientes, agrupadas por id_silla
+            $reservasConSillasRepetidas = Reservas::join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+                ->whereIn('id_silla', function($query) {
+                    $query->select('id_silla')
+                          ->from('reservas')
+                          ->groupBy('id_silla')
+                          ->havingRaw('COUNT(*) > 1');
+                })
+                ->where('reservas.estado', 'pagada')
+                ->select('reservas.*', 'clientes.nombre', 'clientes.apellidos')
+                ->orderBy('id_silla') // Ordenar por id_silla
+                ->get()
+                ->groupBy('id_silla'); // Agrupar por id_silla
 
-        // Contar cuántas de esas reservas están en estado "pagada"
-        $countDuplicadosPagadas = Reservas::join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
-            ->whereIn('id_silla', function($query) {
-                $query->select('id_silla')
-                      ->from('reservas')
-                      ->groupBy('id_silla')
-                      ->havingRaw('COUNT(*) > 1');
-            })
-            ->where('reservas.estado', 'pagada')
-            ->count();
+            // Contar cuántas de esas reservas están en estado "pagada"
+            $countDuplicadosPagadas = Reservas::join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+                ->whereIn('id_silla', function($query) {
+                    $query->select('id_silla')
+                          ->from('reservas')
+                          ->groupBy('id_silla')
+                          ->havingRaw('COUNT(*) > 1');
+                })
+                ->where('reservas.estado', 'pagada')
+                ->count();
 
-        // Retornar ambos resultados
-        return [
-            'reservas' => $reservasConSillasRepetidas,
-            'countPagadas' => $countDuplicadosPagadas
-        ];
+            // Retornar ambos resultados
+            return [
+                'reservas' => $reservasConSillasRepetidas,
+                'countPagadas' => $countDuplicadosPagadas
+            ];
     }
 
-}
+    }
