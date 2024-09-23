@@ -13,6 +13,7 @@ use App\Models\Sectores;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReservasController extends Controller
 {
@@ -358,6 +359,7 @@ class ReservasController extends Controller
                 'r1.id_silla',
                 'sillas.numero as silla_numero',
                 'sillas.id as silla_id',
+                'sillas.fila as fila',
                 'c1.nombre as cliente_1_nombre',
                 'c1.apellidos as cliente_1_apellidos',
                 'c2.nombre as cliente_2_nombre',
@@ -374,6 +376,7 @@ class ReservasController extends Controller
             $reservasArray[] = [
                 'silla_id' => $reserva->silla_id,
                 'silla_numero' => $reserva->silla_numero,
+                'fila' => $reserva->fila,
                 'zona' => $reserva->zona_nombre,
                 'cliente_1' => $reserva->cliente_1_nombre . ' ' . $reserva->cliente_1_apellidos,
                 'cliente_2' => $reserva->cliente_2_nombre . ' ' . $reserva->cliente_2_apellidos,
@@ -381,7 +384,7 @@ class ReservasController extends Controller
                 'grada' => $reserva->grada_numero,
             ];
         }
-
+        //return Excel::download(new ReservasDuplicadasExport($reservasArray), 'reservas_duplicadas.xlsx');
         dd($reservasArray);
     }
 
