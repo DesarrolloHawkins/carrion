@@ -336,4 +336,40 @@ class ReservasController extends Controller
         ];
     }
 
+    public function getReservasDuplicadas()
+    {
+        $reservas = DB::table('reservas as r1')
+            ->join('reservas as r2', function($join) {
+                $join->on('r1.id_silla', '=', 'r2.id_silla')
+                    ->where('r1.estado', '=', 'pagada')
+                    ->where('r2.estado', '=', 'pagada');
+            })
+            ->whereColumn('r1.id_cliente', '<>', 'r2.id_cliente')
+            ->whereColumn('r1.id_cliente', '<', 'r2.id_cliente')  // Evitar duplicados
+            ->join('sillas', 'r1.id_silla', '=', 'sillas.id')
+            ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
+            ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
+            ->join('zonas', 'sillas.id_zona', '=', 'zonas.id')
+            ->groupBy('r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero', 'zonas.nombre', 'palcos.numero', 'gradas.numero')
+            ->orderBy('r1.id_silla', 'asc')
+            ->select('r1.id_silla', 'r1.id_cliente as cliente_1', 'r2.id_cliente as cliente_2', 'sillas.numero as silla_numero', 'zonas.nombre as zona_nombre', 'palcos.numero as palco_numero', 'gradas.numero as grada_numero')
+            ->get();
+
+        $reservasArray = [];
+
+        foreach ($reservas as $reserva) {
+            $reservasArray[] = [
+                'silla' => $reserva->silla_numero,
+                'zona' => $reserva->zona_nombre,
+                'cliente_1' => $reserva->cliente_1,
+                'cliente_2' => $reserva->cliente_2,
+                'palco' => $reserva->palco_numero,
+                'grada' => $reserva->grada_numero,
+            ];
+        }
+
+        dd($reservasArray);
+    }
+
+
     }

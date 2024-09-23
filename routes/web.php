@@ -86,6 +86,7 @@ Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails
 Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
 Route::get('/duplicados', [ReservasController::class, 'duplicados'])->name('reservas.duplicados');
+Route::get('/duplicados2', [ReservasController::class, 'getReservasDuplicadas'])->name('reservas.duplicados2');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
