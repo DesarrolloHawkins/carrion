@@ -319,6 +319,7 @@ class ReservasController extends Controller
                       ->groupBy('id_silla')
                       ->havingRaw('COUNT(*) > 1');
             })
+            ->where('reservas.estado', 'pagada')
             ->select('reservas.*', 'clientes.nombre', 'clientes.apellidos')
             ->get();
 
