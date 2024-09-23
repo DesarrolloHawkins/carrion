@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CodigoVerificacionMail;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -79,6 +80,7 @@ class AuthController extends Controller
     
             return response()->json(['message' => 'Correo de verificación enviado correctamente', 'code' =>  $codigo]);
         }catch(\Exception $e){
+            Log::error('Error al enviar el correo de verificación: '.$e);
             return response()->json(['error' => 'Error al enviar el correo de verificación', 'message' => $e], 401);
         }
        
