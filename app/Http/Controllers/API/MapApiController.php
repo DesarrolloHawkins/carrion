@@ -71,6 +71,10 @@ class MapApiController extends Controller
         
         DB::beginTransaction();
         try {
+            if(!$orderId){
+                return response()->json(['message' => 'No se ha proporcionado un ID de pedido', 'status' => 'error'], 400);
+                throw new \Exception("No se ha proporcionado un ID de pedido");
+            }
             $reservas = Reservas::where('order', $orderId)->get();
 
             if ($reservas->isEmpty()) {
