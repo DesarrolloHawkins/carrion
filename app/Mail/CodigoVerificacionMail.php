@@ -30,7 +30,7 @@ class CodigoVerificacionMail extends Mailable
      */
     public function build()
     {
-        return $this->from('noreply@unionhermandades.com', 'Unión de Hermandades de Jerez') // Configura el alias aquí
+        return $this->from('info@unionhermandadesjerez.hawkins.es', 'Unión de Hermandades de Jerez') // Configura el alias aquí
                 ->view('emails.codigo_verificacion')
                 ->subject('Código de Verificación')
                 ->with([
