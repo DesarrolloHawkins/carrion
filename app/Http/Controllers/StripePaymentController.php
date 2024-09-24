@@ -15,18 +15,13 @@ use App\Models\Palcos;
 use App\Mail\ReservaPagada;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-
-
-
-
+use Carbon\Carbon;
 
 
 class StripePaymentController extends Controller
 {
     public function createCheckoutSession(Request $request)
     {
-
-
 
         // Configura la clave secreta de Stripe
         Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -37,16 +32,66 @@ class StripePaymentController extends Controller
         }
 
         $cliente = Cliente::where('email', $request->input('email'))->first();
-
         if(!$cliente){
             return response()->json(['error' => 'El cliente no existe'], 400);
         }
+        $stripeCustomer = Customer::all([
+            'email' => $request->input('email'),
+            'limit' => 1
+        ]);
 
-        
+        if (count($stripeCustomer->data) > 0) {
+            // Obtener el ID del cliente en Stripe
+            $customerId = $stripeCustomer->data[0]->id;
 
+            // Buscar intenciones de pago pendientes del cliente en Stripe
+            $paymentIntents = PaymentIntent::all([
+                'customer' => $customerId,
+                'limit' => 10,  // Puedes ajustar el límite según tus necesidades
+            ]);
 
+            foreach ($paymentIntents->data as $intent) {
+                // Verificar si el estado de la intención de pago es 'requires_payment_method' o 'requires_confirmation'
+                if (in_array($intent->status, ['requires_payment_method', 'requires_confirmation'])) {
+                    $reservas = Reservas::where('order', $intent->id)
+                    ->get();
+                    foreach ($reservas as $reserva) {
+                        $reserva->estado = 'cancelada';
+                        $reserva->save();
+                    }
+
+                    $intent->cancel(); // Cancelar la intención de pago
+                    //return response()->json(['error' => 'Tienes un pago pendiente. Por favor, completa el pago pendiente antes de continuar.'], 400);
+                }
+            }
+        }
+
+       
         $reservas = Reservas::where('id_cliente', $cliente->id)->where('estado', 'reservada')->get();
         $sillas = [];
+
+        if (count($reservas) == 0) {
+            return response()->json(['error' => 'No hay reservas pendientes'], 400);
+        }
+
+        
+        $reservasPagadas = Reservas::where('id_cliente', $cliente->id)->where('estado', 'pagada')->get();
+
+        if($cliente->abonado ==1 && $cliente->tipo_abonado == 'palco'){
+            $totalReservas = count($reservasPagadas) + count($reservas);
+
+            if($totalReservas > 8){
+                return response()->json(['error' => 'No puedes tener más de 8 reservas activas'], 400);
+            }
+        }else{
+            $totalReservas = count($reservasPagadas) + count($reservas);
+
+            if($totalReservas > 4){
+                return response()->json(['error' => 'No puedes tener más de 4 reservas activas'], 400);
+            }
+        }
+
+
 
         foreach ($reservas as $reserva) {
             $silla = Sillas::find($reserva->id_silla);
@@ -67,8 +112,6 @@ class StripePaymentController extends Controller
                 $reserva->save();
             }
         }
-
-        
 
         //calcular tasa de impuesto
         $montoObjetivo = $totalPrecio/100;  // Monto objetivo que deseas recibir
@@ -244,6 +287,7 @@ class StripePaymentController extends Controller
         } catch (\Exception $e) {
             $reservas = Reservas::where('order', $paymentIntentId)->get();
             foreach ($reservas as $reserva) {
+
                 $reserva->estado = 'cancelada';
                 $reserva->procesando = false;
                 $reserva->save();

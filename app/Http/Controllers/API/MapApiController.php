@@ -108,6 +108,7 @@ public function reservarTemporal(Request $request)
     ->where('id_cliente', $request->input('cliente_id'))
     ->get();
 
+  
     foreach ($reservasAnteriores as $reserva) {
         $reserva->estado = 'cancelada';
         $reserva->save();
@@ -154,6 +155,10 @@ public function reservarTemporal(Request $request)
             $reservaExistente = Reservas::where('id_silla', $sillaId)
                                         ->whereIn('estado', ['reservada', 'pagada'])
                                         ->first();
+
+            if($reservaExistente){
+                return response()->json(['error' => 'La silla ya está reservada'], 400);
+            }
 
             //si la silla es de grada
             if(!$silla->id_palco){
