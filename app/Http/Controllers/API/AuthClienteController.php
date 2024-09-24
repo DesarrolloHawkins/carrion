@@ -114,7 +114,10 @@ class AuthClienteController extends Controller
 					if (isset($respuestaDecodificada['coincidendia']) && $respuestaDecodificada['coincidendia'] == true) {
 						$id = $respuestaDecodificada['id'];
 						$cliente = Cliente::find($id);
-
+                        // Verificar si el campo password no es null
+                        if ($cliente->password !== null) {
+                            return response()->json('El cliente ya está registrado y tiene una contraseña, inicie sesion.', 200);
+                        }
 						// $cliente->nombre = $request->nombre;
 						$cliente->email = $request->email;
 						$cliente->DNI = $request->dni;
@@ -150,13 +153,13 @@ class AuthClienteController extends Controller
 					return response()->json(['cliente' => $cliente], 201);
 				}	
 			}else {
-				// $cliente->nombre = $request->nombre;
-				$cliente->email = $request->email;
+				$cliente->nombre = $request->nombre;
+				// $cliente->email = $request->email;
 				// $cliente->DNI = $request->dni;
 				$cliente->movil = $request->movil;
 				$cliente->fijo = $request->fijo;
 				$cliente->password = Hash::make($request->password);
-				// $cliente->apellidos = $request->apellidos;
+				$cliente->apellidos = $request->apellidos;
 				$cliente->save();
 				return response()->json('Cliente guardado correctamente:',200);
 
