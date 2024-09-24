@@ -27,7 +27,7 @@ class CancelarPagosExpirados extends Command
 
         // Obtener las reservas con procesando=true y que updated_at tenga más de 3 minutos
         $reservasExpiradas = Reservas::where('procesando', true)
-            ->where('updated_at', '<', Carbon::now()->subMinutes(3))
+            ->where('updated_at', '<', Carbon::now()->subMinutes(6))
             ->whereIn('estado', ['reservada', 'cancelada']) // Verificar si el estado es 'reservada' o 'cancelada'
             ->get();
 
@@ -43,7 +43,6 @@ class CancelarPagosExpirados extends Command
                     // Actualizar el estado de la reserva a cancelada
                     $reserva->estado = 'cancelada';
                     $reserva->procesando = false;
-                    $reserva->order = null;
                     $reserva->isCRM = false;
                     $reserva->save();
 
