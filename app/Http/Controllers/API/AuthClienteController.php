@@ -150,6 +150,15 @@ class AuthClienteController extends Controller
             ]);
             return response()->json(['cliente' => $cliente], 201);
         }
+    } else {
+        $cliente->nombre = $request->nombre;
+        $cliente->email = $request->email;
+        // $cliente->DNI = $request->dni;
+        $cliente->movil = $request->movil;
+        $cliente->fijo = $request->fijo;
+        $cliente->password = Hash::make($request->password);
+        $cliente->apellidos = $request->apellidos;
+        $cliente->save();
     }
 
    
