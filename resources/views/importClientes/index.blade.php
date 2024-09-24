@@ -1,4 +1,4 @@
-<form action="/import-clientes" method="POST" enctype="multipart/form-data">
+<form action="/admin/import-clientes" method="POST" enctype="multipart/form-data">
     @csrf
     <input type="file" name="file" required>
     
