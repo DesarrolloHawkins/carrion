@@ -77,6 +77,25 @@ class StripePaymentController extends Controller
             return response()->json(['error' => 'No hay reservas pendientes'], 400);
         }
 
+        
+        $reservasPagadas = Reservas::where('id_cliente', $cliente->id)->where('estado', 'pagada')->get();
+
+        if($cliente->abonado ==1 && $cliente->tipo_abonado == 'palco'){
+            $totalReservas = count($reservasPagadas) + count($reservas);
+
+            if($totalReservas > 8){
+                return response()->json(['error' => 'No puedes tener más de 8 reservas activas'], 400);
+            }
+        }else{
+            $totalReservas = count($reservasPagadas) + count($reservas);
+
+            if($totalReservas > 4){
+                return response()->json(['error' => 'No puedes tener más de 4 reservas activas'], 400);
+            }
+        }
+
+
+
         foreach ($reservas as $reserva) {
             $silla = Sillas::find($reserva->id_silla);
             array_push($sillas, $silla->id);
