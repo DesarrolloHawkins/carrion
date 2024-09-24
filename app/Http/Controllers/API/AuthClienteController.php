@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AuthClienteController extends Controller
@@ -68,100 +69,102 @@ class AuthClienteController extends Controller
 
 
     public function register(Request $request)
-{
-    $request->validate([
-        'nombre' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255',
-        'password' => 'required|string|min:8',
-        'dni' => 'required|string|max:20',
-        'movil' => 'nullable|string|max:15',
-        'fijo' => 'nullable|string|max:15',
-        'apellidos' => 'nullable|string|max:255',
-    ]);
+	{
+		try {
+			
+			// Comprobación si existe por DNI
+			$cliente = Cliente::where('DNI', $request->dni)->first();
 
+			// Si ya hay un cliente con ese email, devolver un error
+			if (Cliente::where('email', $request->email)->exists()) {
+				return response()->json(['error' => 'Ya existe un cliente con ese email'], 400);
+			}
 
-    // Comprobación si existe por DNI
-    $cliente = Cliente::where('DNI', $request->dni)->first();
+			if (!$cliente) {
+				
+				// Si no existe por DNI, buscar coincidencias aproximadas en otros campos
+				$posiblesClientes = Cliente::where('apellidos', 'like', '%' . $request->apellidos . '%')
+					->orWhere('email', 'like', '%' . $request->email . '%')
+					// ->orWhere('apellidos', 'like', '%' . $request->apellidos . '%')
+					->get();
+                    
+				if ($posiblesClientes->isNotEmpty()) {
+					
+					// Llamar a la API de ChatGPT para analizar las coincidencias
+					$coincidencias = $posiblesClientes->map(function($cliente) {
+						return [
+							'id' => $cliente->id,
+							'nombre' => $cliente->nombre,
+							'email' => $cliente->email,
+							'movil' => $cliente->movil,
+							'fijo' => $cliente->fijo,
+							'dni' => $cliente->DNI,
+							'apellidos' => $cliente->apellidos ?? 'N/A', // Usar 'N/A' si no existe apellidos
 
-    // Si ya hay un cliente con ese email, devolver un error
-    if (Cliente::where('email', $request->email)->exists()) {
-        return response()->json(['error' => 'Ya existe un cliente con ese email'], 400);
-    }
+						];
+					});
 
-    if (!$cliente) {
-        // Si no existe por DNI, buscar coincidencias aproximadas en otros campos
-        $posiblesClientes = Cliente::where('nombre', 'like', '%' . $request->nombre . '%')
-            ->orWhere('email', 'like', '%' . $request->email . '%')
-            ->orWhere('apellidos', 'like', '%' . $request->apellidos . '%')
-            ->get();
-        // return($posiblesClientes);
+				   // Petición a ChatGPT
+					$respuestaChatGPT = $this->consultarChatGPT($coincidencias, $request->all());
 
-        if ($posiblesClientes->isNotEmpty()) {
-            // Llamar a la API de ChatGPT para analizar las coincidencias
-            $coincidencias = $posiblesClientes->map(function($cliente) {
-                return [
-                    'id' => $cliente->id,
-                    'nombre' => $cliente->nombre,
-                    'email' => $cliente->email,
-                    'movil' => $cliente->movil,
-                    'fijo' => $cliente->fijo,
-                    'dni' => $cliente->DNI,
-                    'apellidos' => $cliente->apellidos ?? 'N/A', // Usar 'N/A' si no existe apellidos
+					// Decodificar la respuesta JSON devuelta por ChatGPT
+					$respuestaDecodificada = json_decode($respuestaChatGPT, true);
 
-                ];
-            });
+					// Verificar si la respuesta contiene coincidencia y ID
+					if (isset($respuestaDecodificada['coincidendia']) && $respuestaDecodificada['coincidendia'] == true) {
+						$id = $respuestaDecodificada['id'];
+						$cliente = Cliente::find($id);
 
-           // Petición a ChatGPT
-            $respuestaChatGPT = $this->consultarChatGPT($coincidencias, $request->all());
+						$cliente->nombre = $request->nombre;
+						$cliente->email = $request->email;
+						$cliente->DNI = $request->dni;
+						$cliente->movil = $request->movil;
+						$cliente->fijo = $request->fijo;
+						$cliente->password = Hash::make($request->password);
+						$cliente->apellidos = $request->apellidos;
+						$cliente->save();
 
-            // Decodificar la respuesta JSON devuelta por ChatGPT
-            $respuestaDecodificada = json_decode($respuestaChatGPT, true);
+						return response()->json(['cliente' => $cliente], 201);
+					}
+					 // Crear un nuevo cliente si no existe ningún registro similar
+					$cliente = Cliente::create([
+						'nombre' => $request->nombre,
+						'email' => $request->email,
+						'DNI' => $request->dni,
+						'movil' => $request->movil,
+						'fijo' => $request->fijo,
+						'password' => Hash::make($request->password),
+						'apellidos' => $request->apellidos,
+					]);
+					return response()->json(['cliente' => $cliente], 201);
+				}else {
+					$cliente = Cliente::create([
+						'nombre' => $request->nombre,
+						'email' => $request->email,
+						'DNI' => $request->dni,
+						'movil' => $request->movil,
+						'fijo' => $request->fijo,
+						'password' => Hash::make($request->password),
+						'apellidos' => $request->apellidos,
+					]);
+					return response()->json(['cliente' => $cliente], 201);
+				}	
+			}else {
+				$cliente->nombre = $request->nombre;
+				$cliente->email = $request->email;
+				// $cliente->DNI = $request->dni;
+				$cliente->movil = $request->movil;
+				$cliente->fijo = $request->fijo;
+				$cliente->password = Hash::make($request->password);
+				$cliente->apellidos = $request->apellidos;
+				$cliente->save();
+				return response()->json('Cliente guardado correctamente:',200);
 
-            // Verificar si la respuesta contiene coincidencia y ID
-            if (isset($respuestaDecodificada['coincidendia']) && $respuestaDecodificada['coincidendia'] == true) {
-                $id = $respuestaDecodificada['id'];
-                $cliente = Cliente::find($id);
-
-                $cliente->nombre = $request->nombre;
-                $cliente->email = $request->email;
-                $cliente->DNI = $request->dni;
-                $cliente->movil = $request->movil;
-                $cliente->fijo = $request->fijo;
-                $cliente->password = Hash::make($request->password);
-                $cliente->apellidos = $request->apellidos;
-                $cliente->save();
-
-                return response()->json(['cliente' => $cliente], 201);
-            }
-            // return response()->json([
-            //     'message' => 'Cliente no encontrado por DNI, analizando posibles coincidencias.',
-            //     'coincidencias' => $respuestaChatGPT
-            // ], 200);
-
-             // Crear un nuevo cliente si no existe ningún registro similar
-            $cliente = Cliente::create([
-                'nombre' => $request->nombre,
-                'email' => $request->email,
-                'DNI' => $request->dni,
-                'movil' => $request->movil,
-                'fijo' => $request->fijo,
-                'password' => Hash::make($request->password),
-                'apellidos' => $request->apellidos,
-            ]);
-            return response()->json(['cliente' => $cliente], 201);
-        }
-    } else {
-        $cliente->nombre = $request->nombre;
-        $cliente->email = $request->email;
-        // $cliente->DNI = $request->dni;
-        $cliente->movil = $request->movil;
-        $cliente->fijo = $request->fijo;
-        $cliente->password = Hash::make($request->password);
-        $cliente->apellidos = $request->apellidos;
-        $cliente->save();
-    }
-
-   
+			}
+		} catch (\Throwable $th) {
+			Log::error(['Error al registrar: '.$th]);
+			return response()->json('ERROR: '.$th,500);
+		}
 
 }
 
@@ -172,7 +175,7 @@ private function consultarChatGPT($coincidencias, $nuevosDatos)
     $messages = [
         [
             'role' => 'system',
-            'content' => 'Eres un asistente que ayuda a asociar nuevos clientes con clientes existentes. Intenta asociar el DNI y si no coincide o no existe  intenta comparar el nombre y apellido. No seas estricto si coincide alguna nombre o apellido bastante cercano. Si no coincide nada en nombre y apellido no dejes pasar, si falla una letra en el dni puede que sea ese usuario.'
+            'content' => 'Eres un asistente que ayuda a asociar nuevos clientes con clientes existentes. Intenta asociar el DNI y si no coincide o no existe  intenta comparar el nombre y apellido. No seas estricto si coincide alguna nombre o apellido bastante cercano. Si no coincide nada compara apellidos no dejes pasar, si falla una letra en el dni puede que sea ese usuario.'
         ],
         [
             'role' => 'user',
