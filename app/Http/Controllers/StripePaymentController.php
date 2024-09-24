@@ -54,7 +54,6 @@ class StripePaymentController extends Controller
                 // Verificar si el estado de la intención de pago es 'requires_payment_method' o 'requires_confirmation'
                 if (in_array($intent->status, ['requires_payment_method', 'requires_confirmation'])) {
                     $reservas = Reservas::where('order', $intent->id)
-                    ->where('updated_at', '<', Carbon::now()->subSeconds(2))
                     ->get();
                     foreach ($reservas as $reserva) {
                         $reserva->estado = 'cancelada';
@@ -68,8 +67,6 @@ class StripePaymentController extends Controller
         }
 
        
-
-        
         $reservas = Reservas::where('id_cliente', $cliente->id)->where('estado', 'reservada')->get();
         $sillas = [];
 
