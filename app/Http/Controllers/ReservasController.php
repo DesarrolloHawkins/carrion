@@ -338,63 +338,66 @@ class ReservasController extends Controller
     }
 
     public function getReservasDuplicadas()
-    {
-        $reservas = DB::table('reservas as r1')
-            ->join('reservas as r2', function($join) {
-                $join->on('r1.id_silla', '=', 'r2.id_silla')
-                    ->where('r1.estado', '=', 'pagada')
-                    ->where('r2.estado', '=', 'pagada');
-            })
-            ->whereColumn('r1.id_cliente', '<>', 'r2.id_cliente')
-            ->whereColumn('r1.id_cliente', '<', 'r2.id_cliente')  // Evitar duplicados
-            ->join('sillas', 'r1.id_silla', '=', 'sillas.id')
-            ->join('clientes as c1', 'r1.id_cliente', '=', 'c1.id')
-            ->join('clientes as c2', 'r2.id_cliente', '=', 'c2.id')
-            ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
-            ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
-            ->join('zonas', 'sillas.id_zona', '=', 'zonas.id')
-            ->groupBy('r1.id','r2.id','r1.created_at','r2.created_at', 'r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero','sillas.fila', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
-            ->orderBy('r1.id_silla', 'asc')
-            ->select(
-                'r1.id_silla',
-                'r1.id as id1',
-                'r2.id as id2',
-                'r1.created_at as fecha1',
-                'r2.created_at as fecha2',
-                'sillas.numero as silla_numero',
-                'sillas.id as silla_id',
-                'sillas.fila as fila',
-                'c1.nombre as cliente_1_nombre',
-                'c1.apellidos as cliente_1_apellidos',
-                'c2.nombre as cliente_2_nombre',
-                'c2.apellidos as cliente_2_apellidos',
-                'zonas.nombre as zona_nombre',
-                'palcos.numero as palco_numero',
-                'gradas.numero as grada_numero'
-            )
-            ->get();
+{
+    $reservas = DB::table('reservas as r1')
+        ->join('reservas as r2', function($join) {
+            $join->on('r1.id_silla', '=', 'r2.id_silla')
+                ->where('r1.estado', '=', 'pagada')
+                ->where('r2.estado', '=', 'pagada')
+                ->whereNull('r1.deleted_at') // Asegurar que r1 no está eliminada
+                ->whereNull('r2.deleted_at'); // Asegurar que r2 no está eliminada
+        })
+        ->whereColumn('r1.id_cliente', '<>', 'r2.id_cliente')
+        ->whereColumn('r1.id_cliente', '<', 'r2.id_cliente')  // Evitar duplicados
+        ->join('sillas', 'r1.id_silla', '=', 'sillas.id')
+        ->join('clientes as c1', 'r1.id_cliente', '=', 'c1.id')
+        ->join('clientes as c2', 'r2.id_cliente', '=', 'c2.id')
+        ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
+        ->leftJoin('gradas', 'sillas.id_grada', '=', 'gradas.id')
+        ->join('zonas', 'sillas.id_zona', '=', 'zonas.id')
+        ->groupBy('r1.id','r2.id','r1.created_at','r2.created_at', 'r1.id_silla', 'r1.id_cliente', 'r2.id_cliente', 'sillas.numero','sillas.fila', 'sillas.id', 'zonas.nombre', 'palcos.numero', 'gradas.numero', 'c1.nombre', 'c1.apellidos', 'c2.nombre', 'c2.apellidos')
+        ->orderBy('r1.id_silla', 'asc')
+        ->select(
+            'r1.id_silla',
+            'r1.id as id1',
+            'r2.id as id2',
+            'r1.created_at as fecha1',
+            'r2.created_at as fecha2',
+            'sillas.numero as silla_numero',
+            'sillas.id as silla_id',
+            'sillas.fila as fila',
+            'c1.nombre as cliente_1_nombre',
+            'c1.apellidos as cliente_1_apellidos',
+            'c2.nombre as cliente_2_nombre',
+            'c2.apellidos as cliente_2_apellidos',
+            'zonas.nombre as zona_nombre',
+            'palcos.numero as palco_numero',
+            'gradas.numero as grada_numero'
+        )
+        ->get();
 
-        $reservasArray = [];
+    $reservasArray = [];
 
-        foreach ($reservas as $reserva) {
-            $reservasArray[] = [
-                'silla_id' => $reserva->silla_id,
-                'silla_numero' => $reserva->silla_numero,
-                'fila' => $reserva->fila,
-                'palco' => $reserva->palco_numero,
-                'grada' => $reserva->grada_numero,
-                'zona' => $reserva->zona_nombre,
-                'Reserva 1' => $reserva->id1,
-                'Creacion 1' => $reserva->fecha1,
-                'cliente_1' => $reserva->cliente_1_nombre . ' ' . $reserva->cliente_1_apellidos,
-                'Reserva 2' => $reserva->id2,
-                'Creacion 2' => $reserva->fecha2,
-                'cliente_2' => $reserva->cliente_2_nombre . ' ' . $reserva->cliente_2_apellidos,
-            ];
-        }
-        return $reservasArray;
-       // dd($reservasArray);
+    foreach ($reservas as $reserva) {
+        $reservasArray[] = [
+            'silla_id' => $reserva->silla_id,
+            'silla_numero' => $reserva->silla_numero,
+            'fila' => $reserva->fila,
+            'palco' => $reserva->palco_numero,
+            'grada' => $reserva->grada_numero,
+            'zona' => $reserva->zona_nombre,
+            'Reserva 1' => $reserva->id1,
+            'Creacion 1' => $reserva->fecha1,
+            'cliente_1' => $reserva->cliente_1_nombre . ' ' . $reserva->cliente_1_apellidos,
+            'Reserva 2' => $reserva->id2,
+            'Creacion 2' => $reserva->fecha2,
+            'cliente_2' => $reserva->cliente_2_nombre . ' ' . $reserva->cliente_2_apellidos,
+        ];
     }
+    return $reservasArray;
+   // dd($reservasArray);
+}
+
 
 
 
