@@ -416,7 +416,24 @@ class ReservasController extends Controller
 }
 
 
+public function reservasConClientesBorrados()
+{
+    // Obtener todas las reservas asociadas a clientes eliminados (soft deleted)
+    $reservasConClientesBorrados = Reservas::select('reservas.*', 'clientes.nombre', 'clientes.apellidos', 'sillas.id_palco', 'sillas.id_grada')
+        ->where('reservas.estado', 'pagada')
+        ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+        ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
+        ->whereNotNull('clientes.deleted_at')  // Filtrar clientes que hayan sido eliminados (soft delete)
+        ->orderBy('clientes.apellidos')  // Ordenar por apellido del cliente
+        ->orderBy('sillas.id_palco')  // Luego ordenar por palco
+        ->orderBy('sillas.id_grada')  // Luego ordenar por grada
+        ->get();
+
+    return [
+        'reservas' =>  $reservasConClientesBorrados,
+        'count' => count($reservasConClientesBorrados),
+    ];
+}
 
 
-
-    }
+}
