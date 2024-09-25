@@ -32,6 +32,7 @@ class Cliente extends Model
         'code',
         'abonado',
         'tipo_abonado',
+        'email_sent'
     ];
 
 
@@ -46,6 +47,12 @@ class Cliente extends Model
     public function socios()
     {
         return $this->hasOne(Socios::class, 'cliente_id');
+    }
+
+    // Definir la relación con las reservas
+    public function reservas()
+    {
+        return $this->hasMany(Reservas::class, 'id_cliente');
     }
 
 
