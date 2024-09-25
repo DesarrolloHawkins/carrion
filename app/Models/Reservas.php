@@ -17,7 +17,7 @@ class Reservas extends Model
     use HasFactory, softDeletes;
 
     protected $fillable = [
-        
+
         'id_cliente',
         'id_silla',
         'fecha',
@@ -40,7 +40,7 @@ class Reservas extends Model
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at', 'deleted_at', 
+        'created_at', 'updated_at', 'deleted_at',
     ];
 
     public function silla()
@@ -62,7 +62,7 @@ class Reservas extends Model
     //     return $this->belongsTo(Eventos::class, 'id_evento');
     // }
 
-    
+
 
 
 

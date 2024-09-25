@@ -13,10 +13,85 @@ use App\Models\Sectores;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReservasExport;
+
 
 class ReservasController extends Controller
 {
+    public function export(Request $request)
+    {
+        return Excel::download(new ReservasExport($request->all()), 'reservas.xlsx');
+    }
+    public function index(Request $request)
+    {
+        $palcos = Palcos::with('zonas')->get();
+        $gradas = Gradas::with('zonas')->get();
+        $sortColumn = $request->input('sortColumn', 'nombre');  // Columna por defecto
+        $sortDirection = $request->input('sortDirection', 'asc'); // Dirección por defecto
+
+        $filtro = $request->query('filtro', '');
+        $estado = $request->query('estado', 'pagada');
+        $grada = $request->query('grada', '');
+        $palco = $request->query('palco', '');
+        $perPage = $request->query('perPage', 10);
+
+        $reservas = Reservas::with(['clientes', 'sillas'])
+            ->when($filtro, function ($query, $filtro) {
+                return $query->whereHas('clientes', function ($query) use ($filtro) {
+                    $query->where('nombre', 'like', "%{$filtro}%")
+                        ->orWhere('apellidos', 'like', "%{$filtro}%")
+                        ->orWhere('DNI', 'like', "%{$filtro}%")
+                        ->orWhere('movil', 'like', "%{$filtro}%");
+
+                })->orWhereHas('sillas', function ($query) use ($filtro) {
+                    $query->where('fila', 'like', "%{$filtro}%")
+                          ->orWhereHas('zona', function ($query) use ($filtro) {
+                              $query->where('nombre', 'like', "%{$filtro}%");
+                          });
+                });
+            })
+            ->when($estado, function ($query, $estado) {
+                return $query->where('estado', $estado);
+            })
+            ->when($grada, function ($query, $grada) {
+                return $query->WhereHas('sillas', function ($query) use ($grada) {
+                    $query->WhereHas('grada', function ($query) use ($grada) {
+                        $query->where('id', $grada);
+                    });
+                });
+            })
+            ->when($palco, function ($query, $palco) {
+                return   $query->WhereHas('sillas', function ($query) use ($palco) {
+                    $query->WhereHas('palco', function ($query) use ($palco) {
+                        $query->where('id', $palco);
+                    });
+                });
+            })
+
+            ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+            ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
+            ->leftJoin('gradas', 'sillas.id_grada',  '=', 'gradas.id')
+            ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
+            ->join( 'zonas',  'sillas.id_zona', '=', 'zonas.id')
+            ->select('reservas.*',
+                    'clientes.nombre as nombre',
+                    'clientes.apellidos as apellidos',
+                    'clientes.DNI as DNI',
+                    'clientes.movil as movil',
+                    'sillas.fila as fila',
+                    'sillas.numero as asiento',
+                    'zonas.nombre as zona',
+                    'palcos.numero as palco',
+                    'gradas.numero as grada')
+            ->orderBy($sortColumn, $sortDirection)
+            ->paginate($perPage);
+
+        return view('reservas.index', compact('reservas', 'filtro', 'estado', 'perPage','sortColumn','sortDirection','gradas','palcos','grada','palco'));
+    }
+
+
     public function pdfDownload($cliente_id)
     {
         $cliente = Cliente::find($cliente_id);
@@ -35,72 +110,6 @@ class ReservasController extends Controller
 
         return $this->generarYDescargarPDF($reservas, $cliente, $tasas);
     }
-
-    // public function generarYDescargarPDF($reservas, $cliente, $tasas)
-    //     {
-
-    //     // Preparar los detalles de las reservas para el PDF
-    //     $detallesReservas = [];
-    //     $zona = null;
-
-    //     foreach ($reservas as $reserva) {
-    //         $silla = Sillas::find($reserva->id_silla);
-    //         $zona = Zonas::find($silla->id_zona);
-
-    //         if ($silla->id_palco != null) {
-    //             $palco = Palcos::find($silla->id_palco);
-    //             $zona = Sectores::find($palco->id_sector);
-    //         } elseif ($silla->id_grada != null) {
-    //             $grada = Gradas::find($silla->id_grada);
-    //             $zona = Zonas::find($grada->id_zona);
-    //         }
-
-    //         $detallesReservas[] = [
-    //             'asiento' => $silla->numero ?? 'N/A',
-    //             'sector' => $zona->nombre ?? 'N/A',
-    //             'fecha' => $reserva->fecha,
-    //             'año' => $reserva->año,
-    //             'precio' => $reserva->precio,
-    //             'fila' => $silla->fila ?? 'N/A',
-    //             'order' => $reserva->order,
-    //             'palco' => $palco->numero ?? '',
-    //             'grada' => $grada->numero ?? '',
-    //         ];
-    //     }
-
-    //     // Obtener la imagen del mapa según la zona
-    //     $mapImage = $this->getMapImageByZona($zona->nombre);
-    //     $mapImageBase64 = $this->imageToBase64($mapImage);
-
-    //     // Generar el código QR y almacenarlo como base64
-    //     // $qrCodeBase64 = base64_encode(QrCode::format('png')
-    //     //     ->size(200)
-    //     //     ->generate(url('/reservas/' . $cliente->id)));
-    //     $qrCodeBase64 = QrCode::format('svg')
-    //         ->size(200)
-    //         ->generate(url('/reservas/' . $cliente->id));
-
-    //     // Cálculo del total de precios
-    //     $totalReservas = array_sum(array_column($detallesReservas, 'precio'));
-    //     $totalPagado = $tasas;
-    //     // dd($detallesReservas, $qrCodeBase64, $mapImageBase64, $zona->nombre, $mapImage);
-
-    //     $pdf = PDF::loadView('pdf.reserva_qr', [
-    //         'detallesReservas' => $detallesReservas,
-    //         'qrCodeBase64' => $qrCodeBase64,
-    //         'cliente' => $cliente,
-    //         'mapImage' => $mapImageBase64,
-    //         'totalReservas' => $totalReservas,
-    //         'tasas' => $tasas,
-    //         'totalPagado' => $totalPagado,
-    //     ])->setPaper('a4', 'vertical');
-
-    //     return response()->streamDownload(
-    //         fn () => print($pdf),
-    //         "reserva_cliente_" . $cliente->id . ".pdf"
-    //     );
-
-    // }
 
     public function generarYDescargarPDF($reservas, $cliente, $tasas)
     {
@@ -236,10 +245,10 @@ class ReservasController extends Controller
     }
 
     //index
-    public function index()
-    {
-        return view('reservas.index');
-    }
+    // public function index()
+    // {
+    //     return view('reservas.index');
+    // }
     //index
     public function edit($id)
     {
@@ -305,7 +314,15 @@ class ReservasController extends Controller
 
     public function deleted($id){
         $reserva = Reservas::find($id);
+
         $reserva->delete();
+        return response()->json("ok", 200);
+    }
+    public function cancelar($id){
+        $reserva = Reservas::find($id);
+
+        $reserva->estado = 'cancelada';
+        $reserva->save();
         return response()->json("ok", 200);
     }
 

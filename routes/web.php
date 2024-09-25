@@ -93,6 +93,8 @@ Route::get('/send-emails', [App\Http\Controllers\SendEmailsController::class, 's
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
     Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
+    Route::post('reservas/{id}/cancelar', [ReservasController::class, 'cancelar'])->name('reservas.cancelar');
+    Route::get('/reservas/export', [ReservasController::class, 'export'])->name('reservas.export');
 
     Route::post('/import-clientes', [ClienteImportController::class, 'importClientes']);
     Route::get('/import-clientes', [ClienteImportController::class, 'getterForm']);
