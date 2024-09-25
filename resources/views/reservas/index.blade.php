@@ -71,7 +71,7 @@ th {
         <table class="table table-hover table-bordered">
             <thead class="thead-light">
                 <tr>
-                    @foreach(['nombre' => 'Nombre', 'apellidos' => 'Apellidos', 'DNI' => 'DNI', 'movil' => 'Telefono', 'fila' => 'Fila ', 'asiento'=>'Asiento', 'zona' => 'Sector', 'palco' => 'Palco','grada' => 'Grada', 'fecha' => 'Fecha', 'precio' => 'Precio', 'metodo_pago' => 'M. Pago', 'estado' => 'Estado'] as $col => $name)
+                    @foreach(['nombre' => 'Nombre', 'apellidos' => 'Apellidos', 'DNI' => 'DNI', 'movil' => 'Telefono', 'fila' => 'Fila ', 'asiento'=>'Asi.', 'zona' => 'Sector', 'palco' => 'Palco','grada' => 'Grada', 'fecha' => 'Fecha', 'precio' => 'Precio', 'metodo_pago' => 'M. Pago', 'estado' => 'Estado'] as $col => $name)
                         <th class="border px-4 py-2">
                             <a href="{{ route('reservas.index', [
                                 'sortColumn' => $col,
