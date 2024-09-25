@@ -72,7 +72,7 @@ th {
             <thead class="thead-light">
                 <tr>
                     @foreach(['nombre' => 'Nombre', 'apellidos' => 'Apellidos', 'DNI' => 'DNI', 'movil' => 'Telefono', 'fila' => 'Fila ', 'asiento'=>'Asi.', 'zona' => 'Sector', 'palco' => 'Palco','grada' => 'Grada', 'fecha' => 'Fecha', 'precio' => 'Precio', 'metodo_pago' => 'M. Pago', 'estado' => 'Estado'] as $col => $name)
-                        <th class="border px-4 py-2">
+                        <th class="border px-2 py-2">
                             <a href="{{ route('reservas.index', [
                                 'sortColumn' => $col,
                                 'sortDirection' => $sortColumn == $col && $sortDirection == 'asc' ? 'desc' : 'asc',
@@ -89,7 +89,7 @@ th {
                             </a>
                         </th>
                     @endforeach
-                    <th class="border px-4 py-2">Acciones</th>
+                    <th class="border px-2 py-2">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -112,7 +112,7 @@ th {
                             {{ ucfirst($reserva->estado) }}
                         </span>
                     </td>
-                    <td class="border px-4 py-2">
+                    <td class="border px-2 py-2">
                         <button data-id="{{ $reserva->id }}" class="btn-warning bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 my-1 rounded cancelar-reserva">
                             Cancelar
                         </button>
