@@ -42,7 +42,7 @@ class ClienteImportController extends Controller
     // Obtener los registros con las cabeceras procesadas
     $records = $csv->getRecords();
     $tipoAbonado = $request->input('tipo_abonado');
-
+    //dd($records);
     foreach ($records as $record) {
         //si el nombre es nulo, no se importa
         if (empty($record[$headers[1]])) {
@@ -52,8 +52,8 @@ class ClienteImportController extends Controller
             'nombre' => $record[$headers[1]],  // Usar el nuevo nombre de columna
             'apellidos' => $record[$headers[0]],
             'DNI' => null,
-            'fijo' => $record[$headers[4]],
-            'movil' => $record[$headers[4]],
+            'fijo' => $record[$headers[6]],
+            'movil' => $record[$headers[7]],
             'email' => '',
             'abonado' => 1,
             'tipo_abonado' => $tipoAbonado,
