@@ -443,6 +443,7 @@ public function clientesConMuchasReservas()
         ->where('clientes.abonado', true)
         ->where('clientes.tipo_abonado', 'palco')
         ->where('reservas.estado', 'pagada')  // Filtrar solo las reservas pagadas
+        ->whereNull('reservas.deleted_at')
         ->groupBy('clientes.id', 'clientes.DNI', 'clientes.nombre', 'clientes.apellidos')
         ->havingRaw('COUNT(reservas.id) > ?', [8])  // Clientes con más de 8 reservas
         ->get();
@@ -453,6 +454,7 @@ public function clientesConMuchasReservas()
         ->where('clientes.abonado', true)
         ->where('clientes.tipo_abonado', 'silla')
         ->where('reservas.estado', 'pagada')  // Filtrar solo las reservas pagadas
+        ->whereNull('reservas.deleted_at')
         ->groupBy('clientes.id', 'clientes.DNI', 'clientes.nombre', 'clientes.apellidos')
         ->havingRaw('COUNT(reservas.id) > ?', [4])  // Clientes con más de 4 reservas
         ->get();
