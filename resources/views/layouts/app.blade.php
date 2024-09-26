@@ -75,6 +75,7 @@
 
             }
         </style>
+        @yield('style')
         <div class="page-wrapper chiller-theme toggled sticky-sidebar" id="wrapper">
             @include('layouts.header')
             @include('layouts.sidebar')

@@ -86,6 +86,7 @@ Route::get('/enviar', [App\Http\Controllers\HomeController::class, 'mandaremails
 Route::post('/check-zona-completa', [ZonaController::class, 'checkIfFull'])->name('check.zona.completa');
 Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('reservas.show');
 Route::get('/duplicados', [ReservasController::class, 'duplicados'])->name('reservas.duplicados');
+Route::get('/borrados', [ReservasController::class, 'reservasConClientesBorrados'])->name('reservas.borrados');
 Route::get('/duplicados2', [ReservasController::class, 'getReservasDuplicadas'])->name('reservas.duplicados2');
 //enviar emails a clientes con reserva
 Route::get('/send-emails', [App\Http\Controllers\SendEmailsController::class, 'sendEmails'])->name('send.emails');
@@ -93,6 +94,8 @@ Route::get('/send-emails', [App\Http\Controllers\SendEmailsController::class, 's
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
     Route::post('reservas/{id}/delete', [ReservasController::class, 'deleted'])->name('reservas.deleted');
+    Route::post('reservas/{id}/cancelar', [ReservasController::class, 'cancelar'])->name('reservas.cancelar');
+    Route::get('/reservas/export', [ReservasController::class, 'export'])->name('reservas.export');
 
     Route::post('/import-clientes', [ClienteImportController::class, 'importClientes']);
     Route::get('/import-clientes', [ClienteImportController::class, 'getterForm']);

@@ -19,13 +19,17 @@ class Sillas extends Model
         'id_zona',
         'fila',
         'id_palco',
-        
-        
+
+
     ];
 
     public function grada()
     {
         return $this->belongsTo(Gradas::class, 'id_grada');
+    }
+    public function palco()
+    {
+        return $this->belongsTo(Palcos::class,  'id_palco');
     }
 
     public function zona()
