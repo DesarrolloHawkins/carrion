@@ -88,6 +88,7 @@ Route::get('/reservas/{clienteId}', [ReservasController::class, 'show'])->name('
 Route::get('/duplicados', [ReservasController::class, 'duplicados'])->name('reservas.duplicados');
 Route::get('/borrados', [ReservasController::class, 'reservasConClientesBorrados'])->name('reservas.borrados');
 Route::get('/duplicados2', [ReservasController::class, 'getReservasDuplicadas'])->name('reservas.duplicados2');
+Route::get('/reservasextra', [ReservasController::class, 'clientesConMuchasReservas'])->name('reservas.reservasextra');
 //enviar emails a clientes con reserva
 Route::get('/send-emails', [App\Http\Controllers\SendEmailsController::class, 'sendEmails'])->name('send.emails');
 

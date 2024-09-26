@@ -28,9 +28,9 @@ class ReservasController extends Controller
     {
         $palcos = Palcos::with('zonas')->get();
         $gradas = Gradas::with('zonas')->get();
+
         $sortColumn = $request->input('sortColumn', 'nombre');  // Columna por defecto
         $sortDirection = $request->input('sortDirection', 'asc'); // Dirección por defecto
-
         $filtro = $request->query('filtro', '');
         $estado = $request->query('estado', 'pagada');
         $grada = $request->query('grada', '');
@@ -435,5 +435,30 @@ public function reservasConClientesBorrados()
     ];
 }
 
+public function clientesConMuchasReservas()
+{
+    // Clientes abonados con tipo_abonado 'palco' y más de 8 reservas
+    $clientesConPalco = Cliente::select('clientes.DNI', 'clientes.nombre', 'clientes.apellidos', DB::raw('COUNT(reservas.id) as total_reservas'))
+        ->join('reservas', 'clientes.id', '=', 'reservas.id_cliente')
+        ->where('clientes.abonado', true)
+        ->where('clientes.tipo_abonado', 'palco')
+        ->groupBy('clientes.id', 'clientes.DNI', 'clientes.nombre', 'clientes.apellidos')
+        ->havingRaw('COUNT(reservas.id) > ?', [8])
+        ->get();
+
+    // Clientes abonados con tipo_abonado 'silla' y más de 4 reservas
+    $clientesConSilla = Cliente::select('clientes.DNI', 'clientes.nombre', 'clientes.apellidos', DB::raw('COUNT(reservas.id) as total_reservas'))
+        ->join('reservas', 'clientes.id', '=', 'reservas.id_cliente')
+        ->where('clientes.abonado', true)
+        ->where('clientes.tipo_abonado', 'silla')
+        ->groupBy('clientes.id', 'clientes.DNI', 'clientes.nombre', 'clientes.apellidos')
+        ->havingRaw('COUNT(reservas.id) > ?', [4])
+        ->get();
+
+    return [
+        'clientesConPalco' => $clientesConPalco,
+        'clientesConSilla' => $clientesConSilla
+    ];
+}
 
 }
