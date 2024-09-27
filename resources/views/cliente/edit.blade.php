@@ -12,7 +12,7 @@
         <div class="card-body">
             <form action="{{ route('clientes.update', $cliente->id) }}" method="POST">
                 @csrf
-                @method('PUT')
+                {{-- @method('PUT') --}}
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="nombre">Nombre</label>
