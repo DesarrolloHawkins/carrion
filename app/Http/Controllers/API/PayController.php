@@ -444,7 +444,7 @@ class PayController extends Controller
         $form = Redsys::createForm();
 
         // Devolver el formulario HTML al frontend
-        return response()->json(['form' => $form, 'orderId' => $order->id], 200);
+        return response()->json(['form' => $form, 'orderId' => $order->id, 'url' => env('URL_REDSYS')], 200);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }

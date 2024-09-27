@@ -326,6 +326,7 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
      Route::get('/reservas/{cliente_id}/pdf', [ReservasController::class, 'pdfDownload'])->name('reservas.pdfDownload');
      Route::get('/clientes/export', [ClienteController::class, 'export'])->name('clientes.export');
      Route::get('/clientes/delete/{id}', [ClienteController::class, 'destroy'])->name('clientes.delete');
+     Route::get('/clientes/update/{id}', [ClienteController::class, 'update'])->name('clientes.update');
 
      // Clientes
      Route::get('/contratos', [ContratoController::class, 'index'])->name('contratos.index');
