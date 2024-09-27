@@ -30,7 +30,8 @@ class Reservas extends Model
         'metodo_pago',
         'isInvitado',
         'isCRM',
-        'procesando'
+        'procesando',
+        'order_id'
 
     ];
 
@@ -62,7 +63,11 @@ class Reservas extends Model
     //     return $this->belongsTo(Eventos::class, 'id_evento');
     // }
 
-
+    // Relación con Orders
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 
 
 
