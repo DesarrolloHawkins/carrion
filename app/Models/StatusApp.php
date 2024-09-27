@@ -10,7 +10,7 @@ class StatusApp extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = "status_app";
+    protected $table = "status-app";
     protected $fillable = [
         'estado',
     ];
