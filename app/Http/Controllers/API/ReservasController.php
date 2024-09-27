@@ -29,6 +29,17 @@ class ReservasController extends Controller
 
         return response()->json($reservas);
     }
+    public function getSillasReservadas($idCliente)
+    {
+        $reservas = Reservas::where('id_cliente', $idCliente)->where('pagada')->get();
+        $data = [];
+        if (count($reservas) > 0) {
+            foreach ($reservas as $reserva) {
+                array_push($data, $reserva->id_silla);
+            }
+        }
+        return response()->json($data);
+    }
 
     public function getReservasCliente($clienteId)
     {
