@@ -417,8 +417,11 @@ class PayController extends Controller
         $orderId = $request->input('orderId');
 
         // Gestionar el pedido (cancelar el anterior si es necesario y crear uno nuevo)
-        $order = $this->gestionarPedido($clienteId, $amount);
-
+        // $order = $this->gestionarPedido($clienteId, $amount);
+        $order = Order::find($orderId);
+        if (!$order || $order->estado != 'pending') {
+            return response()->json(['error' => 'El pedido ya no se encuentra disponible'], 500);
+        }
         // Configura los datos de Redsys
         $key = config('redsys.key');
         $code = config('redsys.merchantcode');
@@ -450,27 +453,7 @@ class PayController extends Controller
     }
 }
 
-public function gestionarPedido($clienteId, $total)
-{
-    // Verificar si el cliente ya tiene un pedido en estado 'pending' o no pagado
-    $order = Order::where('cliente_id', $clienteId)
-                  ->whereIn('status', ['pending', 'failed']) // Se revisan los pedidos 'pending' o 'failed'
-                  ->first();
 
-    if ($order) {
-        // Si existe un pedido pendiente o fallido, cancelarlo
-        $this->cancelarPedido($order->id);
-    }
-
-    // Crear una nueva orden después de cancelar la anterior, si existía
-    $newOrder = Order::create([
-        'cliente_id' => $clienteId,
-        'total' => $total / 100,
-        'status' => 'pending', // Se inicia como pedido pendiente
-    ]);
-
-    return $newOrder; // Devolvemos la nueva orden creada
-}
 
 // Cancelar pedido anterior
 public function cancelarPedido($orderId)
