@@ -487,55 +487,126 @@ public function cancelarPedido($orderId)
     }
 
     // Callback que recibe la notificación de Redsys cuando el pago es completado o fallido
+    // public function paymentCallback(Request $request)
+    // {
+    //     $redsys = Redsys::getFacadeRoot(); // Obtiene la instancia de Redsys
+
+    //     // Verifica la firma
+    //     if ($redsys->check($request->all())) {
+    //         $merchantOrder = $request->input('Ds_Order');
+    //         $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
+
+    //         if ($order) {
+    //             $dsResponse = $request->input('Ds_Response');
+
+    //             // Verificar si el pago fue exitoso
+    //             if (intval($dsResponse) <= 99) {
+    //                 // Pago exitoso
+    //                 $order->status = 'paid'; // Cambiar estado a 'paid' cuando el pago sea exitoso
+    //                 $order->save();
+
+    //                 // Actualizar todas las reservas asociadas con los datos del pago
+    //                 Reservas::where('order_id', $order->id)->update([
+    //                     'estado' => 'pagada',
+    //                     'transaction' => $request->input('Ds_AuthorisationCode'), // Código de autorización de Redsys
+    //                     'metodo_pago' => 'redsys', // Método de pago
+    //                     'order' => $order->id,
+    //                     'procesando' => 0 // Asumimos que ya no está procesando
+    //                 ]);
+
+    //                 return response()->json(['message' => 'Pago completado correctamente']);
+    //             } else {
+    //                 // Pago fallido
+    //                 $order->status = 'failed'; // Cambiar estado a 'failed'
+    //                 $order->save();
+
+    //                 // Actualizar todas las reservas asociadas
+    //                 Reservas::where('order_id', $order->id)->update([
+    //                     'estado' => 'fallida', // Estado de la reserva cuando el pago falla
+    //                     'transaction' => null, // No hay código de autorización
+    //                     'metodo_pago' => 'redsys', // Método de pago
+    //                     'order' => $order->id,
+    //                     'procesando' => 0 // Asumimos que ya no está procesando
+    //                 ]);
+
+    //                 return response()->json(['message' => 'Pago fallido. Orden actualizada.'], 400);
+    //             }
+    //         }
+    //     } else {
+    //         return response()->json(['message' => 'Firma no válida.'], 400);
+    //     }
+    // }
+
     public function paymentCallback(Request $request)
-    {
-        $redsys = Redsys::getFacadeRoot(); // Obtiene la instancia de Redsys
+{
+    $redsys = Redsys::getFacadeRoot(); // Obtiene la instancia de Redsys
 
-        // Verifica la firma
-        if ($redsys->check($request->all())) {
-            $merchantOrder = $request->input('Ds_Order');
-            $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
+    // Obtener el parámetro de Redsys
+    $merchantParameters = $request->input('Ds_MerchantParameters');
+    $signatureReceived = $request->input('Ds_Signature');
+    $signatureVersion = $request->input('Ds_SignatureVersion');
 
-            if ($order) {
-                $dsResponse = $request->input('Ds_Response');
-
-                // Verificar si el pago fue exitoso
-                if (intval($dsResponse) <= 99) {
-                    // Pago exitoso
-                    $order->status = 'paid'; // Cambiar estado a 'paid' cuando el pago sea exitoso
-                    $order->save();
-
-                    // Actualizar todas las reservas asociadas con los datos del pago
-                    Reservas::where('order_id', $order->id)->update([
-                        'estado' => 'pagada',
-                        'transaction' => $request->input('Ds_AuthorisationCode'), // Código de autorización de Redsys
-                        'metodo_pago' => 'redsys', // Método de pago
-                        'order' => $order->id,
-                        'procesando' => 0 // Asumimos que ya no está procesando
-                    ]);
-
-                    return response()->json(['message' => 'Pago completado correctamente']);
-                } else {
-                    // Pago fallido
-                    $order->status = 'failed'; // Cambiar estado a 'failed'
-                    $order->save();
-
-                    // Actualizar todas las reservas asociadas
-                    Reservas::where('order_id', $order->id)->update([
-                        'estado' => 'fallida', // Estado de la reserva cuando el pago falla
-                        'transaction' => null, // No hay código de autorización
-                        'metodo_pago' => 'redsys', // Método de pago
-                        'order' => $order->id,
-                        'procesando' => 0 // Asumimos que ya no está procesando
-                    ]);
-
-                    return response()->json(['message' => 'Pago fallido. Orden actualizada.'], 400);
-                }
-            }
-        } else {
-            return response()->json(['message' => 'Firma no válida.'], 400);
-        }
+    // Verifica que la versión de la firma sea correcta
+    if ($signatureVersion !== 'HMAC_SHA256_V1') {
+        return response()->json(['message' => 'Versión de firma no válida.'], 400);
     }
+
+    // Genera la firma esperada
+    $signatureExpected = $redsys->generateMerchantSignature(config('redsys.key'), $merchantParameters);
+
+    // Verifica la firma recibida con la firma esperada
+    if ($signatureReceived !== $signatureExpected) {
+        return response()->json(['message' => 'Firma no válida.'], 400);
+    }
+
+    // Decodificar los parámetros del comerciante
+    $decodedParameters = json_decode(base64_decode($merchantParameters), true);
+
+    if (!$decodedParameters) {
+        return response()->json(['message' => 'No se pudieron decodificar los parámetros del comerciante.'], 400);
+    }
+
+    $merchantOrder = $decodedParameters['Ds_Order'] ?? null;
+    $dsResponse = $decodedParameters['Ds_Response'] ?? null;
+
+    // Verifica que el pedido existe y su estado
+    $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
+    if (!$order) {
+        return response()->json(['message' => 'Orden no encontrada.'], 404);
+    }
+
+    // Verificar si el pago fue exitoso
+    if (intval($dsResponse) <= 99) {
+        // Pago exitoso
+        $order->status = 'paid';
+        $order->save();
+
+        Reservas::where('order_id', $order->id)->update([
+            'estado' => 'pagada',
+            'transaction' => $decodedParameters['Ds_AuthorisationCode'], // Código de autorización de Redsys
+            'metodo_pago' => 'redsys',
+            'order' => $order->id,
+            'procesando' => 0
+        ]);
+
+        return response()->json(['message' => 'Pago completado correctamente']);
+    } else {
+        // Pago fallido
+        $order->status = 'failed';
+        $order->save();
+
+        Reservas::where('order_id', $order->id)->update([
+            'estado' => 'fallida',
+            'transaction' => null,
+            'metodo_pago' => 'redsys',
+            'order' => $order->id,
+            'procesando' => 0
+        ]);
+
+        return response()->json(['message' => 'Pago fallido. Orden actualizada.'], 400);
+    }
+}
+
 
 
     // Verificación del estado del pago para el frontend
