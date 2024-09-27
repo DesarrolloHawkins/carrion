@@ -13,8 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReservaPagada2;
-
-
+use App\Models\StatusApp;
 
 class HomeController extends Controller
 {
@@ -57,6 +56,11 @@ class HomeController extends Controller
         $resultados_caja = $ingresos_caja - $gastos_caja;
 
         return view('mapa.index');
+    }
+
+    public function appStatus(){
+        $estado = StatusApp::first();
+        return response()->json(['estado' => $estado]);
     }
 
     public function mandaremails()

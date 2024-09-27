@@ -9,6 +9,7 @@ use App\Http\Controllers\API\AuthAdminController;
 use App\Http\Controllers\API\MapApiController;
 use App\Http\Controllers\API\PayController;
 use App\Http\Controllers\API\ClienteController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\ZonaController;
@@ -68,6 +69,7 @@ Route::get('/payment-success', [PayController::class, 'pagoOk']);
 Route::get('/payment-failure', [PayController::class, 'pagoFallo']);
 Route::get('/payment-success-status/{orderId}', [PayController::class, 'status']);
 Route::post('/sillas-reservadas/{clienteId}', [ReservasController::class, 'getSillasReservadas']);
+Route::post('/app-status', [HomeController::class, 'appStatus']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
