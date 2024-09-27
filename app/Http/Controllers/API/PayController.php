@@ -537,57 +537,37 @@ public function cancelarPedido($orderId)
     //     }
     // }
 
-
-    
-
     public function paymentCallback(Request $request)
     {
-        $redsys = Redsys::getFacadeRoot(); // Obtiene la instancia de Redsys
+        $key = config('redsys.key'); // Obtén la clave de Redsys desde tu configuración
     
-        // Obtener los parámetros enviados por Redsys
-        $merchantParameters = $request->input('Ds_MerchantParameters');
-        $signatureReceived = $request->input('Ds_Signature');
-        $signatureVersion = $request->input('Ds_SignatureVersion');
+        // Decodificar Ds_MerchantParameters usando el método proporcionado por Redsys
+        $parameters = Redsys::getMerchantParameters($request->input('Ds_MerchantParameters'));
+        
+        // Obtener el código de respuesta de Redsys
+        $DsResponse = $parameters["Ds_Response"] ?? null;
     
-        // Decodificar Ds_MerchantParameters (Base64)
-        $decodedParameters = json_decode(base64_decode($merchantParameters), true);
+        // Convertir a entero para evitar problemas de comparación
+        $DsResponse += 0;
     
-        // Verificar si la decodificación fue exitosa
-        if (!$decodedParameters) {
-            return response()->json(['message' => 'Error al decodificar los parámetros del comerciante'], 400);
-        }
+        // Verificar la firma de la respuesta con Redsys::check y si el pago fue exitoso
+        if (Redsys::check($key, $request->input()) && $DsResponse <= 99) {
+            // El pago fue exitoso, procesa la lógica del pedido
+            $merchantOrder = $parameters['Ds_Order'] ?? null;
     
-        // Mostrar los parámetros decodificados
+            // Verificar que el pedido existe
+            $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
+            if (!$order) {
+                return response()->json(['message' => 'Orden no encontrada.'], 404);
+            }
     
-        // Obtener valores específicos del array
-        $merchantOrder = $decodedParameters['Ds_Order'] ?? null;
-        $dsResponse = $decodedParameters['Ds_Response'] ?? null;
-        $dsAmount = $decodedParameters['Ds_Amount'] ?? null;
-        $dsCurrency = $decodedParameters['Ds_Currency'] ?? null;
-        $dsErrorCode = $decodedParameters['Ds_ErrorCode'] ?? null;
-        $dsAuthCode = $decodedParameters['Ds_AuthorisationCode'] ?? null;
-    
-        // Verificar que el pedido existe
-        $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
-        if (!$order) {
-            return response()->json(['message' => 'Orden no encontrada.'], 404);
-        }
-    
-        // Verificar la firma generada localmente y compararla con la recibida
-        $signatureExpected = $redsys->generateMerchantSignature(config('redsys.key'), $merchantParameters);
-        if ($signatureReceived !== $signatureExpected) {
-            return response()->json(['message' => 'Firma no válida.'], 400);
-        }
-    
-        // Verificar el código de respuesta de Redsys
-        if (intval($dsResponse) <= 99) {
-            // El pago fue exitoso
+            // Marcar el pedido como pagado
             $order->status = 'paid';
             $order->save();
     
             Reservas::where('order_id', $order->id)->update([
                 'estado' => 'pagada',
-                'transaction' => $dsAuthCode,
+                'transaction' => $parameters['Ds_AuthorisationCode'] ?? null, // Código de autorización
                 'metodo_pago' => 'redsys',
                 'order' => $order->id,
                 'procesando' => 0
@@ -595,7 +575,16 @@ public function cancelarPedido($orderId)
     
             return response()->json(['message' => 'Pago completado correctamente']);
         } else {
-            // El pago falló
+            // El pago falló o la firma no fue validada
+            $merchantOrder = $parameters['Ds_Order'] ?? null;
+    
+            // Verificar que el pedido existe
+            $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
+            if (!$order) {
+                return response()->json(['message' => 'Orden no encontrada.'], 404);
+            }
+    
+            // Marcar el pedido como fallido
             $order->status = 'failed';
             $order->save();
     
@@ -607,9 +596,10 @@ public function cancelarPedido($orderId)
                 'procesando' => 0
             ]);
     
-            return response()->json(['message' => 'Pago fallido. Orden actualizada.'], 400);
+            return response()->json(['message' => 'Pago fallido. Orden actualizada.'], 200);
         }
     }
+    
     
 
 

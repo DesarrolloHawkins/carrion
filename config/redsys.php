@@ -1,6 +1,6 @@
 <?php
 return [
-    'environment' => 'production', // Cambiar a 'test' si estás en desarrollo
+    'environment' => 'live', // Cambiar a 'test' si estás en desarrollo
     'key' => env('REDSYS_KEY', 'YOUR_REDSYS_KEY'), // Tu clave secreta de Redsys
     'merchant_code' => env('REDSYS_MERCHANT_CODE', 'YOUR_MERCHANT_CODE'),
     'terminal' => env('REDSYS_TERMINAL', '1'),
