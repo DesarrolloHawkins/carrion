@@ -586,8 +586,16 @@ public function cancelarPedido($orderId)
                 'procesando' => 0
             ]);
 
+            $cliente = Cliente::find($order->cliente_id);
+            if ($cliente) {
+                $cliente->pending_payment == true ?  $cliente->pending_payment = false : $cliente->pending_payment = null;
+                $cliente->save();
+            }
+
             return response()->json(['message' => 'Pago completado correctamente']);
         } else {
+
+
             // El pago falló o la firma no fue validada
             $merchantOrder = $parameters['Ds_Order'] ?? null;
 
@@ -595,6 +603,12 @@ public function cancelarPedido($orderId)
             $order = Order::where('id', ltrim($merchantOrder, '0'))->first();
             if (!$order) {
                 return response()->json(['message' => 'Orden no encontrada.'], 404);
+            }
+
+            $cliente = Cliente::find($order->cliente_id);
+            if ($cliente->pending_payment == true) {
+            return response()->json(['message' => 'Pago fallido, pongase en contacto con la Unión de Hermandades.'], 200);
+
             }
 
             // Marcar el pedido como fallido
