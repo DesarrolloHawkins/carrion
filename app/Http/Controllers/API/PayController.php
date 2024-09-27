@@ -442,7 +442,7 @@ class PayController extends Controller
         // Generar la firma
         $signature = Redsys::generateMerchantSignature($key);
         Redsys::setMerchantSignature($signature);
-        $paymentUrl = env('PAYMENT_URL');
+        $paymentUrl = env('URL_REDSYS');
         // Generar el formulario HTML de Redsys
         $form = Redsys::createForm();
 
