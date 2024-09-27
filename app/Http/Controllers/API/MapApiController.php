@@ -21,28 +21,28 @@ class MapApiController extends Controller
 
     public function confirmarPago(Request $request)
     {
-        
+
         $merchantParams = base64_decode($request->input('Ds_MerchantParameters'));
         $expectedSignature = $request->input('Ds_Signature');
-        
+
         // Verificar la firma (como lo tienes implementado previamente)
         $claveSecreta = 'CLAVE_SECRETA';
         $key = base64_decode($claveSecreta);
         $generatedSignature = base64_encode(hash_hmac('sha256', $request->input('Ds_MerchantParameters'), $key, true));
-    
+
         if ($generatedSignature === $expectedSignature) {
             $params = json_decode($merchantParams, true);
             $orderId = $params['Ds_Order'];
-    
+
             DB::beginTransaction();
             try {
                 // Busca las reservas asociadas a ese order
                 $reservas = Reservas::where('order', $orderId)->get();
-    
+
                 if ($reservas->isEmpty()) {
                     throw new \Exception("No se encontraron reservas con ese pedido.");
                 }
-    
+
                 // Actualiza el estado de las reservas a 'pagada'
                 foreach ($reservas as $reserva) {
                     $reserva->estado = 'pagada';
@@ -59,8 +59,8 @@ class MapApiController extends Controller
                 return response()->json(['message' => $e->getMessage(), 'status' => 'error'], 400);
             }
         } else {
-           
-        
+
+
             return response()->json(['message' => 'La firma no es válida. Reservas canceladas.', 'status' => 'error'], 400);
         }
     }
@@ -99,7 +99,7 @@ class MapApiController extends Controller
     }
 
 
-    
+
 
 public function reservarTemporal(Request $request)
 {
@@ -108,7 +108,7 @@ public function reservarTemporal(Request $request)
     ->where('id_cliente', $request->input('cliente_id'))
     ->get();
 
-  
+
     foreach ($reservasAnteriores as $reserva) {
         $reserva->estado = 'cancelada';
         $reserva->save();
@@ -126,7 +126,7 @@ public function reservarTemporal(Request $request)
     $total = 0;
 
     $fechaActual = Carbon::now();
-    $fechaInicioReservas = Carbon::parse(env('FECHA_INICIO_RESERVAS')); 
+    $fechaInicioReservas = Carbon::parse(env('FECHA_INICIO_RESERVAS'));
 
     if ($fechaActual->lt($fechaInicioReservas) && !$cliente->abonado) {
         return response()->json(['error' => 'Las reservas no están disponibles aún para usuarios no abonados'], 400);
@@ -180,7 +180,7 @@ public function reservarTemporal(Request $request)
                 $palcoIds = [
                     16, 17, 18, 19, 20,21,22,23,24,25,26,27,28,122,121,120,119,118,117,116,115,114,113,112,111,110,109,108,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
                     534, 533, 532, 531, 530, 529, 528, 527, 526, 525, 524, 523, 522, 521, 520, 519, 518, 517, 516, 515, 514, 513, 512, 511, 510, 509, 508, 507, 506, 505, 504, 503, 502, 501, 500, 499, 498, 497, 496, 495, 494, 493,
-                    
+
                 ];
                 $precio = DB::table('precios_sillas')
                     ->where('tipo_asiento', 'palco')
@@ -194,7 +194,7 @@ public function reservarTemporal(Request $request)
                         $precio = (object) ['precio' => 18];
                     }
                 }
-                
+
             }
 
             if ($reservaExistente) {
@@ -246,7 +246,7 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
     public function simularRespuestaRedsys(Request $request)
 {
     $merchantParameters = base64_encode(json_encode([
-        'Ds_MerchantCode' => '999008881', 
+        'Ds_MerchantCode' => '999008881',
         'Ds_Order' => '012345678',
         'Ds_Amount' => '5000', // Simulando 50,00€
         'Ds_Currency' => '978',
@@ -268,6 +268,7 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
     //function que te dice si puedes reservar o no dependiendo de la fecha
     public function getPuedoReservar($clienteId)
     {
+        return  response()->json(['data' => true]);
         try {
             // Obtener el cliente por su ID
             $cliente = Cliente::find($clienteId);
@@ -283,9 +284,10 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
 
             // Comprobar si el cliente no es abonado y si la fecha actual es anterior a la fecha de inicio de reservas
             if ($fechaActual->lt($fechaInicioReservas) && !$cliente->abonado) {
+                print_r($fechaInicioReservas->toDateString());
                 return response()->json([
                     'error' => 'No puedes reservar aún',
-                    'success' => $fechaInicioReservas->toDateString() // Devolver la fecha de inicio de reservas
+                    'fechaInicioReservas' => $fechaInicioReservas->toDateString() // Devolver la fecha de inicio de reservas
                 ], 400);
             }
 
@@ -297,10 +299,10 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
-        
-       
+
+
     }
-    
+
 
     public function checkSilla(Request $request, $id)
     {
@@ -399,11 +401,11 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
     public function getSilla($id)
     {
         $silla = Sillas::find($id);
-        //zona 
+        //zona
         $zona = Zonas::find($silla->id_zona);
         //palco
         $palco = Palcos::find($silla->id_palco);
-        
+
         if($palco){
             $sector = Sectores::find($palco->id_sector);
         }else{
@@ -423,23 +425,23 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
             $palcoIds = [
                 16, 17, 18, 19, 20,21,22,23,24,25,26,27,28,122,121,120,119,118,117,116,115,114,113,112,111,110,109,108,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
                 534, 533, 532, 531, 530, 529, 528, 527, 526, 525, 524, 523, 522, 521, 520, 519, 518, 517, 516, 515, 514, 513, 512, 511, 510, 509, 508, 507, 506, 505, 504, 503, 502, 501, 500, 499, 498, 497, 496, 495, 494, 493,
-                
+
             ];
 
-           
+
 
 
             $precio = DB::table('precios_sillas')
                 ->where('tipo_asiento', 'palco')
                 ->first();
-                
+
              if (in_array($palco->numero, $palcoIds)) {
                 $precio = (object) ['precio' => 18];
                 // return response()->json([
-                  
+
                 //     'precio' => $palco->numero
                 // ]);
-                
+
              }
 
         } else {
@@ -480,7 +482,7 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
 
 
 
-        
+
     }
 
 

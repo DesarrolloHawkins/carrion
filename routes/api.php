@@ -48,24 +48,25 @@ Route::prefix('admin')->group(function () {
 
 Route::middleware('auth:sanctum')->get('/reservas/cliente/{clienteId}', [ReservasController::class, 'getTotalReservasCliente']);
 
-Route::get('/sillas', [MapApiController::class, 'getSillas']); // Obtener sillas con filtros
+Route::post('/sillas', [MapApiController::class, 'getSillas']); // Obtener sillas con filtros
 Route::get('/palcos/{id}/{zona}/{sector}', [MapApiController::class, 'getPalco']); // Obtener un palco específico
 Route::get('/gradas/{id}/{zona}', [MapApiController::class, 'getGrada']); // Obtener una grada específica
 Route::get('sillas/{id}/check', [MapApiController::class, 'checkSilla']);
-Route::get('sillas/{id}', [MapApiController::class, 'getSilla']);
+Route::post('sillas/{id}', [MapApiController::class, 'getSilla']);
 Route::post('/reservar-silla', [ReservasController::class, 'reservarSilla'])->middleware('auth:sanctum', 'admin');
 Route::post('/confirmar-pago', [MapApiController::class, 'confirmarPago']);
 Route::post('/reservar-temporal', [ReservasController::class, 'reservarSillaTemporal']);
 Route::post('/cancelar-reserva', [MapApiController::class, 'cancelarReserva']);
 Route::post('/process-payment', [PayController::class, 'processPayment']);
-Route::get('/cliente/sillas-disponibles/{clienteId}', [ReservasController::class, 'getSillasDisponibles']);
+Route::post('/cliente/sillas-disponibles/{clienteId}', [ReservasController::class, 'getSillasDisponibles']);
 Route::get('/fecha-inicio-reservas', [ReservasController::class, 'getFechaInicioReservas']);
-Route::get('/puedo-reservar/{clienteId}', [MapApiController::class, 'getPuedoReservar']);
+Route::post('/puedo-reservar/{clienteId}', [MapApiController::class, 'getPuedoReservar']);
 Route::post('/initiate-payment', [PayController::class, 'initiatePayment']);
 Route::post('/payment-callback', [PayController::class, 'paymentCallback']);
 Route::get('/payment-status/{orderId}', [PayController::class, 'checkPaymentStatus']);
-Route::post('/payment-success', [PayController::class, 'pagoOk']);
-Route::post('/payment-failure', [PayController::class, 'pagoFallo']);
+Route::get('/payment-success', [PayController::class, 'pagoOk']);
+Route::get('/payment-failure', [PayController::class, 'pagoFallo']);
+Route::get('/payment-success-status/{orderId}', [PayController::class, 'status']);
 
 Route::middleware('auth:sanctum')->group(function () {
 

@@ -32,7 +32,8 @@ class Cliente extends Model
         'code',
         'abonado',
         'tipo_abonado',
-        'email_sent'
+        'email_sent',
+        'pending_payment'
     ];
 
 

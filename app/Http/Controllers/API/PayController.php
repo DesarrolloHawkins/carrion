@@ -439,12 +439,12 @@ class PayController extends Controller
         // Generar la firma
         $signature = Redsys::generateMerchantSignature($key);
         Redsys::setMerchantSignature($signature);
-
+        $paymentUrl = env('PAYMENT_URL');
         // Generar el formulario HTML de Redsys
         $form = Redsys::createForm();
 
         // Devolver el formulario HTML al frontend
-        return response()->json(['form' => $form, 'orderId' => $order->id], 200);
+        return response()->json(data: ['form' => $form, 'orderId' => $order->id, 'paymentUrl' => $paymentUrl], status: 200);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
@@ -465,7 +465,7 @@ public function gestionarPedido($clienteId, $total)
     // Crear una nueva orden después de cancelar la anterior, si existía
     $newOrder = Order::create([
         'cliente_id' => $clienteId,
-        'total' => $total,
+        'total' => $total / 100,
         'status' => 'pending', // Se inicia como pedido pendiente
     ]);
 
@@ -496,8 +496,8 @@ public function cancelarPedido($orderId)
 }
 
 
-    public function pagoOk(){
-        return true;
+    public function pagoOk(Request $request){
+        return response()->json([$request->all()]);
     }
     public function pagoFallo(){
         return false;
@@ -557,6 +557,22 @@ public function cancelarPedido($orderId)
 
     // Verificación del estado del pago para el frontend
     public function checkPaymentStatus($orderId)
+    {
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['error' => 'Orden no encontrada'], 404);
+        }
+
+        if ($order->status === 'paid') {
+            return response()->json(['status' => 'completed']);
+        } elseif ($order->status === 'failed') {
+            return response()->json(['status' => 'failed']);
+        } else {
+            return response()->json(['status' => 'pending']);
+        }
+    }
+    public function status($orderId)
     {
         $order = Order::find($orderId);
 
