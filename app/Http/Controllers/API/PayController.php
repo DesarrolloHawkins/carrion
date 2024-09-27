@@ -419,7 +419,7 @@ class PayController extends Controller
         // Gestionar el pedido (cancelar el anterior si es necesario y crear uno nuevo)
         // $order = $this->gestionarPedido($clienteId, $amount);
         $order = Order::find($orderId);
-        if (!$order || $order->estado != 'pending') {
+        if (!$order || $order->status != 'pending') {
             return response()->json(['error' => 'El pedido ya no se encuentra disponible'], 500);
         }
         // Configura los datos de Redsys
