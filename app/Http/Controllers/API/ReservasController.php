@@ -31,7 +31,7 @@ class ReservasController extends Controller
     }
     public function getSillasReservadas($idCliente)
     {
-        $reservas = Reservas::where('id_cliente', $idCliente)->where('pagada')->get();
+        $reservas = Reservas::where('id_cliente', $idCliente)->where('estado','pagada')->get();
         $data = [];
         if (count($reservas) > 0) {
             foreach ($reservas as $reserva) {
