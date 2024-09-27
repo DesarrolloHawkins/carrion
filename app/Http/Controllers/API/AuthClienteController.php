@@ -241,6 +241,7 @@ private function consultarChatGPT($coincidencias, $nuevosDatos)
                 'apellidos' => $cliente->apellidos,
                 'abonado' => $cliente->abonado,
                 'tipo_abonado' => $cliente->tipo_abonado,
+                'payment' => $cliente->pending_payment,
             ]
         ], 200);
     }
