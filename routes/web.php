@@ -319,10 +319,14 @@ Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
      // Clientes
      Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+     Route::post('/clientes-store', [ClienteController::class, 'store'])->name('clientes.store');
      Route::get('/clientes-create', [ClienteController::class, 'create'])->name('clientes.create');
      Route::get('/clientes-create-from-budget', [ClienteController::class, 'createFromBudget'])->name('clientes.create-from-budget');
      Route::get('/clientes-edit/{id}', [ClienteController::class, 'edit'])->name('clientes.edit');
      Route::get('/reservas/{cliente_id}/pdf', [ReservasController::class, 'pdfDownload'])->name('reservas.pdfDownload');
+     Route::get('/clientes/export', [ClienteController::class, 'export'])->name('clientes.export');
+     Route::get('/clientes/delete/{id}', [ClienteController::class, 'destroy'])->name('clientes.delete');
+     Route::post('/clientes/update/{id}', [ClienteController::class, 'update'])->name('clientes.update');
 
      // Clientes
      Route::get('/contratos', [ContratoController::class, 'index'])->name('contratos.index');
