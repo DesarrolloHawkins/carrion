@@ -76,25 +76,42 @@ th {
             <thead class="thead-light">
                 <tr>
                     @foreach(['nombre' => 'Nombre', 'apellidos' => 'Apellidos', 'DNI' => 'DNI', 'movil' => 'Telefono', 'fila' => 'Fila ', 'asiento'=>'Asi.', 'zona' => 'Sector', 'palco' => 'Palco','grada' => 'Grada', 'fecha' => 'Fecha', 'precio' => 'Precio', 'metodo_pago' => 'M. Pago', 'estado' => 'Estado'] as $col => $name)
-                        <<th class="border px-2 py-2">
+                        <th class="border px-2 py-2">
                             <a href="{{ route('reservas.index', [
-                                'sortColumn' => 'order_id',
-                                'sortDirection' => $sortColumn == 'order_id' && $sortDirection == 'asc' ? 'desc' : 'asc',
+                                'sortColumn' => $col,
+                                'sortDirection' => $sortColumn == $col && $sortDirection == 'asc' ? 'desc' : 'asc',
                                 'filtro' => request()->filtro,
                                 'estado' => request()->estado,
                                 'perPage' => request()->perPage,
                                 'grada' => request()->grada,
-                                'palco' => request()->palco,
-                                'order_id' => request()->order_id
+                                'palco' => request()->palco
                             ]) }}">
-                                Número de Orden
-                                @if ($sortColumn == 'order_id')
+                                {{ $name }}
+                                @if ($sortColumn == $col)
                                 <span>{!! $sortDirection == 'asc' ? '&#9650;' : '&#9660;' !!}</span>
                                 @endif
                             </a>
                         </th>
 
                     @endforeach
+                    <!-- Columna de Número de Orden fuera del @foreach -->
+                    <th class="border px-2 py-2">
+                        <a href="{{ route('reservas.index', [
+                            'sortColumn' => 'order_id',
+                            'sortDirection' => $sortColumn == 'order_id' && $sortDirection == 'asc' ? 'desc' : 'asc',
+                            'filtro' => request()->filtro,
+                            'estado' => request()->estado,
+                            'perPage' => request()->perPage,
+                            'grada' => request()->grada,
+                            'palco' => request()->palco,
+                            'order_id' => request()->order_id
+                        ]) }}">
+                            Número de Orden
+                            @if ($sortColumn == 'order_id')
+                            <span>{!! $sortDirection == 'asc' ? '&#9650;' : '&#9660;' !!}</span>
+                            @endif
+                        </a>
+                    </th>
                     <th class="border px-2 py-2">Acciones</th>
                 </tr>
             </thead>
@@ -113,13 +130,13 @@ th {
                     <td>{{ $reserva->fecha }}</td>
                     <td>{{ $reserva->precio }}€</td>
                     <td>{{ $reserva->metodo_pago }}</td>
-                    <td>{{ $reserva->order_id }}</td>
-
                     <td>
                         <span class="badge badge-{{ $reserva->estado == 'pagada' ? 'success' : ($reserva->estado == 'reservada' ? 'warning' : 'danger') }}">
                             {{ ucfirst($reserva->estado) }}
                         </span>
                     </td>
+                    <td>{{ $reserva->order_id }}</td>
+
                     <td class="border px-2 py-2">
                         <button data-id="{{ $reserva->id }}" class="btn-warning bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 my-1 rounded cancelar-reserva">
                             Cancelar
