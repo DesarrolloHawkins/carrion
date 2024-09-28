@@ -46,7 +46,7 @@ class EnviarCorreos extends Command
                     return $reserva->silla;
                 });
                 $order = Order::where('cliente_id', $cliente->id)
-                ->where('estado', 'paid') // Solo orders con estado 'paid'
+                ->where('status', 'paid') // Solo orders con estado 'paid'
                 ->first(); // Obtener el order_id asociado
 
                 $existeEmailLog = EmailLog::where('cliente_id', $cliente->id)
