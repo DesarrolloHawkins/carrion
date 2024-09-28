@@ -51,6 +51,10 @@ th {
                     </select>
                 </div>
                 <div class="col-sm-2 my-1">
+                    <input type="text" name="order_id" class="form-control" placeholder="Código de Pedido..." value="{{ $order_id }}">
+                </div>
+
+                <div class="col-sm-2 my-1">
                     <select name="perPage" class="form-control">
                         <option value="5"{{ $perPage == 5 ? ' selected' : '' }}>5 por página</option>
                         <option value="10"{{ $perPage == 10 ? ' selected' : '' }}>10 por página</option>
@@ -72,22 +76,24 @@ th {
             <thead class="thead-light">
                 <tr>
                     @foreach(['nombre' => 'Nombre', 'apellidos' => 'Apellidos', 'DNI' => 'DNI', 'movil' => 'Telefono', 'fila' => 'Fila ', 'asiento'=>'Asi.', 'zona' => 'Sector', 'palco' => 'Palco','grada' => 'Grada', 'fecha' => 'Fecha', 'precio' => 'Precio', 'metodo_pago' => 'M. Pago', 'estado' => 'Estado'] as $col => $name)
-                        <th class="border px-2 py-2">
+                        <<th class="border px-2 py-2">
                             <a href="{{ route('reservas.index', [
-                                'sortColumn' => $col,
-                                'sortDirection' => $sortColumn == $col && $sortDirection == 'asc' ? 'desc' : 'asc',
+                                'sortColumn' => 'order_id',
+                                'sortDirection' => $sortColumn == 'order_id' && $sortDirection == 'asc' ? 'desc' : 'asc',
                                 'filtro' => request()->filtro,
                                 'estado' => request()->estado,
                                 'perPage' => request()->perPage,
                                 'grada' => request()->grada,
-                                'palco' => request()->palco
+                                'palco' => request()->palco,
+                                'order_id' => request()->order_id
                             ]) }}">
-                                {{ $name }}
-                                @if ($sortColumn == $col)
+                                Número de Orden
+                                @if ($sortColumn == 'order_id')
                                 <span>{!! $sortDirection == 'asc' ? '&#9650;' : '&#9660;' !!}</span>
                                 @endif
                             </a>
                         </th>
+
                     @endforeach
                     <th class="border px-2 py-2">Acciones</th>
                 </tr>
@@ -107,6 +113,8 @@ th {
                     <td>{{ $reserva->fecha }}</td>
                     <td>{{ $reserva->precio }}€</td>
                     <td>{{ $reserva->metodo_pago }}</td>
+                    <td>{{ $reserva->order_id }}</td>
+
                     <td>
                         <span class="badge badge-{{ $reserva->estado == 'pagada' ? 'success' : ($reserva->estado == 'reservada' ? 'warning' : 'danger') }}">
                             {{ ucfirst($reserva->estado) }}
@@ -141,7 +149,9 @@ th {
             'sortDirection' => request()->sortDirection,
             'palco' => request()->palco,
             'grada' => request()->grada,
-            ])->links('vendor.pagination.bootstrap-5') }}
+            'order_id' => request()->order_id, // Añadir order_id aquí
+        ])->links('vendor.pagination.bootstrap-5') }}
+
     </div>
 </div>
 @endsection

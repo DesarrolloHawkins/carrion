@@ -22,8 +22,11 @@ class SendEmailsController  extends Controller
     // Array donde guardaremos los clientes y reservas que exceden el límite
     $clientesConExcesoReservas = [];
 
-    // Obtener todas las reservas que tienen un order_id no nulo
-    $reservasConOrder = Reservas::whereNotNull('order_id')->with('clientes')->get();
+    // Obtener todas las reservas que tienen un order_id no nulo y estado "pagada"
+    $reservasConOrder = Reservas::whereNotNull('order_id')
+        ->where('estado', 'pagada') // Asegurarse de que el estado sea "pagada"
+        ->with('clientes')
+        ->get();
 
     // Agrupar las reservas por order_id
     $reservasAgrupadasPorOrder = $reservasConOrder->groupBy('order_id');
@@ -58,6 +61,8 @@ class SendEmailsController  extends Controller
     // Devolver el array de clientes con reservas que exceden el límite
     return $clientesConExcesoReservas;
 }
+
+
 
     public function sendEmails()
     {

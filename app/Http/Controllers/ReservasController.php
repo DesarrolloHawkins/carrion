@@ -25,71 +25,70 @@ class ReservasController extends Controller
         return Excel::download(new ReservasExport($request->all()), 'reservas.xlsx');
     }
     public function index(Request $request)
-    {
-        $palcos = Palcos::with('zonas')->get();
-        $gradas = Gradas::with('zonas')->get();
+{
+    $palcos = Palcos::with('zonas')->get();
+    $gradas = Gradas::with('zonas')->get();
 
-        $sortColumn = $request->input('sortColumn', 'nombre');  // Columna por defecto
-        $sortDirection = $request->input('sortDirection', 'asc'); // Dirección por defecto
-        $filtro = $request->query('filtro', '');
-        $estado = $request->query('estado', 'pagada');
-        $grada = $request->query('grada', '');
-        $palco = $request->query('palco', '');
-        $perPage = $request->query('perPage', 10);
+    $sortColumn = $request->input('sortColumn', 'nombre');  // Columna por defecto
+    $sortDirection = $request->input('sortDirection', 'asc'); // Dirección por defecto
+    $filtro = $request->query('filtro', '');
+    $estado = $request->query('estado', 'pagada');
+    $grada = $request->query('grada', '');
+    $palco = $request->query('palco', '');
+    $perPage = $request->query('perPage', 10);
+    $order_id = $request->query('order_id', ''); // Nuevo filtro de order_id
 
-        $reservas = Reservas::with(['clientes', 'sillas'])
-            ->when($filtro, function ($query, $filtro) {
-                return $query->whereHas('clientes', function ($query) use ($filtro) {
-                    $query->where('nombre', 'like', "%{$filtro}%")
-                        ->orWhere('apellidos', 'like', "%{$filtro}%")
-                        ->orWhere('DNI', 'like', "%{$filtro}%")
-                        ->orWhere('movil', 'like', "%{$filtro}%");
+    $reservas = Reservas::with(['clientes', 'sillas'])
+        ->when($filtro, function ($query, $filtro) {
+            return $query->whereHas('clientes', function ($query) use ($filtro) {
+                $query->where('nombre', 'like', "%{$filtro}%")
+                    ->orWhere('apellidos', 'like', "%{$filtro}%")
+                    ->orWhere('DNI', 'like', "%{$filtro}%")
+                    ->orWhere('movil', 'like', "%{$filtro}%");
+            })->orWhereHas('sillas', function ($query) use ($filtro) {
+                $query->where('fila', 'like', "%{$filtro}%")
+                      ->orWhereHas('zona', function ($query) use ($filtro) {
+                          $query->where('nombre', 'like', "%{$filtro}%");
+                      });
+            });
+        })
+        ->when($estado, function ($query, $estado) {
+            return $query->where('estado', $estado);
+        })
+        ->when($grada, function ($query, $grada) {
+            return $query->whereHas('sillas.grada', function ($query) use ($grada) {
+                $query->where('id', $grada);
+            });
+        })
+        ->when($palco, function ($query, $palco) {
+            return $query->whereHas('sillas.palco', function ($query) use ($palco) {
+                $query->where('id', $palco);
+            });
+        })
+        ->when($order_id, function ($query, $order_id) {
+            return $query->where('order_id', 'like', "%{$order_id}%");
+        })
+        ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
+        ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
+        ->leftJoin('gradas', 'sillas.id_grada',  '=', 'gradas.id')
+        ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
+        ->join( 'zonas',  'sillas.id_zona', '=', 'zonas.id')
+        ->select('reservas.*',
+                'clientes.nombre as nombre',
+                'clientes.apellidos as apellidos',
+                'clientes.DNI as DNI',
+                'clientes.movil as movil',
+                'sillas.fila as fila',
+                'sillas.numero as asiento',
+                'zonas.nombre as zona',
+                'palcos.numero as palco',
+                'gradas.numero as grada')
+        ->orderBy($sortColumn, $sortDirection)
+        ->paginate($perPage);
 
-                })->orWhereHas('sillas', function ($query) use ($filtro) {
-                    $query->where('fila', 'like', "%{$filtro}%")
-                          ->orWhereHas('zona', function ($query) use ($filtro) {
-                              $query->where('nombre', 'like', "%{$filtro}%");
-                          });
-                });
-            })
-            ->when($estado, function ($query, $estado) {
-                return $query->where('estado', $estado);
-            })
-            ->when($grada, function ($query, $grada) {
-                return $query->WhereHas('sillas', function ($query) use ($grada) {
-                    $query->WhereHas('grada', function ($query) use ($grada) {
-                        $query->where('id', $grada);
-                    });
-                });
-            })
-            ->when($palco, function ($query, $palco) {
-                return   $query->WhereHas('sillas', function ($query) use ($palco) {
-                    $query->WhereHas('palco', function ($query) use ($palco) {
-                        $query->where('id', $palco);
-                    });
-                });
-            })
+    return view('reservas.index', compact('reservas', 'filtro', 'estado', 'perPage', 'sortColumn', 'sortDirection', 'gradas', 'palcos', 'grada', 'palco', 'order_id'));
+}
 
-            ->join('clientes', 'reservas.id_cliente', '=', 'clientes.id')
-            ->join('sillas', 'reservas.id_silla', '=', 'sillas.id')
-            ->leftJoin('gradas', 'sillas.id_grada',  '=', 'gradas.id')
-            ->leftJoin('palcos', 'sillas.id_palco', '=', 'palcos.id')
-            ->join( 'zonas',  'sillas.id_zona', '=', 'zonas.id')
-            ->select('reservas.*',
-                    'clientes.nombre as nombre',
-                    'clientes.apellidos as apellidos',
-                    'clientes.DNI as DNI',
-                    'clientes.movil as movil',
-                    'sillas.fila as fila',
-                    'sillas.numero as asiento',
-                    'zonas.nombre as zona',
-                    'palcos.numero as palco',
-                    'gradas.numero as grada')
-            ->orderBy($sortColumn, $sortDirection)
-            ->paginate($perPage);
-
-        return view('reservas.index', compact('reservas', 'filtro', 'estado', 'perPage','sortColumn','sortDirection','gradas','palcos','grada','palco'));
-    }
 
 
     public function pdfDownload($cliente_id)
