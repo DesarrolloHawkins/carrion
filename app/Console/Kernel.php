@@ -15,8 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('reservas:cancel-expired')->everyMinute();
-        $schedule->command('pagos:cancelar-expirados')->everyMinute();
+        // $schedule->command('reservas:cancel-expired')->everyMinute();
+        // $schedule->command('pagos:cancelar-expirados')->everyMinute();
         $schedule->command('reservas:send-mails')->everyMinute();
 
     }
