@@ -91,6 +91,7 @@ Route::get('/duplicados2', [ReservasController::class, 'getReservasDuplicadas'])
 Route::get('/reservasextra', [ReservasController::class, 'clientesConMuchasReservas'])->name('reservas.reservasextra');
 //enviar emails a clientes con reserva
 Route::get('/send-emails', [App\Http\Controllers\SendEmailsController::class, 'sendEmails'])->name('send.emails');
+Route::get('/clientes-exceso', [App\Http\Controllers\SendEmailsController::class, 'obtenerClientesConExcesoDeReservas'])->name('obtenerClientesConExcesoDeReservas.emails');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 
