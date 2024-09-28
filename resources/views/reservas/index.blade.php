@@ -136,7 +136,7 @@ th {
                     </td>
                     <td>
                         @if($reserva->order_id)
-                            {{ ($reserva->order_id, 12, '0', STR_PAD_LEFT) }}
+                            {{ str_pad($reserva->order_id, 12, '0', STR_PAD_LEFT) }}
                         @else
                             {{ $reserva->order }}
                         @endif
