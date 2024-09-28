@@ -56,7 +56,10 @@ class Cliente extends Model
         return $this->hasMany(Reservas::class, 'id_cliente');
     }
 
-
+    public function emailLogs()
+{
+    return $this->hasMany(EmailLog::class);
+}
 
     /**
      * Mutaciones de fecha.
