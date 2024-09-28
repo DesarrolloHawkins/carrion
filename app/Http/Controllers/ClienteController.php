@@ -140,7 +140,7 @@ class ClienteController extends Controller
        // Obtener los registros de envío de correos
         $emailLogs = $cliente->emailLogs()->orderBy('created_at', 'desc')->get();
 
-        return view('clientes.edit', compact('cliente', 'emailLogs'));
+        return view('cliente.edit', compact('cliente', 'emailLogs'));
 
 
     }
