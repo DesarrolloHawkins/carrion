@@ -37,6 +37,7 @@ use GlobalPayments\Api\Entities\ThreeDSecure;
 use GlobalPayments\Api\Entities\BrowserData;
 
 use App\Models\Order;
+use Carbon\Carbon;
 use Ssheduardo\Redsys\Facades\Redsys; // Usando Redsys SDK
 
 
@@ -415,6 +416,11 @@ class PayController extends Controller
         $clienteId = $request->input('cliente_id');
         $amount = $request->input('amount'); // La cantidad en céntimos
         $orderId = $request->input('orderId');
+
+        $cliente = Cliente::find($clienteId);
+        if ($cliente->abonado == false && Carbon::parse(env('FECHA_INICIO_RESERVAS')) > Carbon::now()) {
+            return response()->json(['error' => 'No es posible realizar la compra hasta el ' . env('FECHA_INICIO_RESERVAS')], 500);
+        }
 
         if ($request->input('isPendingPay') != false) {
             $isPendingPay  = $request->input('isPendingPay');
