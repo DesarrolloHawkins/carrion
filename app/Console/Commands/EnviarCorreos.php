@@ -55,12 +55,11 @@ class EnviarCorreos extends Command
                     try {
                         Mail::to($cliente->email)->send(new ReservaPagada($reservas, $sillas, $cliente));
 
-                        $emailContent = view('emails.reserva_pagada', ['reservas' => $reservas, 'sillas' => $sillas, 'cliente' => $cliente])->render();
                         // Registrar el envío en email_logs
                         EmailLog::create([
                             'cliente_id' => $cliente->id,
                             'order_id' => $order->id,
-                            'email_content' => $emailContent,
+                            'email_content' => 'Contenido del correo guardado correctamente.', // Aquí puedes registrar lo necesario
                             'email_sent' => true,
                             'response' => 'Enviado exitosamente' // Puedes ajustar según la respuesta real del servidor de correo
                         ]);
