@@ -137,7 +137,11 @@ class ClienteController extends Controller
     public function edit($id)
     {
         $cliente = Cliente::find($id);
-        return view('cliente.edit', compact('cliente'));
+       // Obtener los registros de envío de correos
+        $emailLogs = $cliente->emailLogs()->orderBy('created_at', 'desc')->get();
+
+        return view('clientes.edit', compact('cliente', 'emailLogs'));
+
 
     }
 

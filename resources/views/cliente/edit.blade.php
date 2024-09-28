@@ -89,6 +89,35 @@
             </form>
         </div>
     </div>
+    {{-- Card de información del envío de correos --}}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Historial de Envío de Correos</h6>
+        </div>
+        <div class="card-body">
+            @if($emailLogs->isEmpty())
+                <p>No se han enviado correos a este cliente.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Fecha de Envío</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Respuesta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($emailLogs as $log)
+                        <tr>
+                            <td>{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
+                            <td>{{ $log->email_sent ? 'Enviado' : 'No enviado' }}</td>
+                            <td>{{ $log->response }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
 </div>
 @endsection
 
