@@ -1,7 +1,9 @@
 @component('mail::message')
+## Estimado **{{ $cliente->nombre }}**, hemos confirmado su pago.
+
 # Confirmación de Reserva
 
-### Estimado **{{ $cliente->nombre }}**,
+### No olvide conserva este correo, para poder acceder al palco. Este es su confirmacion de los asientos reservado, debera presentar este justificante con el QR el proximo dia 12 de Octubre.
 
 Gracias por su pago. Aquí están los detalles de su reserva con código {{ $detallesReservas[0]['order'] }}
 
@@ -15,7 +17,7 @@ Gracias por su pago. Aquí están los detalles de su reserva con código {{ $det
 
 @php
     $totalPrecio = $tasas - array_sum(array_column($detallesReservas, 'precio'));
-    
+
 @endphp
 
 Total de las sillas reservadas: **{{ array_sum(array_column($detallesReservas, 'precio')) }}€**
@@ -36,7 +38,7 @@ Unión de Hermandades de Jerez
 
 @slot('footer')
 @component('mail::footer')
-Si tienes alguna duda, contáctanos en david@hawkins.es
+Si tienes alguna duda, contáctanos en tesoreria@uniondehermandades.com
 @endcomponent
 @endslot
 @endcomponent

@@ -27,6 +27,7 @@ class ReservaPagada extends Mailable
     public $qrCodeBase64; // Para almacenar el código QR en base64
     public $mapImageBase64;
     public $montoCobrar;
+    public $mapImage;
 
 
 
