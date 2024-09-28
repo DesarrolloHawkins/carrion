@@ -94,7 +94,6 @@ th {
                         </th>
 
                     @endforeach
-                    <!-- Columna de Número de Orden fuera del @foreach -->
                     <th class="border px-2 py-2">
                         <a href="{{ route('reservas.index', [
                             'sortColumn' => 'order_id',
