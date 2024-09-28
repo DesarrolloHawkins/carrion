@@ -268,7 +268,7 @@ public function calcularMontoCobrar($montoObjetivo, $tarifaFija, $tarifaPorcenta
     //function que te dice si puedes reservar o no dependiendo de la fecha
     public function getPuedoReservar($clienteId)
     {
-        return  response()->json(['data' => true]);
+
         try {
             // Obtener el cliente por su ID
             $cliente = Cliente::find($clienteId);

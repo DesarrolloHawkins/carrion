@@ -216,10 +216,28 @@ class ReservasController extends Controller
         DB::transaction(function () use ($sillasSeleccionadas, $clienteId, $fecha, $estado, $eventoId, &$totalEnviar, &$orderId) { // Pasamos $totalEnviar y $orderId por referencia
 
             // Verificar si ya existe una orden pendiente para el cliente
+            $order = Order::where('cliente_id', $clienteId)
+            ->whereHas('reservas') // Asegura que el orden tenga reservas asociadas
+            ->where('status', 'pending')
+            ->first();
+
+            if ($order) {
+            // Cambiar el estado de la orden a 'failed' si ya tiene reservas asociadas
+            $order->update(['status' => 'failed']);
+            // Crear un nuevo orden
+            $order = new Order([
+                'cliente_id' => $clienteId,
+                'total' => 0,
+                'status' => 'pending'
+            ]);
+            $order->save();
+            } else {
+            // Si no existe una orden, o no tiene reservas, crear una nueva
             $order = Order::firstOrCreate(
-                ['cliente_id' => $clienteId, 'status' => 'pending'], // Crea una orden solo si no hay una "pendiente"
-                ['total' => 0] // Inicializamos la orden con total 0
+                ['cliente_id' => $clienteId, 'status' => 'pending'],
+                ['total' => 0]
             );
+            }
 
             $orderId = $order->id; // Guardamos el ID de la orden
 
