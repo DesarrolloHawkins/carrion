@@ -24,8 +24,9 @@ class SendEmailsController  extends Controller
 
     // Obtener todas las reservas que tienen un order_id no nulo y estado "pagada"
     $reservasConOrder = Reservas::whereNotNull('order_id')
-        ->where('estado', 'pagada') // Asegurarse de que el estado sea "pagada"
+        ->where('estado', 'pagada') // Solo reservas con estado "pagada"
         ->with('clientes')
+        ->orderBy('created_at', 'asc') // Ordenar por fecha de creación
         ->get();
 
     // Agrupar las reservas por order_id
@@ -33,17 +34,43 @@ class SendEmailsController  extends Controller
 
     // Recorrer cada grupo de reservas
     foreach ($reservasAgrupadasPorOrder as $order_id => $reservas) {
-        // Obtener el primer cliente asociado a las reservas (ya que todas las reservas comparten el mismo cliente)
+        // Obtener el primer cliente asociado a las reservas
         $cliente = $reservas->first()->clientes;
 
         // Determinar el límite de sillas permitidas
         $limiteSillas = ($cliente->abonado && $cliente->tipo_abonado === 'palco') ? 8 : 4;
 
-        // Contar cuántas sillas ha reservado el cliente para este order_id
-        $cantidadSillas = $reservas->count();
+        // Agrupar reservas basadas en el tiempo de creación
+        $gruposDeReservas = [];
+        $grupoActual = [];
 
-        // Si excede el límite, añadir al array
-        if ($cantidadSillas > $limiteSillas) {
+        foreach ($reservas as $reserva) {
+            if (empty($grupoActual)) {
+                // Si no hay reservas en el grupo actual, añadir la primera
+                $grupoActual[] = $reserva;
+            } else {
+                // Comparar la última reserva añadida en el grupo actual con la nueva reserva
+                $ultimaReserva = end($grupoActual);
+                $diferenciaTiempo = $reserva->created_at->diffInSeconds($ultimaReserva->created_at);
+
+                if ($diferenciaTiempo <= 2) {
+                    // Si la diferencia es menor o igual a 2 segundos, añadirla al mismo grupo
+                    $grupoActual[] = $reserva;
+                } else {
+                    // Si la diferencia es mayor a 2 segundos, iniciar un nuevo grupo
+                    $gruposDeReservas[] = $grupoActual;
+                    $grupoActual = [$reserva];
+                }
+            }
+        }
+
+        // Añadir el último grupo si no está vacío
+        if (!empty($grupoActual)) {
+            $gruposDeReservas[] = $grupoActual;
+        }
+
+        // Verificar si el cliente tiene más grupos de reservas de las permitidas
+        if (count($gruposDeReservas) > 1 || $reservas->count() > $limiteSillas) {
             $clientesConExcesoReservas[] = [
                 'cliente' => [
                     'id' => $cliente->id,
@@ -53,7 +80,10 @@ class SendEmailsController  extends Controller
                     'tipo_abonado' => $cliente->tipo_abonado,
                     'order_id' => $order_id, // Incluir el order_id en la información del cliente
                 ],
-                'reservas' => $reservas->pluck('id')->toArray(), // Solo agregar los IDs de las reservas
+                'reservas' => array_map(function($grupo) {
+                    // Solo agregar los IDs de las reservas en cada grupo
+                    return collect($grupo)->pluck('id')->toArray();
+                }, $gruposDeReservas), // Añadir las reservas en grupos separados
             ];
         }
     }
@@ -61,6 +91,7 @@ class SendEmailsController  extends Controller
     // Devolver el array de clientes con reservas que exceden el límite
     return $clientesConExcesoReservas;
 }
+
 
 
 
