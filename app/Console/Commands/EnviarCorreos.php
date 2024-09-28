@@ -38,7 +38,7 @@ class EnviarCorreos extends Command
         ->whereDoesntHave('emailLogs');
         Log::info('Clientes pendientes de correo: ' . $clientesConReservasPagadasQuery->count());
 
-        $clientesConReservasPagadasQuery->chunk(50, function ($clientesConReservasPagadas) {
+        $clientesConReservasPagadasQuery->chunk(10, function ($clientesConReservasPagadas) {
 
             foreach ($clientesConReservasPagadas as $cliente) {
                 $reservas = $cliente->reservas;
