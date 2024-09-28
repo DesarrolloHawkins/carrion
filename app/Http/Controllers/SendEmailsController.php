@@ -22,9 +22,12 @@ class SendEmailsController  extends Controller
     // Array donde guardaremos los clientes y reservas que exceden el límite
     $clientesConExcesoReservas = [];
 
-    // Obtener todas las reservas que tienen un order_id no nulo y estado "pagada"
+    // Obtener todas las reservas que tienen un order_id no nulo, estado "pagada", y que su pedido tenga estado "paid"
     $reservasConOrder = Reservas::whereNotNull('order_id')
         ->where('estado', 'pagada') // Solo reservas con estado "pagada"
+        ->whereHas('order', function ($query) {
+            $query->where('status', 'paid'); // Solo órdenes con estado "paid"
+        })
         ->with('clientes')
         ->orderBy('created_at', 'asc') // Ordenar por fecha de creación
         ->get();
