@@ -26,14 +26,16 @@ class EnviarCorreos extends Command
 
         // Subconsulta para seleccionar clientes que no tienen un EmailLog registrado
         $clientesConReservasPagadasQuery = Cliente::whereHas('reservas', function ($query) {
-            $query->where('estado', 'pagada');
+            $query->where('estado', 'pagada')
+                ->whereNotNull('order_id'); // Añadir condición de que el order_id no sea null
         })
         ->with(['reservas' => function ($query) {
-            $query->where('estado', 'pagada')->with('silla');
+            $query->where('estado', 'pagada')
+                ->whereNotNull('order_id') // Añadir condición de que el order_id no sea null
+                ->with('silla');
         }])
         ->whereNotNull('email')
-        ->whereDoesntHave('emailLogs'); // Asegurarse de que no tienen un emailLog
-
+        ->whereDoesntHave('emailLogs');
         Log::info('Clientes pendientes de correo: ' . $clientesConReservasPagadasQuery->count());
 
         $clientesConReservasPagadasQuery->chunk(50, function ($clientesConReservasPagadas) {
