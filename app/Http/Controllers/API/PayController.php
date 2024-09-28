@@ -616,7 +616,7 @@ public function cancelarPedido($orderId)
             $order->save();
 
             Reservas::where('order_id', $order->id)->update([
-                'estado' => 'fallida',
+                'estado' => 'cancelada',
                 'transaction' => null,
                 'metodo_pago' => 'redsys',
                 'order' => $order->id,
