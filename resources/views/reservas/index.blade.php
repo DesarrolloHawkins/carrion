@@ -134,7 +134,13 @@ th {
                             {{ ucfirst($reserva->estado) }}
                         </span>
                     </td>
-                    <td>{{ $reserva->order_id }}</td>
+                    <td>
+                        @if($reserva->order_id)
+                            {{ $reserva->order_id }}
+                        @else
+                            {{ $reserva->order }}
+                        @endif
+                    </td>
 
                     <td class="border px-2 py-2">
                         <button data-id="{{ $reserva->id }}" class="btn-warning bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 my-1 rounded cancelar-reserva">
