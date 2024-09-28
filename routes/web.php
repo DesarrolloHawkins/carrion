@@ -92,6 +92,7 @@ Route::get('/reservasextra', [ReservasController::class, 'clientesConMuchasReser
 //enviar emails a clientes con reserva
 Route::get('/send-emails', [App\Http\Controllers\SendEmailsController::class, 'sendEmails'])->name('send.emails');
 Route::get('/clientes-exceso', [App\Http\Controllers\SendEmailsController::class, 'obtenerClientesConExcesoDeReservas'])->name('obtenerClientesConExcesoDeReservas.emails');
+Route::get('/clientes-estados', [App\Http\Controllers\SendEmailsController::class, 'obtenerReservasConEstadosDiferentes'])->name('obtenerReservasConEstadosDiferentes.emails');
 
 Route::group(['middleware' => 'is.admin', 'prefix' => 'admin'], function () {
 

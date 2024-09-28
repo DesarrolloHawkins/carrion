@@ -95,6 +95,49 @@ class SendEmailsController  extends Controller
     return $clientesConExcesoReservas;
 }
 
+public function obtenerReservasConEstadosDiferentes()
+{
+    // Array donde guardaremos los clientes y reservas con diferentes estados
+    $clientesConReservasConEstadosDiferentes = [];
+
+    // Obtener todas las reservas que tienen un order_id no nulo
+    $reservasConOrder = Reservas::whereNotNull('order_id')
+        ->with('clientes')
+        ->get();
+
+    // Agrupar las reservas por order_id
+    $reservasAgrupadasPorOrder = $reservasConOrder->groupBy('order_id');
+
+    // Recorrer cada grupo de reservas
+    foreach ($reservasAgrupadasPorOrder as $order_id => $reservas) {
+        // Obtener el primer cliente asociado a las reservas
+        $cliente = $reservas->first()->clientes;
+
+        // Obtener todos los estados de las reservas y verificar si hay más de un estado diferente
+        $estados = $reservas->pluck('estado')->unique();
+
+        // Si hay más de un estado único, entonces agrupar esas reservas
+        if ($estados->count() > 1) {
+            $clientesConReservasConEstadosDiferentes[] = [
+                'cliente' => [
+                    'id' => $cliente->id,
+                    'nombre' => $cliente->nombre,
+                    'apellidos' => $cliente->apellidos,
+                    'order_id' => $order_id, // Incluir el order_id en la información del cliente
+                ],
+                'reservas' => $reservas->map(function ($reserva) {
+                    return [
+                        'reserva_id' => $reserva->id,
+                        'estado' => $reserva->estado,
+                    ];
+                })->toArray(), // Añadir las reservas con su estado
+            ];
+        }
+    }
+
+    // Devolver el array de clientes con reservas que tienen diferentes estados
+    return $clientesConReservasConEstadosDiferentes;
+}
 
 
 
