@@ -30,56 +30,52 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="DNI">DNI</label>
-                        <input type="text" class="form-control @error('DNI') is-invalid @enderror" id="DNI" name="DNI" value="{{ old('DNI') }}" placeholder="DNI del cliente" >
-                        @error('DNI')
-                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="movil">Teléfono Móvil</label>
-                        <input type="text" class="form-control @error('movil') is-invalid @enderror" id="movil" name="movil" value="{{ old('movil') }}" placeholder="Teléfono móvil del cliente" >
-                        @error('movil')
-                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="fijo">Teléfono Fijo</label>
-                        <input type="text" class="form-control @error('fijo') is-invalid @enderror" id="fijo" name="fijo" value="{{ old('fijo') }}" placeholder="Teléfono fijo del cliente (opcional)">
-                        @error('fijo')
-                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="form-group col-md-6">
                         <label for="email">Email</label>
                         <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="Correo electrónico del cliente" >
                         @error('email')
                         <span class="invalid-feedback" role="alert">{{ $message }}</span>
                         @enderror
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="Teléfono del cliente" >
+                        @error('telefono')
+                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="abonado">¿Es Abonado?</label>
-                        <select class="form-control @error('abonado') is-invalid @enderror" id="abonado" name="abonado">
-                            <option value="">Seleccionar...</option>
-                            <option value="1"{{ old('abonado') == '1' ? ' selected' : '' }}>Sí</option>
-                            <option value="0"{{ old('abonado') == '0' ? ' selected' : '' }}>No</option>
-                        </select>
-                        @error('abonado')
+                        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" >
+                        @error('fecha_nacimiento')
                         <span class="invalid-feedback" role="alert">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="tipo_abonado">Tipo de Abonado</label>
-                        <select class="form-control @error('tipo_abonado') is-invalid @enderror" id="tipo_abonado" name="tipo_abonado">
-                            <option value="">Sin tipo</option>
-                            <option value="palco"{{ old('tipo_abonado') == 'palco' ? ' selected' : '' }}>Palco</option>
-                            <option value="silla"{{ old('tipo_abonado') == 'silla' ? ' selected' : '' }}>Silla</option>
+                        <label for="genero">Género</label>
+                        <select class="form-control @error('genero') is-invalid @enderror" id="genero" name="genero">
+                            <option value="">Seleccionar...</option>
+                            <option value="masculino"{{ old('genero') == 'masculino' ? ' selected' : '' }}>Masculino</option>
+                            <option value="femenino"{{ old('genero') == 'femenino' ? ' selected' : '' }}>Femenino</option>
                         </select>
-                        @error('tipo_abonado')
+                        @error('genero')
+                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="domicilio">Domicilio</label>
+                        <input type="text" class="form-control @error('domicilio') is-invalid @enderror" id="domicilio" name="domicilio" value="{{ old('domicilio') }}" placeholder="Domicilio del cliente" >
+                        @error('domicilio')
+                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ciudad">Ciudad</label>
+                        <input type="text" class="form-control @error('ciudad') is-invalid @enderror" id="ciudad" name="ciudad" value="{{ old('ciudad') }}" placeholder="Ciudad del cliente" >
+                        @error('ciudad')
                         <span class="invalid-feedback" role="alert">{{ $message }}</span>
                         @enderror
                     </div>
@@ -90,4 +86,3 @@
     </div>
 </div>
 @endsection
-

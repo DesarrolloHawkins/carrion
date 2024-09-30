@@ -17,49 +17,16 @@ class Cliente extends Model
     protected $table = "clientes";
 
     protected $fillable = [
-        'apellidos',
         'nombre',
-        'direccion',
-        'codigo_postal',
-        'poblacion',
-        'provincia',
-        'fijo',
-        'movil',
-        'DNI',
+        'apellidos',
         'email',
-        'categoria_id',
-        'password',
-        'code',
-        'abonado',
-        'tipo_abonado',
-        'email_sent',
-        'pending_payment'
+        'telefono',
+        'fecha_nacimiento',
+        'genero',
+        'domicilio',
+        'ciudad',
+        'pais',
     ];
-
-
-
-    public function categoriaJugadores()
-    {
-        return $this->belongsTo(CategoriaJugadores::class, 'categoria_id');
-    }
-
-
-
-    public function socios()
-    {
-        return $this->hasOne(Socios::class, 'cliente_id');
-    }
-
-    // Definir la relación con las reservas
-    public function reservas()
-    {
-        return $this->hasMany(Reservas::class, 'id_cliente');
-    }
-
-    public function emailLogs()
-{
-    return $this->hasMany(EmailLog::class);
-}
 
     /**
      * Mutaciones de fecha.
@@ -69,4 +36,9 @@ class Cliente extends Model
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at',
     ];
+    // Relación con Deuda
+    public function deudas()
+    {
+        return $this->hasMany(Deuda::class);
+    }
 }

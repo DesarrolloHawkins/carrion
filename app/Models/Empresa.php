@@ -2,38 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Empresa extends Model
 {
-    use HasFactory;
-
+    use SoftDeletes;
     protected $table = "empresas";
 
     protected $fillable = [
-        'nombre',
-        'telefono1',
-        'telefono2',
-        'direccion',
-        'cif',
-        'email',
-        'cod_postal',
-        'localidad',
-        'pais',
-        'legal1',
-        'legal2',
-        'legal3',
-        'legal4',
-
+        'nombre', 'telefono', 'email', 'direccion', 'cif', 'cod_postal', 'localidad', 'pais', 
+        'legal1', 'legal2', 'legal3', 'legal4'
     ];
 
-    /**
-     * Mutaciones de fecha.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'created_at', 'updated_at', 'deleted_at',
-    ];
+    // Relación con saldos iniciales
+    public function saldosIniciales()
+    {
+        return $this->hasMany(SaldoInicial::class);
+    }
 }

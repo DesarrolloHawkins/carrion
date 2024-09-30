@@ -17,7 +17,8 @@
     <div class="container">
         <div class="row justify-content-center mt-5">
             <div class="col-sm-12 text-center">
-                <img src="{{ asset('images/logo.png') }}" style="width: 30% !important;">
+                <h2>Carrión</h2>
+                {{-- <img src="{{ asset('images/logo.png') }}" style="width: 30% !important;"> --}}
             </div>
         </div>
 

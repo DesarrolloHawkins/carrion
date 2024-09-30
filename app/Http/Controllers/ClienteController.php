@@ -19,19 +19,11 @@ class ClienteController extends Controller
     {
         // Filtros para buscar clientes
         $filtro = $request->input('filtro');
-        $abonado = $request->input('abonado');  // Aquí puede ser '1' o null
-        $tipo_abonado = $request->input('tipo_abonado'); // Aquí puede ser 'palco', 'silla' o null
         $perPage = $request->input('perPage', 10);
 
         // Inicializar sortColumn y sortDirection con valores por defecto
         $sortColumn = $request->input('sortColumn', 'nombre'); // 'nombre' es el valor por defecto
         $sortDirection = $request->input('sortDirection', 'asc'); // 'asc' es el valor por defecto
-
-        // Posibles valores para tipo_abonado
-        $tiposAbonado = [
-            'palco',
-            'silla'
-        ];
 
         // Query básica para obtener los clientes con filtros
         $clientes = Cliente::query();
@@ -41,24 +33,18 @@ class ClienteController extends Controller
             $clientes->where(function($query) use ($filtro) {
                 $query->where('nombre', 'like', "%{$filtro}%")
                     ->orWhere('apellidos', 'like', "%{$filtro}%")
-                    ->orWhere('DNI', 'like', "%{$filtro}%");
+                    ->orWhere('email', 'like', "%{$filtro}%")
+                    ->orWhere('telefono', 'like', "%{$filtro}%")
+                    ->orWhere('fecha_nacimiento', 'like', "%{$filtro}%");
             });
         }
 
-        // Filtro por abonado (1 o null)
-        if ($abonado !== null) {
-            $clientes->where('abonado', $abonado);
-        }
-
-        // Filtro por tipo_abonado (palco, silla o null)
-        if ($tipo_abonado) {
-            $clientes->where('tipo_abonado', $tipo_abonado);
-        }
+        
 
         // Ordenar los resultados y paginarlos
         $clientes = $clientes->orderBy($sortColumn, $sortDirection)->paginate($perPage);
 
-        return view('cliente.index', compact('clientes', 'filtro', 'abonado', 'tipo_abonado', 'sortDirection', 'sortColumn', 'tiposAbonado', 'perPage'));
+        return view('cliente.index', compact('clientes', 'filtro',  'sortDirection', 'sortColumn', 'perPage'));
     }
 
 
@@ -79,13 +65,6 @@ class ClienteController extends Controller
         return view('cliente.create');
 
     }
-    public function createFromBudget()
-    {
-        //
-        return view('cliente.create-from-budget');
-
-    }
-
 
     /**
      * Store a newly created resource in storage.
@@ -95,23 +74,31 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        // Validar los datos del cliente
-        $validatedData = $request->validate([
+        // Validar los datos del formulario
+        $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'DNI' => 'required|string|max:15|unique:clientes,DNI',
-            'movil' => 'required|string|max:15',
-            'fijo' => 'nullable|string|max:15',
-            'email' => 'required|email|max:255|unique:clientes,email',
-            'abonado' => 'nullable|in:1,0',
-            'tipo_abonado' => 'nullable|string|in:palco,silla',
+            // 'email' => 'required|string|email|max:255|unique:clientes',
+            // 'telefono' => 'required|string|max:15',
+            // 'fecha_nacimiento' => 'required|date',
+            // 'genero' => 'required|string',
+            // 'domicilio' => 'required|string|max:255',
+            // 'ciudad' => 'required|string|max:255',
+            // 'pais' => 'required|string|max:255',
         ]);
 
-        // Si el campo 'abonado' no viene marcado, se asegura que sea 0 (No abonado)
-        $validatedData['abonado'] = $request->has('abonado') ? 1 : 0;
-
-        // Crear el cliente en la base de datos
-        Cliente::create($validatedData);
+        // Crear nuevo cliente
+        Cliente::create([
+            'nombre' => $request->input('nombre'),
+            'apellidos' => $request->input('apellidos'),
+            'email' => $request->input('email'),
+            'telefono' => $request->input('telefono'),
+            'fecha_nacimiento' => $request->input('fecha_nacimiento'),
+            'genero' => $request->input('genero'),
+            'domicilio' => $request->input('domicilio'),
+            'ciudad' => $request->input('ciudad'),
+            // 'pais' => $request->input('pais'),
+        ]);
 
         return redirect()->route('clientes.index')->with('success', 'Cliente creado exitosamente.');
     }
@@ -136,14 +123,10 @@ class ClienteController extends Controller
      */
     public function edit($id)
     {
-        $cliente = Cliente::find($id);
-       // Obtener los registros de envío de correos
-        $emailLogs = $cliente->emailLogs()->orderBy('created_at', 'desc')->get();
-
-        return view('cliente.edit', compact('cliente', 'emailLogs'));
-
-
+        $cliente = Cliente::with('deudas')->findOrFail($id);
+        return view('cliente.edit', compact('cliente'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -152,29 +135,28 @@ class ClienteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function update(Request $request, $id)
-{
-    // Validar los datos del cliente
-    $validatedData = $request->validate([
-        'nombre' => 'required|string|max:255',
-        'apellidos' => 'required|string|max:255',
-        'DNI' => 'required|string|max:15|unique:clientes,DNI,' . $id,
-        'movil' => 'required|string|max:15',
-        'fijo' => 'nullable|string|max:15',
-        'email' => 'required|email|max:255|unique:clientes,email,' . $id,
-        'abonado' => 'nullable|boolean',
-        'tipo_abonado' => 'nullable|string|in:palco,silla',
-    ]);
-
-    // Si el campo 'abonado' no viene marcado, se asegura que sea 0 (No abonado)
-    $validatedData['abonado'] = $request->has('abonado') ? 1 : 0;
-
-    // Buscar el cliente por su id y actualizarlo
-    $cliente = Cliente::findOrFail($id);
-    $cliente->update($validatedData);
-
-    return redirect()->route('clientes.index')->with('success', 'Cliente actualizado exitosamente.');
-}
+    public function update(Request $request, $id)
+    {
+        // Validar los datos del cliente
+        $validatedData = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            // 'email' => 'required|string|email|max:255|unique:clientes,email,' . $id, // Asegura que el email sea único excepto para el cliente actual
+            // 'telefono' => 'required|string|max:15',
+            // 'fecha_nacimiento' => 'required|date',
+            // 'genero' => 'required|string',
+            // 'domicilio' => 'required|string|max:255',
+            // 'ciudad' => 'required|string|max:255',
+            // 'pais' => 'required|string|max:255',
+        ]);
+    
+        // Buscar el cliente por su id y actualizarlo
+        $cliente = Cliente::findOrFail($id);
+        $cliente->update($validatedData);
+    
+        return redirect()->route('clientes.index')->with('success', 'Cliente actualizado exitosamente.');
+    }
+    
 
 
     /**

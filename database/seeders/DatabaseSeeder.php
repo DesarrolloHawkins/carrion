@@ -15,18 +15,18 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
-        $this->call(SillasSeeder::class);
+        // $this->call(SillasSeeder::class);
 
         // $this->call(UsersTableSeeder::class);
         // \App\Models\User::factory(10)->create();
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'username' => 'Test',
-        //     'email' => 'test@example.com',
-        //     'password' => '123456',
-        //     'role'=>'Admin',
-        //     'inactive' => false
-        // ]);
+        \App\Models\User::factory()->create([
+            'name' => 'Admin',
+            'username' => 'Admin',
+            'email' => 'admin@admin.com',
+            'password' => bcrypt('123456789'), // Encriptar la contraseña
+            'role'=>'Admin',
+            'inactive' => false
+        ]);
     }
 }

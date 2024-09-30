@@ -20,11 +20,7 @@ class Controller extends BaseController
 
     public function __construct() 
     {
-        $this->user = Auth::user();
-        // Fetch the Site Settings object
-        $this->alertas = Alertas::all();
-        View::share('alertas', $this->alertas);
-        View::share('user', $this->user);
+   
     }
 
 }

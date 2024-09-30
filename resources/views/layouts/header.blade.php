@@ -6,7 +6,8 @@
     <div class="topbar-left" style="margin-bottom: -145px !important;">
         <a href="{{route('home')}}" class="logo">
             <span class="logo-light">
-                <img class="img-fluid p-1" width="100px" src="{{ asset('assets/images/logo.png') }}" alt="Logo">
+                    <h1 style="color: #30419B; font-size:40px"><strong>Carrion</strong></h1>
+                {{-- <img class="img-fluid p-1" width="100px" src="{{ asset('assets/images/logo.png') }}" alt="Logo"> --}}
                 {{-- <i class="mdi mdi-camera-control"></i> La Fabrica --}}
             </span>
             <span class="logo-sm">
