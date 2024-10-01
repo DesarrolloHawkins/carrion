@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gasto;
 use App\Models\Cliente;
 use App\Models\Gastos;
+use App\Models\Proveedor;
 use Illuminate\Http\Request;
 
 class GastoController extends Controller
@@ -18,13 +19,15 @@ class GastoController extends Controller
     public function create()
     {
         $clientes = Cliente::all();
-        return view('gastos.create', compact('clientes'));
+        $proveedores = Proveedor::all();
+
+        return view('gastos.create', compact('clientes','proveedores'));
     }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'cliente_id' => 'nullable|exists:clientes,id',
+            'proveedor_id' => 'nullable|exists:clientes,id',
             'concepto' => 'string|max:255',
             'precio' => 'numeric',
             'fecha' => 'date',
@@ -39,13 +42,14 @@ class GastoController extends Controller
     {
         $gasto = Gastos::findOrFail($id);
         $clientes = Cliente::all();
-        return view('gastos.edit', compact('gasto', 'clientes'));
+        $proveedores = Proveedor::all();
+        return view('gastos.edit', compact('gasto', 'clientes', 'proveedores'));
     }
 
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'cliente_id' => 'nullable|exists:clientes,id',
+            'proveedor_id' => 'nullable|exists:clientes,id',
             'concepto' => 'string|max:255',
             'precio' => 'numeric',
             'fecha' => 'date',
